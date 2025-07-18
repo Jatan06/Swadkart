@@ -1,6 +1,8 @@
 package Menus;
 import Constants.AppConstants;
+import Utils.Validators;
 import java.util.*;
+
 public class MainMenu {
     static {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSwadkart - Food Ordering System\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEk command, anek swaad!");
@@ -19,10 +21,16 @@ public class MainMenu {
                         // This calls registration (newCustomer) method for a new customer.
                         break;
                     case 2:
-                        System.out.print("\nEnter id :- ");
-                        String id = AppConstants.s.next();
-                        System.out.print("Enter password :- ");
-                        String password = AppConstants.s.next();
+                        String id = null;
+                        while(!Validators.validateId(id)) {
+                            System.out.print("\nEnter id :- ");
+                            id = AppConstants.s.next();
+                        }
+                        String password = null;
+                        while(!Validators.validatePassword(id)) {
+                            System.out.print("Enter password :- ");
+                            password = AppConstants.s.next();
+                        }
                         // Logic for sending validator that customer or admin that returns string as "Customer" or "Admin" and using if-else to call methods respectively.
                         break;
                     case 3:
