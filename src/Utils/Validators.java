@@ -1,10 +1,10 @@
 package Utils;
 
 public class Validators {
-    public boolean validateId(String id){
-
+    public static boolean validateId(String id){
+        return false;
     }
-    public boolean validatepassword(String pass){
-
+    public static boolean validatePassword(String pass){
+        return false;
     }
 }

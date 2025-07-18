@@ -1,7 +1,6 @@
 package Menus;
 
 import Constants.*;
-import java.util.*;
 public class CustomerMenu {
     static void newCustomer() {
         // New Customer Registration logic
