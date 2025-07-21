@@ -1,4 +1,14 @@
 package Db;
-
+import Constants.AppConstants;
+import java.sql.*;
 public class DBConnection {
+    public static boolean DbConnection() {
+        try {
+            AppConstants.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/SwadKart","root","");
+            return true;
+        } catch (SQLException e) {
+            System.out.println("\nException :- Java Connection to Swadkart Database is unsuccessful.");
+            return false;
+        }
+    }
 }
