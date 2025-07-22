@@ -39,6 +39,5 @@ public class SessionManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
