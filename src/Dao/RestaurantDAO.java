@@ -1,5 +1,5 @@
 package Dao;
-import Constants.AppConstants;
+import Constants.*;
 import java.sql.*;
 public class RestaurantDAO {
     public static void browseRestaurants() throws Exception{
@@ -13,17 +13,14 @@ public class RestaurantDAO {
         final String RED = "\u001B[31m";
         final String BLUE = "\u001B[34m";
         final String CYAN = "\u001B[36m";
-
-//        // Print header with styling
-//        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
-        System.out.println(BOLD + BLUE + "\t\t\t\t                                    🍽️  RESTAURANTS  🍽️" + RESET+"\n\n");
-//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-
+        // Print header with styling
+        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
+        System.out.println(BOLD + BLUE + "\t\t\t                                       🍽️  RESTAURANTS  🍽️" + RESET);
+        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
         // Print column headers
         System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s %-12s%n" + RESET,
                 "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating", "Status");
-//        System.out.println(CYAN + "-".repeat(130) + RESET);
-
+        System.out.println(CYAN + "-".repeat(130) + RESET);
         int count = 0;
         while (restaurants.next()) {
             String id = restaurants.getString("id");
@@ -59,18 +56,15 @@ public class RestaurantDAO {
                     id, displayName, cuisine, phone, displayAddress,
                     ratingColor, rating, RESET, statusText);
             count++;
-
-            // Add separator every 15 rows
-//            if (count % 15 == 0) {
-//                System.out.println(CYAN + "-".repeat(130) + RESET);
-//            }
+            // Add a separator every 15 rows
+            if (count % 15 == 0) {
+                System.out.println(CYAN + "-".repeat(130) + RESET);
+            }
         }
-
-//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-//        System.out.println(BOLD + GREEN + "📊 Total Restaurants Found: " + count + RESET);
+        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
+        System.out.println(BOLD + GREEN + "📊 Total Restaurants: " + count + RESET);
 //        System.out.println(BOLD + BLUE + "💡 Sorted by Rating (Highest to Lowest)" + RESET);
-//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-
+        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
         restaurants.close();
         br.close();
     }

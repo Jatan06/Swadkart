@@ -1,8 +1,14 @@
 package Menus;
-
-import Constants.AppConstants;
-import Dao.RestaurantDAO;
-
+import java.sql.*;
+import java.io.*;
+import Constants.*;
+import Utils.*;
+import Services.*;
+import Dao.*;
+import Db.*;
+import Menus.*;
+import Models.*;
+import java.util.*;
 public class AdminMenu {
     static boolean adminValidator(String id,String password) {
         if(id.equals(AppConstants.admin_id) && password.equals(AppConstants.admin_password)) {
@@ -16,19 +22,25 @@ public class AdminMenu {
         AppConstants.adminRun = true;
         try {
         while (AppConstants.adminRun) {
-            System.out.print("""
-                    \nEnter "1" to Edit Restaurants.
-                    Enter "2" to View Restaurants.
-                    Enter "3" to View Orders.
-                    Enter "4" to Logout.
-                    \nEnter : \s""");
+            System.out.print("""               
+            \n======= Admin Menu =======
+                1. Edit Restaurants
+                2. View Restaurants
+                3. View Orders
+                4. Logout
+            ==========================
+            Please enter your choice: """);
             switch (AppConstants.s.nextInt()) {
                 case 1:
                     boolean b = true;
                     while (b) {
-                        System.out.println("Enter \"1\" to Add Restaurant.");
-                        System.out.println("Enter \"2\" to Delete Restaurant.");
-                        System.out.println("Enter \"3\" to Exit.");
+                        System.out.print("""               
+                        \n==== Edit Restaurants ====
+                        1. Add Restaurant
+                        2. Delete Restaurant
+                        3. Exit
+                       ==========================
+                       Please enter your choice: """);
                         int n = AppConstants.s.nextInt();
                         if (n == 1) {
                             RestaurantDAO.addRestaurant();

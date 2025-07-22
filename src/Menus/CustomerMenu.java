@@ -1,10 +1,15 @@
 package Menus;
-import Constants.*;
-import Dao.*;
-import Utils.*;
 import java.sql.*;
+import java.io.*;
+import Constants.*;
+import Utils.*;
+import Services.*;
+import Dao.*;
+import Db.*;
+import Menus.*;
+import Session.*;
+import Models.*;
 import java.util.*;
-import Session.SessionManager;
 public class CustomerMenu {
     static void newCustomer() {
         // Add logic for a new customer here
@@ -39,7 +44,7 @@ public class CustomerMenu {
     }
     private static void displayMenu() {
         System.out.print("""
-            \n==== Swadkart Menu ====
+          \n======== Swadkart Menu ==========
             1. Browse Restaurants
             2. Browse Dishes by Restaurant
             3. Browse Dishes by Cuisine
@@ -48,8 +53,8 @@ public class CustomerMenu {
             6. Place Order
             7. View Order History
             8. Log Out
-            ========================
-            Please enter your choice: 
+          =================================
+          Please enter your choice: 
             """);
     }
     private static int getUserInput() {
