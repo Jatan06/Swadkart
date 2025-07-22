@@ -65,4 +65,11 @@ public class AppConstants {
     public static final String SUCCESS_ORDER_PLACED = "Order placed successfully!";
     public static final String SUCCESS_PAYMENT = "Payment completed successfully!";
     public static final String SUCCESS_REVIEW = "Review submitted successfully!";
+
+    //SessionManager Messages
+    public static final String LOG_SUCCESS = "Login Successful";
+    public static final String LOG_FAIL = "Login Unsuccessful";
+    public static final String NEW_USER_SUCCESS  = "New User Added";
+    public static final String NEW_USER_FAIL  = "Error while creating new User";
+    public static final String HEADER  = "          ============   SWADKART   ============";
 }

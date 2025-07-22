@@ -4,9 +4,12 @@ import Dao.*;
 import Utils.*;
 import java.sql.*;
 import java.util.*;
+import Session.SessionManager;
 public class CustomerMenu {
     static void newCustomer() {
         // Add logic for a new customer here
+        //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated  = true,catch isCreated = false.
+
     }
     public static boolean customerValidator(String id, String password) throws Exception {
         Statement s = AppConstants.connection.createStatement();
@@ -19,6 +22,7 @@ public class CustomerMenu {
                 AppConstants.customerValid = false;
             }
         }
+        SessionManager.Login(id);
         return AppConstants.customerValid;
     }
     static void customerMenu() {
