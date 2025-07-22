@@ -5,6 +5,9 @@ public class AppConstants {
 
     public static Scanner s = new Scanner(System.in);
 
+    public static String admin_id = "admin_xyz";
+    public static String admin_password = "12345";
+    public static boolean adminRun = true;
     public static boolean run;
     public static boolean show;
     public static boolean customerValid;

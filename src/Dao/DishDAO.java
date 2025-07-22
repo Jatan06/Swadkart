@@ -2,11 +2,11 @@ package Dao;
 import java.sql.*;
 import Constants.AppConstants;
 public class DishDAO {
-    public static void browseDishesByRestaurant(String dish_name) throws Exception {
+    public static void browseDishesByRestaurant(String res_name) throws Exception {
         PreparedStatement bd = AppConstants.connection.prepareStatement(
-                "SELECT * FROM dishes WHERE restaurant = ?"
+                "SELECT * FROM dishes WHERE restaurant = ?;"
         );
-        bd.setString(1, dish_name);
+        bd.setString(1,res_name);
         ResultSet rs = bd.executeQuery();
 
         // ANSI color codes
@@ -19,21 +19,21 @@ public class DishDAO {
         final String CYAN = "\u001B[36m";
 
         // Print header
-        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
+        System.out.println("\n" + BOLD + CYAN + " ".repeat(130) + RESET);
         System.out.println(BOLD + BLUE + "\t\t\t\t                                🍽️  DISHES  🍽️" + RESET + "\n");
-        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
+        System.out.println(BOLD + CYAN + " ".repeat(130) + RESET);
 
         // Print column headers
         System.out.printf(BOLD + "%-10s %-25s %-10s %-25s %-8s %-10s %-12s%n" + RESET,
                 "Dish ID", "Dish Name", "Type", "Restaurant", "Rating", "Price(₹)", "Status");
 
-        System.out.println(CYAN + "-".repeat(130) + RESET);
+//        System.out.println(CYAN + "-".repeat(130) + RESET);
 
         int count = 0;
         while (rs.next()) {
             String id = rs.getString("dish_id");
             String name = rs.getString("name");
-            String type = rs.getString("veg_non_veg");
+            String type = rs.getString("cuisine");
             String restaurant = rs.getString("restaurant");
             double rating = rs.getDouble("rating");
             int price = rs.getInt("price");
@@ -65,21 +65,14 @@ public class DishDAO {
                     ratingColor, rating, RESET, price, status);
 
             count++;
-            if (count % 15 == 0) {
-                System.out.println(CYAN + "-".repeat(130) + RESET);
-            }
         }
-
         if (count == 0) {
-            System.out.println(RED + "No dish found with the name: " + dish_name + RESET);
+            System.out.println(RED + "Restaurant : " + res_name + " not found" + RESET);
         }
-
-        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
     }
-
     public static void browseDishesByCategory(String dish_category) throws Exception{
         PreparedStatement bd = AppConstants.connection.prepareStatement(
-                "SELECT * FROM dishes WHERE veg_non_veg = ?;"
+                "SELECT * FROM dishes WHERE cuisine = ?;"
         );
         bd.setString(1, dish_category);
         ResultSet rs = bd.executeQuery();
@@ -107,7 +100,7 @@ public class DishDAO {
         while (rs.next()) {
             String id = rs.getString("dish_id");
             String name = rs.getString("name");
-            String type = rs.getString("veg_non_veg");
+            String type = rs.getString("cuisine");
             String restaurant = rs.getString("restaurant");
             double rating = rs.getDouble("rating");
             int price = rs.getInt("price");

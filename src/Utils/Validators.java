@@ -4,7 +4,7 @@ public class Validators {
 
     // Validate user ID format (u-0001 or a-0001)
     public static boolean validateId(String id) {
-        if (id == null || id.length() < 7) {
+        if (id == null || id.length() != 6) {
             return false;
         }
         return (id.startsWith("u-") || id.startsWith("a-")) &&

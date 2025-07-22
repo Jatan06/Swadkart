@@ -22,7 +22,7 @@ public class MainMenu {
                         \nEnter "1" to Register(User only)
                         Enter "2" to login
                         Enter "3" to Exit
-                        Enter : \s""");
+                        \nEnter : \s""");
                 int n = AppConstants.s.nextInt();
                 switch (n) {
                     case 1:
@@ -41,7 +41,7 @@ public class MainMenu {
                                 System.out.println("\nInvalid User id or User password please try again !");
                             }
                         }
-                        else if(id.charAt(0)=='A') {
+                        else if(id.charAt(0)=='A' || id.charAt(0)=='a') {
                             if(AdminMenu.adminValidator(id,password)) {
                                 AdminMenu.adminMenu();
                             }
@@ -52,7 +52,6 @@ public class MainMenu {
                         else {
                             System.out.println("\nInvalid id !");
                         }
-                        // Logic for sending validator that customer or admin that returns string as "Customer" or "Admin" and using if-else to call methods respectively.
                         break;
                     case 3:
                         System.out.println("\nSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");

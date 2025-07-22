@@ -1,13 +1,12 @@
 package Menus;
 import Constants.*;
 import Dao.*;
-
-import java.sql.ResultSet;
-import java.sql.Statement;
+import Utils.*;
+import java.sql.*;
 import java.util.*;
 public class CustomerMenu {
     static void newCustomer() {
-        // New Customer Registration logic
+
     }
     public static boolean customerValidator(String id,String password) throws Exception {
         Statement s = AppConstants.connection.createStatement();
@@ -27,14 +26,16 @@ public class CustomerMenu {
         try {
             AppConstants.run = true;
             while (AppConstants.run) {
-                System.out.print("\nEnter 1 to browse Restaurants.\n" +
-                        "Enter 2 to browse Dishes by Restaurant.\n" +
-                        "Enter 3 to browse Dishes by Category.\n" +
-                        "Enter 4 to Add to cart.\n" +
-                        "Enter 5 to View cart.\n" +
-                        "Enter 6 to Place order.\n" +
-                        "Enter 7 to for Order history\n" +
-                        "Enter 8 to logout.\n\nEnter :  ");
+                System.out.print("""
+                        Enter 1 to browse Restaurants.
+                        Enter 2 to browse Dishes by Restaurant.
+                        Enter 3 to browse Dishes by Cuisine.
+                        Enter 4 to Add to cart.
+                        Enter 5 to View cart.
+                        Enter 6 to Place order.
+                        Enter 7 to for Order history
+                        Enter 8 to logout.
+                        Enter : \s""");
                 int n = AppConstants.s.nextInt();
                 switch (n) {
                     case 1:
@@ -42,12 +43,13 @@ public class CustomerMenu {
                         break;
                     case 2:
                         System.out.print("\nEnter Restaurant name :  ");
-                        DishDAO.browseDishesByRestaurant(AppConstants.s.next());
                         AppConstants.s.nextLine();
+                        String res_name = AppConstants.s.nextLine();
+                        DishDAO.browseDishesByRestaurant(res_name);
                         break;
                     case 3:
                         System.out.print("\nEnter dish category :  ");
-                        DishDAO.browseDishesByCategory(AppConstants.s.nextLine().trim());
+                        DishDAO.browseDishesByCategory(AppConstants.s.next());
                         AppConstants.s.nextLine();
                         break;
                     case 4:

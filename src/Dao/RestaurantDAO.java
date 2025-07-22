@@ -1,10 +1,6 @@
 package Dao;
-
 import Constants.AppConstants;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
+import java.sql.*;
 public class RestaurantDAO {
     public static void browseRestaurants() throws Exception{
         PreparedStatement br = AppConstants.connection.prepareCall("select * from restaurants");
@@ -78,8 +74,6 @@ public class RestaurantDAO {
         restaurants.close();
         br.close();
     }
-
-    // Additional utility method for cuisine-wise browsing
     public static void browseRestaurantsByCuisine() throws Exception {
         System.out.print("Enter cuisine type (or 'ALL' for all cuisines): ");
         String cuisineInput = AppConstants.s.nextLine().trim();
@@ -150,5 +144,46 @@ public class RestaurantDAO {
 
         restaurants.close();
         br.close();
+    }
+    public static void addRestaurant() throws Exception {
+        AppConstants.s.nextLine();
+        System.out.println("Enter Restaurant ID: ");
+        String id = AppConstants.s.nextLine().trim();
+        System.out.println("Enter Restaurant Name: ");
+        String name = AppConstants.s.nextLine().trim();
+        System.out.println("Enter Cuisine Type: ");
+        String cuisine = AppConstants.s.nextLine().trim();
+        System.out.println("Enter Phone Number: ");
+        String phone = AppConstants.s.nextLine().trim();
+        System.out.println("Enter Address: ");
+        String address = AppConstants.s.nextLine().trim();
+        System.out.println("Enter Rating: ");
+        double rating = AppConstants.s.nextDouble();
+        CallableStatement br = AppConstants.connection.prepareCall("insert into restaurants values (?,?,?,?,?,?)");
+        br.setString(1, id);
+        br.setString(2, name);
+        br.setString(3, cuisine);
+        br.setString(4, phone);
+        br.setString(5, address);
+        br.setDouble(6, rating);
+        if (br.executeUpdate() > 0) {
+            System.out.println("Restaurant added successfully.");
+        }
+        else {
+            System.out.println("Error adding restaurant.");
+        }
+    }
+    public static void deleteRestaurant() throws Exception {
+        AppConstants.s.nextLine();
+        System.out.println("Enter Restaurant ID: ");
+        String id = AppConstants.s.nextLine().trim();
+        CallableStatement br = AppConstants.connection.prepareCall("delete from restaurants where id = ?");
+        br.setString(1, id);
+        if (br.executeUpdate() > 0) {
+            System.out.println("Restaurant deleted successfully.");
+        }
+        else {
+            System.out.println("Error deleting restaurant.");
+        }
     }
 }
