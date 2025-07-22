@@ -36,7 +36,7 @@ public class DishDAO {
         System.out.printf(BOLD + "%-10s %-25s %-10s %-25s %-8s %-10s %-12s%n" + RESET,
                 "Dish ID", "Dish Name", "Type", "Restaurant", "Rating", "Price(₹)", "Status");
 
-//        System.out.println(CYAN + "-".repeat(130) + RESET);
+        System.out.println(CYAN + "-".repeat(130) + RESET);
 
         int count = 0;
         while (rs.next()) {
@@ -96,7 +96,7 @@ public class DishDAO {
         final String CYAN = "\u001B[36m";
 
 //        // Print header
-//        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
+        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
         System.out.println(BOLD + BLUE + "\t\t\t\t                                🍽️  DISHES  🍽️" + RESET + "\n");
         System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
 
@@ -141,9 +141,9 @@ public class DishDAO {
                     ratingColor, rating, RESET, price, status);
 
             count++;
-//            if (count % 15 == 0) {
-//                System.out.println(CYAN + "-".repeat(130) + RESET);
-//            }
+            if (count % 15 == 0) {
+                System.out.println(CYAN + "-".repeat(130) + RESET);
+            }
         }
         if (count == 0) {
             System.out.println(RED + "No dish found with the category: " + dish_category + RESET);

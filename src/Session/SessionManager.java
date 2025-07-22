@@ -36,7 +36,8 @@ public class SessionManager {
     public static void Login(String id){
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
-            String s = (AppConstants.customerValid)?(AppConstants.LOG_SUCCESS + ": " +  id):AppConstants.LOG_FAIL;
+            String timestamp = java.time.LocalDateTime.now().toString();
+            String s = (AppConstants.customerValid) ? AppConstants.LOG_SUCCESS + " (" + timestamp + "): " + id : AppConstants.LOG_FAIL + " (" + timestamp + "): " + id;
             Writer.write(s);
             Writer.newLine();
             Writer.flush();
