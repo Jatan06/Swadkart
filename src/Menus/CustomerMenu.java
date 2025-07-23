@@ -105,6 +105,7 @@ public class CustomerMenu {
                         }
                         UserDAO.insertNewUser(id, user_Name, email, ph_no, address);
                         SessionManager.NewRegistration(id,true);
+                        SpeakTextService.speak("Registration successful");
                         break;
                     case 2:
                         System.out.println("\nReturning to Main Menu...\n");

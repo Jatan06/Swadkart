@@ -1,6 +1,8 @@
 package Menus;
 import Constants.AppConstants;
 import Db.DBConnection;
+import Services.*;
+import Services.SpeakTextService;
 
 public class MainMenu {
     public static void run() {
@@ -55,6 +57,9 @@ public class MainMenu {
                             }
                             break;
                         case 3:
+                            //Thank you for using SwadKart. Goodbye!
+                            SpeakTextService.speak("SwadKart signing off... pet full, mood chill!");
+                            Thread.sleep(4000);
                             System.out.println("\nSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
                             AppConstants.show = false;
                             break;
