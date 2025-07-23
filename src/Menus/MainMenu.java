@@ -1,16 +1,7 @@
 package Menus;
 import Constants.AppConstants;
-import Db.DBConnection;
-import java.sql.*;
-import java.io.*;
-import Constants.*;
-import Utils.*;
-import Services.*;
-import Dao.*;
-import Db.*;
-import Menus.*;
-import Models.*;
-import java.util.*;
+import Dao.DBConnection;
+
 public class MainMenu {
     public static void run() {
         if(DBConnection.DbConnection()) {
