@@ -1,4 +1,4 @@
-package Dao;
+package Db;
 import Constants.AppConstants;
 import java.sql.*;
 public class DBConnection {

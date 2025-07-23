@@ -22,7 +22,7 @@ public class OTPService {
             }
             Message message = Message.creator(
                     new com.twilio.type.PhoneNumber(phoneNumber),
-                    new com.twilio.type.PhoneNumber("+14027519222"), // Your verified Twilio number
+                    new com.twilio.type.PhoneNumber(""), // Your verified Twilio number
                     "Your OTP is: " + otp
             ).create();
             System.out.println("OTP sent successfully to " + phoneNumber);

@@ -1,6 +1,6 @@
 package Menus;
 import Constants.AppConstants;
-import Dao.DBConnection;
+import Db.DBConnection;
 
 public class MainMenu {
     public static void run() {
@@ -16,15 +16,15 @@ public class MainMenu {
             AppConstants.show = true;
             while (AppConstants.show) {
             try {
-                    System.out.print("""               
-                   ========== Main Menu =========
-                    1. New Customer Registration
-                    2. Existing Customer Login
-                    3. Exit
-                   ==============================
-                   
-                   Please enter your choice:  \s""");
-                    int n = AppConstants.s.nextInt();
+                System.out.println("===================================");
+                System.out.println("|           Main Menu             |");
+                System.out.println("===================================");
+                System.out.println("|  1. New Customer Registration   |");
+                System.out.println("|  2. Existing Customer Login     |");
+                System.out.println("|  3. Exit                        |");
+                System.out.println("===================================");
+                System.out.print("\nPlease enter your choice: ");
+                int n = AppConstants.s.nextInt();
                     switch (n) {
                         case 1:
                             CustomerMenu.newCustomer();
