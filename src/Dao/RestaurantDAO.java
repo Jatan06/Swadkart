@@ -68,77 +68,77 @@ public class RestaurantDAO {
         restaurants.close();
         br.close();
     }
-    public static void browseRestaurantsByCuisine() throws Exception {
-        System.out.print("Enter cuisine type (or 'ALL' for all cuisines): ");
-        String cuisineInput = AppConstants.s.nextLine().trim();
-
-        String query;
-        PreparedStatement br;
-
-        if (cuisineInput.equalsIgnoreCase("ALL")) {
-            query = "SELECT * FROM restaurants ORDER BY cuisine, rating DESC";
-            br = AppConstants.connection.prepareStatement(query);
-        } else {
-            query = "SELECT * FROM restaurants WHERE cuisine LIKE ? ORDER BY rating DESC";
-            br = AppConstants.connection.prepareStatement(query);
-            br.setString(1, "%" + cuisineInput + "%");
-        }
-
-        ResultSet restaurants = br.executeQuery();
-
-        // Similar formatting as above method
-        final String RESET = "\u001B[0m";
-        final String BOLD = "\u001B[1m";
-        final String GREEN = "\u001B[32m";
-        final String BLUE = "\u001B[34m";
-        final String CYAN = "\u001B[36m";
-
-        System.out.println("\n" + BOLD + CYAN + "=".repeat(120) + RESET);
-        System.out.println(BOLD + BLUE + "🔍 FILTERED RESTAURANTS - " + cuisineInput.toUpperCase() + RESET);
-        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-
-        System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s%n" + RESET,
-                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating");
-        System.out.println(CYAN + "-".repeat(120) + RESET);
-
-        int count = 0;
-        String currentCuisine = "";
-
-        while (restaurants.next()) {
-            String cuisine = restaurants.getString("cuisine");
-
-            // Add cuisine separator when cuisine changes
-            if (!cuisine.equals(currentCuisine) && cuisineInput.equalsIgnoreCase("ALL")) {
-                if (count > 0) System.out.println();
-                System.out.println(BOLD + BLUE + "📍 " + cuisine.toUpperCase() + " RESTAURANTS:" + RESET);
-                System.out.println(CYAN + "-".repeat(60) + RESET);
-                currentCuisine = cuisine;
-            }
-
-            String id = restaurants.getString("id");
-            String name = restaurants.getString("name");
-            String phone = restaurants.getString("phone_no");
-            String address = restaurants.getString("address");
-            double rating = restaurants.getDouble("rating");
-
-            String displayName = name.length() > 25 ? name.substring(0, 22) + "..." : name;
-            String displayAddress = address.length() > 35 ? address.substring(0, 32) + "..." : address;
-
-            String ratingColor = rating >= 4.5 ? GREEN : rating >= 4.0 ? "\u001B[33m" : "";
-
-            System.out.printf("%-8s %-25s %-18s %-14s %-35s %s%-8.1f%s%n",
-                    id, displayName, cuisine, phone, displayAddress,
-                    ratingColor, rating, RESET);
-            count++;
-        }
-
-        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-        System.out.println(BOLD + GREEN + "📊 Total Matching Restaurants: " + count + RESET);
-        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-
-        restaurants.close();
-        br.close();
-    }
+//    public static void browseRestaurantsByCuisine() throws Exception {
+//        System.out.print("Enter cuisine type (or 'ALL' for all cuisines): ");
+//        String cuisineInput = AppConstants.s.nextLine().trim();
+//
+//        String query;
+//        PreparedStatement br;
+//
+//        if (cuisineInput.equalsIgnoreCase("ALL")) {
+//            query = "SELECT * FROM restaurants ORDER BY cuisine, rating DESC";
+//            br = AppConstants.connection.prepareStatement(query);
+//        } else {
+//            query = "SELECT * FROM restaurants WHERE cuisine LIKE ? ORDER BY rating DESC";
+//            br = AppConstants.connection.prepareStatement(query);
+//            br.setString(1, "%" + cuisineInput + "%");
+//        }
+//
+//        ResultSet restaurants = br.executeQuery();
+//
+//        // Similar formatting as above method
+//        final String RESET = "\u001B[0m";
+//        final String BOLD = "\u001B[1m";
+//        final String GREEN = "\u001B[32m";
+//        final String BLUE = "\u001B[34m";
+//        final String CYAN = "\u001B[36m";
+//
+//        System.out.println("\n" + BOLD + CYAN + "=".repeat(120) + RESET);
+//        System.out.println(BOLD + BLUE + "🔍 FILTERED RESTAURANTS - " + cuisineInput.toUpperCase() + RESET);
+//        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
+//
+//        System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s%n" + RESET,
+//                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating");
+//        System.out.println(CYAN + "-".repeat(120) + RESET);
+//
+//        int count = 0;
+//        String currentCuisine = "";
+//
+//        while (restaurants.next()) {
+//            String cuisine = restaurants.getString("cuisine");
+//
+//            // Add cuisine separator when cuisine changes
+//            if (!cuisine.equals(currentCuisine) && cuisineInput.equalsIgnoreCase("ALL")) {
+//                if (count > 0) System.out.println();
+//                System.out.println(BOLD + BLUE + "📍 " + cuisine.toUpperCase() + " RESTAURANTS:" + RESET);
+//                System.out.println(CYAN + "-".repeat(60) + RESET);
+//                currentCuisine = cuisine;
+//            }
+//
+//            String id = restaurants.getString("id");
+//            String name = restaurants.getString("name");
+//            String phone = restaurants.getString("phone_no");
+//            String address = restaurants.getString("address");
+//            double rating = restaurants.getDouble("rating");
+//
+//            String displayName = name.length() > 25 ? name.substring(0, 22) + "..." : name;
+//            String displayAddress = address.length() > 35 ? address.substring(0, 32) + "..." : address;
+//
+//            String ratingColor = rating >= 4.5 ? GREEN : rating >= 4.0 ? "\u001B[33m" : "";
+//
+//            System.out.printf("%-8s %-25s %-18s %-14s %-35s %s%-8.1f%s%n",
+//                    id, displayName, cuisine, phone, displayAddress,
+//                    ratingColor, rating, RESET);
+//            count++;
+//        }
+//
+//        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
+//        System.out.println(BOLD + GREEN + "📊 Total Matching Restaurants: " + count + RESET);
+//        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
+//
+//        restaurants.close();
+//        br.close();
+//    }
     public static void addRestaurant() throws Exception {
         AppConstants.s.nextLine();
         System.out.print("\nEnter Restaurant ID: ");
