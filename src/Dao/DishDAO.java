@@ -1,15 +1,8 @@
 package Dao;
 import java.sql.*;
-import java.sql.*;
-import java.io.*;
+
 import Constants.*;
-import Utils.*;
-import Services.*;
-import Dao.*;
-import Db.*;
-import Menus.*;
-import Models.*;
-import java.util.*;
+
 public class DishDAO {
     public static void browseDishesByRestaurant(String res_name) throws Exception {
         PreparedStatement bd = AppConstants.connection.prepareStatement(
