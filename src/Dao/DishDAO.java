@@ -1,10 +1,10 @@
 package Dao;
 import java.sql.*;
-
 import Constants.*;
-
 public class DishDAO {
     public static void browseDishesByRestaurant(String res_name) throws Exception {
+        String [] res_name_arr = res_name.split(" ");
+
         PreparedStatement bd = AppConstants.connection.prepareStatement(
                 "SELECT * FROM dishes WHERE restaurant = ?;"
         );
@@ -79,7 +79,6 @@ public class DishDAO {
         );
         bd.setString(1, dish_category);
         ResultSet rs = bd.executeQuery();
-
         // ANSI color codes
         final String RESET = "\u001B[0m";
         final String BOLD = "\u001B[1m";
@@ -88,7 +87,6 @@ public class DishDAO {
         final String RED = "\u001B[31m";
         final String BLUE = "\u001B[34m";
         final String CYAN = "\u001B[36m";
-
         if(rs!=null) {
             // Print header
             System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);

@@ -1,13 +1,6 @@
 package Session;
 import java.io.*;
 import Constants.*;
-import Utils.*;
-import Services.*;
-import Dao.*;
-import Db.*;
-import Menus.*;
-import Models.*;
-import java.util.*;
 public class SessionManager {
     static File logs = new File("B:\\Work\\Coding Projects\\Java Projects\\Swadkart - Food Ordering System\\Text_Files\\LogsInfo.txt");
     static {

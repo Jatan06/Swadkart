@@ -23,7 +23,7 @@ public class MainMenu {
                 System.out.println("|  2. Existing Customer Login     |");
                 System.out.println("|  3. Exit                        |");
                 System.out.println("===================================");
-                System.out.print("\nPlease enter your choice: ");
+                System.out.print("\nPlease select an option: ");
                 int n = AppConstants.s.nextInt();
                     switch (n) {
                         case 1:

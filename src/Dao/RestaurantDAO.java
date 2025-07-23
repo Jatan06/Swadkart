@@ -161,10 +161,10 @@ public class RestaurantDAO {
         br.setString(5, address);
         br.setDouble(6, rating);
         if (br.executeUpdate() > 0) {
-            System.out.println("Restaurant added successfully.");
+            System.out.println("\nRestaurant added successfully.");
         }
         else {
-            System.out.println("Error adding restaurant.");
+            System.out.println("\nError adding restaurant.");
         }
     }
     public static void deleteRestaurant() throws Exception {
