@@ -6,16 +6,16 @@ import Services.*;
 import Dao.*;
 import Session.*;
 public class CustomerMenu {
-        //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated  = true,catch isCreated = false.
-    public static void newCustomer() throws Exception {
+        //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
+    public static void newCustomer() {
         boolean flag = true;
         while (flag) {
             try {
                 System.out.println("\n\n===================================");
                 System.out.println("|         Customer Menu           |");
                 System.out.println("===================================");
-                System.out.println("|  1. Register New Account         |");
-                System.out.println("|  2. Return to Main Menu          |");
+                System.out.println("|  1. Register New Account        |");
+                System.out.println("|  2. Return to Main Menu         |");
                 System.out.println("===================================");
                 System.out.print("Please select an option: ");
                 int choice = AppConstants.s.nextInt();
@@ -25,10 +25,24 @@ public class CustomerMenu {
                         // Logic for registering a new account
                         int users = UserDAO.countUsers();
                         users++;
+                        String password = "";
+                        // Exception at entering same number check out please !!
                         System.out.print("Enter Phone No. : ");
                         AppConstants.s.nextLine(); // This seems unnecessary unless you're clearing a buffer
                         String ph_no = AppConstants.s.nextLine();
                         ph_no = "+91" + ph_no;
+                        boolean exist = UserDAO.phoneNumberExists(ph_no);
+                        while(exist) {
+                            System.out.println("Phone number already exists. Please enter a different number. ");
+                            ph_no = AppConstants.s.nextLine();
+                            ph_no = "+91" + ph_no;
+                            exist = UserDAO.phoneNumberExists(ph_no);
+                            if(exist) {
+                                System.out.println("Phone number already exists. Please enter a different number. ");
+                                ph_no = AppConstants.s.nextLine();
+                                ph_no = "+91" + ph_no;
+                            }
+                        }
                         // Validate mobile number using Validators class
                         while (!Validators.validateMobileNumber(ph_no)) {
                             System.out.print("\nEnter valid mobile number (e.g., +919876543210): ");
@@ -47,6 +61,15 @@ public class CustomerMenu {
                                 if (userOTP.equals(generatedOTP)) {
                                     otpValidated = true;
                                     System.out.println("\n✅ Phone number verified successfully!");
+                                    System.out.print("\nEnter password : ");
+                                    password = AppConstants.s.nextLine();
+                                    while (!Validators.validatePassword(password)) {
+                                        System.out.println("Enter valid password :-  ");
+                                        password = AppConstants.s.nextLine();
+                                        if (!Validators.validatePassword(password)) {
+                                            System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
+                                        }
+                                    }
                                     break;
                                 } else {
                                     otpAttempts--;
@@ -86,16 +109,18 @@ public class CustomerMenu {
                             }
                         }
                         System.out.print("Enter address : ");
-                        String address = AppConstants.s.nextLine();
+//                        AppConstants.s.nextLine();
+                        String address = AppConstants.s.next();
                         while (true) {
-                            if (Validators.validateAddress(address))
+                            if (Validators.validateAddress(address)) {
                                 break;
+                            }
                             else {
                                 System.out.print("\nEnter valid address : ");
                                 address = AppConstants.s.nextLine();
                             }
                         }
-                        String id = "";
+                        String id;
                         if (users > 0 && users < 100) {
                             id = "u-00" + users;
                         } else if (users >= 100 && users < 1000) {
@@ -103,9 +128,8 @@ public class CustomerMenu {
                         } else {
                             id = "u-" + users;
                         }
-                        UserDAO.insertNewUser(id, user_Name, email, ph_no, address);
+                        UserDAO.insertNewUser(id, user_Name, email, ph_no, address,password);
                         SessionManager.NewRegistration(id,true);
-                        SpeakTextService.speak("Registration successful");
                         break;
                     case 2:
                         System.out.println("\nReturning to Main Menu...\n");
@@ -113,6 +137,7 @@ public class CustomerMenu {
                         break;
                     default:
                         System.out.println("\nInvalid choice. Please try again.\n");
+                        break;
                 }
             } catch (Exception e) {
                 System.out.println("\nException: InputMismatchException in new Customer Menu. Please provide valid input.");

@@ -36,7 +36,7 @@ public class Validators {
 
     // Validate address format
     public static boolean validateAddress(String address) {
-        if(address==null || address.length()<10) {
+        if(address==null || address.length()<8) {
             return false;
         }
         else {
@@ -168,7 +168,7 @@ public class Validators {
             return false;
         }
         for (char c : str.toCharArray()) {
-            if (!Character.isLetterOrDigit(c)) {
+            if (!Character.isLetterOrDigit(c) && c != '@') {
                 return false;
             }
         }
