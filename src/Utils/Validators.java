@@ -8,7 +8,7 @@ public class Validators {
             return false;
         }
         return (id.startsWith("u-") || id.startsWith("a-")) &&
-                isNumeric(id.substring(6));
+                isNumeric(id.substring(2));
     }
 
     // Validate password (minimum 6 characters, alphanumeric)
@@ -21,11 +21,8 @@ public class Validators {
 
     // Validate mobile number (10 digits, Indian format)
     public static boolean validateMobileNumber(String mobile) {
-        if (mobile == null || mobile.length() != 10) {
-            return false;
-        }
-        char firstDigit = mobile.charAt(0);
-        return (firstDigit >= '6' && firstDigit <= '9') && isNumeric(mobile);
+        if (mobile == null) return false;
+        return mobile.matches("^\\+91[6-9]\\d{9}$"); // Validates Indian numbers only
     }
 
     // Validate email format
@@ -35,6 +32,16 @@ public class Validators {
         }
         return email.contains("@") && email.contains(".") &&
                 email.indexOf("@") < email.lastIndexOf(".");
+    }
+
+    // Validate address format
+    public static boolean validateAddress(String address) {
+        if(address==null || address.length()<10) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     // Validate integer input

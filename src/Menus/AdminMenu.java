@@ -35,9 +35,9 @@ public class AdminMenu {
                     boolean b = true;
                     while (b) {
                         System.out.print("""               
-                        \n==== Edit Restaurants ====
-                        1. Add Restaurant
-                        2. Delete Restaurant
+                        \n==== Edit Restaurants ==== |
+                        1. Add Restaurant            |
+                        2. Delete Restaurant         |
                         3. Exit
                        ==========================
                        Please enter your choice: """);

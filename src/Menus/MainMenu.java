@@ -22,7 +22,8 @@ public class MainMenu {
                     2. Existing Customer Login
                     3. Exit
                    ==============================
-                   Please enter your choice:  """);
+                   
+                   Please enter your choice:  \s""");
                     int n = AppConstants.s.nextInt();
                     switch (n) {
                         case 1:
