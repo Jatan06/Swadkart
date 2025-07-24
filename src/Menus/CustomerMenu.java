@@ -1,82 +1,94 @@
 package Menus;
 import java.sql.*;
-import java.io.*;
 import Constants.*;
 import Utils.*;
 import Services.*;
 import Dao.*;
-import Db.*;
-import Menus.*;
 import Session.*;
-import Models.*;
-import java.util.*;
 public class CustomerMenu {
-//    static void newCustomer() {
-        // Add logic for a new customer here
-        //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated  = true,catch isCreated = false.
-//
-//    }
-    static void newCustomer() throws Exception{
+        //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
+    public static void newCustomer() {
         boolean flag = true;
         while (flag) {
             try {
                 System.out.println("\n\n===================================");
                 System.out.println("|         Customer Menu           |");
                 System.out.println("===================================");
-                System.out.println("|  1. Register New Account         |");
-                System.out.println("|  2. Return to Main Menu          |");
+                System.out.println("|  1. Register New Account        |");
+                System.out.println("|  2. Return to Main Menu         |");
                 System.out.println("===================================");
                 System.out.print("Please select an option: ");
-
                 int choice = AppConstants.s.nextInt();
-
                 switch (choice) {
                     case 1:
+                        System.out.println("\n========= Verification =========");
                         // Logic for registering a new account
-                        System.out.println("\nRegistering your account...");
-                        System.out.println("\n====== Register ======");
                         int users = UserDAO.countUsers();
+                        users++;
+                        String password = "";
+                        // Exception at entering same number check out please !!
                         System.out.print("Enter Phone No. : ");
                         AppConstants.s.nextLine(); // This seems unnecessary unless you're clearing a buffer
                         String ph_no = AppConstants.s.nextLine();
-// Validate mobile number format using your Validators class
+                        ph_no = "+91" + ph_no;
+                        boolean exist = UserDAO.phoneNumberExists(ph_no);
+                        while(exist) {
+                            System.out.println("Phone number already exists. Please enter a different number. ");
+                            ph_no = AppConstants.s.nextLine();
+                            ph_no = "+91" + ph_no;
+                            exist = UserDAO.phoneNumberExists(ph_no);
+                            if(exist) {
+                                System.out.println("Phone number already exists. Please enter a different number. ");
+                                ph_no = AppConstants.s.nextLine();
+                                ph_no = "+91" + ph_no;
+                            }
+                        }
+                        // Validate mobile number using Validators class
                         while (!Validators.validateMobileNumber(ph_no)) {
-                            System.out.print("Enter valid mobile number (e.g., +919876543210): ");
+                            System.out.print("\nEnter valid mobile number (e.g., +919876543210): ");
                             ph_no = AppConstants.s.nextLine();
                         }
-// Generate OTP once
+                        // Generate OTP once
                         String generatedOTP = OTPService.generateOTP();
-// Send the same OTP
-                        OTPService.sendOTP(ph_no, generatedOTP);
-// Prompt user to enter OTP
-                        System.out.print("Enter the OTP sent to your phone: ");
-                        String userOTP = AppConstants.s.nextLine();
-                        int otpAttempts = 3;
-                        boolean otpValidated = false;
-                        while (otpAttempts > 0) {
-                            if (userOTP.equals(generatedOTP)) {
-                                otpValidated = true;
-                                System.out.println("\n✅ Phone number verified successfully!");
-                                break;
-                            } else {
-                                otpAttempts--;
-                                if (otpAttempts > 0) {
-                                    System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
-                                    userOTP = AppConstants.s.nextLine();
+                        // Send the same OTP
+                        if(OTPService.sendOTP(ph_no, generatedOTP)) {
+                            // Prompt user to enter OTP
+                            System.out.print("\nEnter the OTP sent to your phone: ");
+                            String userOTP = AppConstants.s.nextLine();
+                            int otpAttempts = 3;
+                            boolean otpValidated = false;
+                            while (otpAttempts > 0) {
+                                if (userOTP.equals(generatedOTP)) {
+                                    otpValidated = true;
+                                    System.out.println("\n✅ Phone number verified successfully!");
+                                    System.out.print("\nEnter password : ");
+                                    password = AppConstants.s.nextLine();
+                                    while (!Validators.validatePassword(password)) {
+                                        System.out.println("Enter valid password :-  ");
+                                        password = AppConstants.s.nextLine();
+                                        if (!Validators.validatePassword(password)) {
+                                            System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
+                                        }
+                                    }
+                                    break;
                                 } else {
-                                    System.out.println("\n🚫 Phone number verification failed. Registration terminated.");
-                                    return;
+                                    otpAttempts--;
+                                    if (otpAttempts > 0) {
+                                        System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
+                                        userOTP = AppConstants.s.nextLine();
+                                    } else {
+                                        System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                                        return;
+                                    }
                                 }
                             }
                         }
-// Proceed if OTP is validated
-                        if (otpValidated) {
-                            // Continue your registration logic here
-                            System.out.println("➡️ Continuing with registration...");
+                        else {
+                            System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                            return;
                         }
-
-                        System.out.print("Enter name : ");
-                        AppConstants.s.nextLine();
+                        System.out.println("\n========= Registration =========");
+                        System.out.print("Enter Name : ");
                         String user_Name = AppConstants.s.nextLine();
                         while (true) {
                             if (Validators.validateName(user_Name))
@@ -87,7 +99,6 @@ public class CustomerMenu {
                             }
                         }
                         System.out.print("Enter email : ");
-                        AppConstants.s.nextLine();
                         String email = AppConstants.s.nextLine();
                         while (true) {
                             if (Validators.validateEmail(email))
@@ -98,17 +109,18 @@ public class CustomerMenu {
                             }
                         }
                         System.out.print("Enter address : ");
-                        String address = AppConstants.s.nextLine();
-                        AppConstants.s.nextLine();
+//                        AppConstants.s.nextLine();
+                        String address = AppConstants.s.next();
                         while (true) {
-                            if (Validators.validateAddress(address))
+                            if (Validators.validateAddress(address)) {
                                 break;
+                            }
                             else {
                                 System.out.print("\nEnter valid address : ");
                                 address = AppConstants.s.nextLine();
                             }
                         }
-                        String id = "";
+                        String id;
                         if (users > 0 && users < 100) {
                             id = "u-00" + users;
                         } else if (users >= 100 && users < 1000) {
@@ -116,17 +128,19 @@ public class CustomerMenu {
                         } else {
                             id = "u-" + users;
                         }
-                        UserDAO.insertNewUser(id, user_Name, email, ph_no, address);
+                        UserDAO.insertNewUser(id, user_Name, email, ph_no, address,password);
+                        SessionManager.NewRegistration(id,true);
                         break;
                     case 2:
                         System.out.println("\nReturning to Main Menu...\n");
                         flag = false;
                         break;
                     default:
-                        System.out.println("Invalid choice. Please try again.\n");
+                        System.out.println("\nInvalid choice. Please try again.\n");
+                        break;
                 }
             } catch (Exception e) {
-                System.out.println("\nException: InputMismatchException. Please provide valid input.");
+                System.out.println("\nException: InputMismatchException in new Customer Menu. Please provide valid input.");
                 AppConstants.s.nextLine(); // Clear scanner buffer
             }
         }
@@ -145,7 +159,7 @@ public class CustomerMenu {
         SessionManager.Login(id);
         return AppConstants.customerValid;
     }
-    static void customerMenu() {
+    public static void customerMenu() {
         try {
             AppConstants.run = true;
             while (AppConstants.run) {
@@ -154,23 +168,24 @@ public class CustomerMenu {
                 processAction(option);
             }
         } catch (Exception e) {
-            throw new RuntimeException("An error occurred in the Customer Menu", e);
+            throw new RuntimeException("An error occurred in the Customer Menu in customer validator ", e);
         }
     }
     private static void displayMenu() {
-        System.out.print("""
-          \n======== Swadkart Menu ==========
-            1. Browse Restaurants
-            2. Browse Dishes by Restaurant
-            3. Browse Dishes by Cuisine
-            4. Add to Cart
-            5. View Cart
-            6. Place Order
-            7. View Order History
-            8. Log Out
-          =================================
-          Please enter your choice: 
-            """);
+        System.out.println("\n=================================");
+        System.out.println("|              Menu              |");
+        System.out.println("=================================");
+        System.out.println("|  1. Browse Restaurants         |");
+        System.out.println("|  2. Browse Dishes by Restaurant|");
+        System.out.println("|  3. Browse Dishes by Cuisine   |");
+        System.out.println("|  4. Add to Cart                |");
+        System.out.println("|  5. View Cart                  |");
+        System.out.println("|  6. Place Order                |");
+        System.out.println("|  7. View Order History         |");
+        System.out.println("|  8. Profile                    |");
+        System.out.println("|  9. Log Out                    |");
+        System.out.println("=================================");
+        System.out.print("\nPlease enter your choice: ");
     }
     private static int getUserInput() {
         while (true) {
@@ -196,11 +211,15 @@ public class CustomerMenu {
                 DishDAO.browseDishesByCuisine(AppConstants.s.next());
                 AppConstants.s.nextLine();
             }
-            case 4 -> UserService.addToCart();
+            case 4 -> OrderDAO.addToCart();
             case 5 -> OrderDAO.viewCart();
             case 6 -> PaymentDAO.placeOrder();
             case 7 -> OrderDAO.orderHistory();
-            case 8 -> AppConstants.run = false;
+            case 8 -> UserDAO.profile();
+            case 9 -> {
+                System.out.println();
+                AppConstants.run = false;
+            }
             default -> System.out.println("Invalid choice. Please try again.");
         }
     }

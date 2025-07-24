@@ -73,7 +73,7 @@ public class DishDAO {
             System.out.println(RED + "Restaurant: " + res_name + " not found" + RESET);
         }
     }
-    public static void browseDishesByCuisine(String dish_category) throws Exception{
+    public static void browseDishesByCuisine(String dish_category) throws Exception {
         PreparedStatement bd = AppConstants.connection.prepareStatement(
                 "SELECT * FROM dishes WHERE cuisine = ?;"
         );

@@ -4,6 +4,8 @@ import Db.DBConnection;
 import Services.*;
 import Services.SpeakTextService;
 
+import java.sql.Statement;
+
 public class MainMenu {
     public static void run() {
         if(DBConnection.DbConnection()) {
@@ -69,7 +71,8 @@ public class MainMenu {
                     }
                 }
                 catch (Exception e) {
-                    System.out.println("\nException :- InputMismatchException. Please provide valid input.");
+                e.printStackTrace();
+//                    System.out.println("\nException :- InputMismatchException. Please provide valid input.");
                     AppConstants.s.nextLine();
                 }
             }
