@@ -1,8 +1,16 @@
 package Menus;
+import java.sql.*;
+import java.io.*;
 import Constants.*;
+import Utils.*;
+import Services.*;
 import Dao.*;
+import Db.*;
+import Menus.*;
+import Models.*;
+import java.util.*;
 public class AdminMenu {
-    public static boolean adminValidator(String id,String password) {
+    static boolean adminValidator(String id,String password) {
         if(id.equals(AppConstants.admin_id) && password.equals(AppConstants.admin_password)) {
             return true;
         }
@@ -10,31 +18,29 @@ public class AdminMenu {
             return false;
         }
     }
-    public static void adminMenu(){
+    static void adminMenu(){
         AppConstants.adminRun = true;
         try {
         while (AppConstants.adminRun) {
-            System.out.println("\n=================================");
-            System.out.println("|          Admin Menu           |");
-            System.out.println("=================================");
-            System.out.println("|  1. Edit Restaurants          |");
-            System.out.println("|  2. View Restaurants          |");
-            System.out.println("|  3. View Orders               |");
-            System.out.println("|  4. Logout                    |");
-            System.out.println("=================================");
-            System.out.print("\nPlease enter your choice: ");
+            System.out.print("""               
+            \n======= Admin Menu =======
+                1. Edit Restaurants
+                2. View Restaurants
+                3. View Orders
+                4. Logout
+            ==========================
+            Please enter your choice: """);
             switch (AppConstants.s.nextInt()) {
                 case 1:
                     boolean b = true;
                     while (b) {
-                        System.out.println("\n=================================");
-                        System.out.println("|       Edit Restaurants        |");
-                        System.out.println("=================================");
-                        System.out.println("|  1. Add Restaurant            |");
-                        System.out.println("|  2. Delete Restaurant         |");
-                        System.out.println("|  3. Exit                      |");
-                        System.out.println("=================================");
-                        System.out.print("\nPlease enter your choice: ");
+                        System.out.print("""               
+                        \n==== Edit Restaurants ==== |
+                        1. Add Restaurant            |
+                        2. Delete Restaurant         |
+                        3. Exit
+                       ==========================
+                       Please enter your choice: """);
                         int n = AppConstants.s.nextInt();
                         if (n == 1) {
                             RestaurantDAO.addRestaurant();
@@ -53,7 +59,6 @@ public class AdminMenu {
                 case 3:
                     break;
                 case 4:
-                    System.out.println();
                     AppConstants.adminRun = false;
                     break;
                 default:

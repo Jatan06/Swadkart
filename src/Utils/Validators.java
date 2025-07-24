@@ -96,7 +96,7 @@ public class Validators {
 
     // Validate restaurant name (letters, numbers, spaces, hyphens)
     public static boolean validateRestaurantName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null || name.trim().isEmpty() || !name.startsWith("r-")) {
             return false;
         }
         String trimmed = name.trim();

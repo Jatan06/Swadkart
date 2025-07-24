@@ -141,17 +141,17 @@ public class RestaurantDAO {
 //    }
     public static void addRestaurant() throws Exception {
         AppConstants.s.nextLine();
-        System.out.print("\nEnter Restaurant ID: ");
+        System.out.println("Enter Restaurant ID: ");
         String id = AppConstants.s.nextLine().trim();
-        System.out.print("\nEnter Restaurant Name: ");
+        System.out.println("Enter Restaurant Name: ");
         String name = AppConstants.s.nextLine().trim();
-        System.out.print("\nEnter Cuisine Type: ");
+        System.out.println("Enter Cuisine Type: ");
         String cuisine = AppConstants.s.nextLine().trim();
-        System.out.print("\nEnter Phone Number: ");
+        System.out.println("Enter Phone Number: ");
         String phone = AppConstants.s.nextLine().trim();
-        System.out.print("\nEnter Address: ");
+        System.out.println("Enter Address: ");
         String address = AppConstants.s.nextLine().trim();
-        System.out.print("\nEnter Rating: ");
+        System.out.println("Enter Rating: ");
         double rating = AppConstants.s.nextDouble();
         CallableStatement br = AppConstants.connection.prepareCall("insert into restaurants values (?,?,?,?,?,?)");
         br.setString(1, id);
@@ -168,28 +168,13 @@ public class RestaurantDAO {
         }
     }
     public static void deleteRestaurant() throws Exception {
-        AppConstants.connection.setAutoCommit(false);
         AppConstants.s.nextLine();
-        System.out.print("\nEnter Restaurant ID: ");
+        System.out.println("Enter Restaurant ID: ");
         String id = AppConstants.s.nextLine().trim();
         CallableStatement br = AppConstants.connection.prepareCall("delete from restaurants where id = ?");
         br.setString(1, id);
         if (br.executeUpdate() > 0) {
-            System.out.print("\nAre you sure you want to delete this restaurant? (y/n): ");
-            if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
-                System.out.print("\nEnter Password");
-                if(AppConstants.s.next().equals(AppConstants.admin_password)) {
-                    AppConstants.connection.commit();
-                    System.out.println("\nRestaurant deleted successfully.");
-                }
-                else {
-                    AppConstants.connection.rollback();
-                    System.out.println("\nIncorrect password. Restaurant not deleted.");
-                }
-            }
-            else {
-                System.out.println("\nRestaurant not deleted.");
-            }
+            System.out.println("Restaurant deleted successfully.");
         }
         else {
             System.out.println("Error deleting restaurant.");
