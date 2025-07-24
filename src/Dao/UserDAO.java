@@ -12,7 +12,7 @@ public class UserDAO {
         pst.setString(5,address);pst.setString(6,password);
         if(pst.executeUpdate()>0)
         {
-            System.out.println("\nYour user id is \""+id+"\" and password is "+password);
+            System.out.println("\nYour user id is \""+id+".");
             SpeakTextService.speak(user_Name+" your registration is successful");
             Thread.sleep(3000);
         }
@@ -31,15 +31,10 @@ public class UserDAO {
         // Pending
     }
     public static boolean phoneNumberExists(String number) throws Exception {
-        int i = 0;
-        Statement s = AppConstants.connection.createStatement();
-        ResultSet rs = s.executeQuery("SELECT phone_number FROM users;");
-        while (rs.next()) {
-            if (rs.getString(4).equals(number)) {
-                i = 1;
-                break;
-            }
-        }
-        return i == 1;
+        String query = "SELECT phone_number FROM users WHERE phone_number = ?;";
+        PreparedStatement ps = AppConstants.connection.prepareStatement(query);
+        ps.setString(1, number);
+        ResultSet rs = ps.executeQuery();
+        return rs.next(); // true if phone number exists
     }
 }

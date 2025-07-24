@@ -1,5 +1,4 @@
 package Utils;
-
 public class Validators {
 
     // Validate user ID format (u-0001 or a-0001)
@@ -22,7 +21,7 @@ public class Validators {
     // Validate mobile number (10 digits, Indian format)
     public static boolean validateMobileNumber(String mobile) {
         if (mobile == null) return false;
-        return mobile.matches("^\\+91[6-9]\\d{9}$"); // Validates Indian numbers only
+        return mobile.matches("^\\+91[6-9]\\d{9}$");
     }
 
     // Validate email format

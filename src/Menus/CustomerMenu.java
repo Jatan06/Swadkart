@@ -22,31 +22,24 @@ public class CustomerMenu {
                 switch (choice) {
                     case 1:
                         System.out.println("\n========= Verification =========");
-                        // Logic for registering a new account
                         int users = UserDAO.countUsers();
                         users++;
                         String password = "";
-                        // Exception at entering same number check out please !!
                         System.out.print("Enter Phone No. : ");
-                        AppConstants.s.nextLine(); // This seems unnecessary unless you're clearing a buffer
-                        String ph_no = AppConstants.s.nextLine();
-                        ph_no = "+91" + ph_no;
-                        boolean exist = UserDAO.phoneNumberExists(ph_no);
-                        while(exist) {
-                            System.out.println("Phone number already exists. Please enter a different number. ");
-                            ph_no = AppConstants.s.nextLine();
-                            ph_no = "+91" + ph_no;
-                            exist = UserDAO.phoneNumberExists(ph_no);
-                            if(exist) {
-                                System.out.println("Phone number already exists. Please enter a different number. ");
-                                ph_no = AppConstants.s.nextLine();
-                                ph_no = "+91" + ph_no;
+                        String ph_no = "+91" + AppConstants.s.next();
+                        while(true) {
+                            if(UserDAO.phoneNumberExists(ph_no)) {
+                                System.out.print("\nPhone number already exists. Please enter a different number : ");
+                                ph_no = "+91" + AppConstants.s.next().trim();
+                            }
+                            else {
+                                break;
                             }
                         }
                         // Validate mobile number using Validators class
                         while (!Validators.validateMobileNumber(ph_no)) {
-                            System.out.print("\nEnter valid mobile number (e.g., +919876543210): ");
-                            ph_no = AppConstants.s.nextLine();
+                            System.out.print("\nEnter valid mobile number (e.g., 9876543210): ");
+                            ph_no = "+91" + AppConstants.s.next().trim();
                         }
                         // Generate OTP once
                         String generatedOTP = OTPService.generateOTP();
@@ -54,7 +47,8 @@ public class CustomerMenu {
                         if(OTPService.sendOTP(ph_no, generatedOTP)) {
                             // Prompt user to enter OTP
                             System.out.print("\nEnter the OTP sent to your phone: ");
-                            String userOTP = AppConstants.s.nextLine();
+                            String userOTP = AppConstants.s.next();
+                            AppConstants.s.nextLine();
                             int otpAttempts = 3;
                             boolean otpValidated = false;
                             while (otpAttempts > 0) {
@@ -110,7 +104,7 @@ public class CustomerMenu {
                         }
                         System.out.print("Enter address : ");
 //                        AppConstants.s.nextLine();
-                        String address = AppConstants.s.next();
+                        String address = AppConstants.s.nextLine();
                         while (true) {
                             if (Validators.validateAddress(address)) {
                                 break;
@@ -140,8 +134,9 @@ public class CustomerMenu {
                         break;
                 }
             } catch (Exception e) {
-                System.out.println("\nException: InputMismatchException in new Customer Menu. Please provide valid input.");
-                AppConstants.s.nextLine(); // Clear scanner buffer
+                throw new RuntimeException("An error occurred in the Customer Menu in new customer ", e);
+//                System.out.println("\nException: InputMismatchException in new Customer Menu. Please provide valid input.");
+//                AppConstants.s.nextLine(); // Clear scanner buffer
             }
         }
     }

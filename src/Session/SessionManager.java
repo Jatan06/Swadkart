@@ -18,7 +18,8 @@ public class SessionManager {
     public static void NewRegistration(String id,Boolean isCreated) {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
-            String s = (isCreated)?(AppConstants.NEW_USER_SUCCESS + ": " +  id):AppConstants.NEW_USER_FAIL;
+            String timestamp = java.time.LocalDateTime.now().toString();
+            String s = (isCreated)?(AppConstants.NEW_USER_SUCCESS + " (" + timestamp + "): " +  id):AppConstants.NEW_USER_FAIL;
             Writer.write(s);
             Writer.newLine();
             Writer.flush();
@@ -26,7 +27,7 @@ public class SessionManager {
             throw new RuntimeException(e);
         }
     }
-    public static void Login(String id){
+    public static void Login(String id) {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
             String timestamp = java.time.LocalDateTime.now().toString();
