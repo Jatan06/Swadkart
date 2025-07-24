@@ -173,4 +173,8 @@ public class Validators {
         }
         return true;
     }
+
+    public static boolean validateColumnNameUser(String c_name) {
+        return true;
+    }
 }

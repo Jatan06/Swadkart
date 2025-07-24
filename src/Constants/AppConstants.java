@@ -47,26 +47,26 @@ public class AppConstants {
     public static final int MAX_QUANTITY = 99;
 
     // System Messages
-    public static final String MSG_INVALID_CHOICE = "Invalid choice. Please try again.";
-    public static final String MSG_OPERATION_SUCCESS = "Operation completed successfully!";
-    public static final String MSG_NO_DATA = "No data found.";
+    public static final String MSG_INVALID_CHOICE = "\nInvalid choice. Please try again.";
+    public static final String MSG_OPERATION_SUCCESS = "\nOperation completed successfully!";
+    public static final String MSG_NO_DATA = "\nNo data found.";
 
     // Error Messages
-    public static final String ERR_INVALID_INPUT = "Invalid input. Please try again.";
-    public static final String ERR_USER_NOT_FOUND = "User not found.";
-    public static final String ERR_INVALID_CREDENTIALS = "Invalid credentials.";
-    public static final String ERR_RESTAURANT_NOT_FOUND = "Restaurant not found.";
-    public static final String ERR_DISH_NOT_FOUND = "Dish not found.";
-    public static final String ERR_ORDER_NOT_FOUND = "Order not found.";
+    public static final String ERR_INVALID_INPUT = "\nInvalid input. Please try again.";
+    public static final String ERR_USER_NOT_FOUND = "\nUser not found.";
+    public static final String ERR_INVALID_CREDENTIALS = "\nInvalid credentials.";
+    public static final String ERR_RESTAURANT_NOT_FOUND = "\nRestaurant not found.";
+    public static final String ERR_DISH_NOT_FOUND = "\nDish not found.";
+    public static final String ERR_ORDER_NOT_FOUND = "\nOrder not found.";
 
     // Success Messages
-    public static final String SUCCESS_REGISTRATION = "Registration successful!";
-    public static final String SUCCESS_LOGIN = "Login successful!";
-    public static final String SUCCESS_RESTAURANT_ADDED = "Restaurant added successfully!";
-    public static final String SUCCESS_DISH_ADDED = "Dish added successfully!";
-    public static final String SUCCESS_ORDER_PLACED = "Order placed successfully!";
-    public static final String SUCCESS_PAYMENT = "Payment completed successfully!";
-    public static final String SUCCESS_REVIEW = "Review submitted successfully!";
+    public static final String SUCCESS_REGISTRATION = "\nRegistration successful!";
+    public static final String SUCCESS_LOGIN = "\nLogin successful!";
+    public static final String SUCCESS_RESTAURANT_ADDED = "\nRestaurant added successfully!";
+    public static final String SUCCESS_DISH_ADDED = "\nDish added successfully!";
+    public static final String SUCCESS_ORDER_PLACED = "\nOrder placed successfully!";
+    public static final String SUCCESS_PAYMENT = "\nPayment completed successfully!";
+    public static final String SUCCESS_REVIEW = "\nReview submitted successfully!";
 
     //SessionManager Messages
     public static final String LOG_SUCCESS = "Login Successful";
