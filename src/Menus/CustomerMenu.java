@@ -159,13 +159,13 @@ public class CustomerMenu {
         SessionManager.Login(id);
         return AppConstants.customerValid;
     }
-    public static void customerMenu() {
+    public static void customerMenu(String id) {
         try {
             AppConstants.run = true;
             while (AppConstants.run) {
                 displayMenu();
                 int option = getUserInput();
-                processAction(option);
+                processAction(option,id);
             }
         } catch (Exception e) {
             throw new RuntimeException("An error occurred in the Customer Menu in customer validator ", e);
@@ -185,7 +185,7 @@ public class CustomerMenu {
         System.out.println("|  8. Profile                    |");
         System.out.println("|  9. Log Out                    |");
         System.out.println("=================================");
-        System.out.print("\nPlease enter your choice: ");
+        System.out.print("\nPlease select an option: ");
     }
     private static int getUserInput() {
         while (true) {
@@ -197,7 +197,7 @@ public class CustomerMenu {
             }
         }
     }
-    private static void processAction(int option) throws Exception {
+    private static void processAction(int option,String id) throws Exception {
         switch (option) {
             case 1 -> RestaurantDAO.browseRestaurants();
             case 2 -> {
@@ -215,7 +215,7 @@ public class CustomerMenu {
             case 5 -> OrderDAO.viewCart();
             case 6 -> PaymentDAO.placeOrder();
             case 7 -> OrderDAO.orderHistory();
-            case 8 -> UserDAO.profile();
+            case 8 -> UserDAO.profile(id);
             case 9 -> {
                 System.out.println();
                 AppConstants.run = false;

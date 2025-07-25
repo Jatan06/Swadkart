@@ -1,11 +1,7 @@
 package Menus;
 import Constants.AppConstants;
 import Db.DBConnection;
-import Services.*;
 import Services.SpeakTextService;
-
-import java.sql.Statement;
-
 public class MainMenu {
     public static void run() {
         if(DBConnection.DbConnection()) {
@@ -34,16 +30,17 @@ public class MainMenu {
                             CustomerMenu.newCustomer();
                             break;
                         case 2:
+                            System.out.print("\n========= Login =========");
                             System.out.print("\nEnter id : ");
                             String id = AppConstants.s.next();
                             System.out.print("Enter password : ");
                             String password = AppConstants.s.next();
                             if(id.charAt(0)=='U' || id.charAt(0)=='u') {
                                 if (CustomerMenu.customerValidator(id,password)) {
-                                    CustomerMenu.customerMenu();
+                                    CustomerMenu.customerMenu(id);
                                 }
                                 else {
-                                    System.out.println("\nInvalid User id or User password please try again !");
+                                    System.out.println("\nInvalid User id or User password please try again !\n");
                                 }
                             }
                             else if(id.charAt(0)=='A' || id.charAt(0)=='a') {
