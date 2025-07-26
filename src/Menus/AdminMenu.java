@@ -1,9 +1,10 @@
 package Menus;
 import Constants.*;
 import Dao.*;
+import Admin.Admin;
 public class AdminMenu {
     public static boolean adminValidator(String id,String password) {
-        if(id.equals(AppConstants.admin_id) && password.equals(AppConstants.admin_password)) {
+        if(id.equals(Admin.getAdminId()) && password.equals(Admin.getAdminPassword())) {
             return true;
         }
         else {
