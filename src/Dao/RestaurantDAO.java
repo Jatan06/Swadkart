@@ -1,6 +1,7 @@
 package Dao;
 import Constants.*;
 import java.sql.*;
+import Admin.*;
 public class RestaurantDAO {
     public static void browseRestaurants() throws Exception{
         PreparedStatement br = AppConstants.connection.prepareCall("select * from restaurants");
@@ -178,7 +179,7 @@ public class RestaurantDAO {
             System.out.print("\nAre you sure you want to delete this restaurant? (y/n): ");
             if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
                 System.out.print("\nEnter Password");
-                if(AppConstants.s.next().equals(AppConstants.admin_password)) {
+                if(AppConstants.s.next().equals(Admin.getAdminPassword())) {
                     AppConstants.connection.commit();
                     System.out.println("\nRestaurant deleted successfully.");
                 }
