@@ -6,7 +6,7 @@ import Services.*;
 import Dao.*;
 import Session.*;
 public class CustomerMenu {
-        //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
+    //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
     public static void newCustomer() {
         boolean flag = true;
         while (flag) {
@@ -124,7 +124,6 @@ public class CustomerMenu {
                         }
                         UserDAO.insertNewUser(id, user_Name, email, ph_no, address,password);
                         SessionManager.NewRegistration(id,true);
-                        break;
                     case 2:
                         System.out.println("\nReturning to Main Menu...\n");
                         flag = false;
@@ -206,16 +205,17 @@ public class CustomerMenu {
                 DishDAO.browseDishesByCuisine(AppConstants.s.next());
                 AppConstants.s.nextLine();
             }
-            case 4 -> OrderDAO.addToCart();
+            //case 4 -> OrderDAO.addToCart();
             case 5 -> OrderDAO.viewCart();
             case 6 -> PaymentDAO.placeOrder();
             case 7 -> OrderDAO.orderHistory();
             case 8 -> UserDAO.profile(id);
             case 9 -> {
                 System.out.println();
+                Services.UserService.Cart = null;
                 AppConstants.run = false;
             }
             default -> System.out.println("Invalid choice. Please try again.");
-        }
-    }
+ }
+}
 }

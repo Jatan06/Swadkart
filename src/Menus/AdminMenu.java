@@ -11,7 +11,7 @@ public class AdminMenu {
             return false;
         }
     }
-    public static void adminMenu() {
+    public static void adminMenu(){
         AppConstants.adminRun = true;
         try {
         while (AppConstants.adminRun) {
