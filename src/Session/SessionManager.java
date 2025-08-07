@@ -9,7 +9,7 @@ import Menus.*;
 import Models.*;
 import java.util.*;
 public class SessionManager {
-    static File logs = new File("B:\\Work\\Coding Projects\\Java Projects\\Swadkart - Food Ordering System\\Text_Files\\LogsInfo.txt");
+    static File logs = new File("LogsInfo.txt");
     static {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs));

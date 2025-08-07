@@ -1,3 +1,4 @@
+//DishDAO.java
 package Dao;
 import java.sql.*;
 import Constants.*;
@@ -141,5 +142,27 @@ public class DishDAO {
         else {
             System.out.println(RED + "No dish found with the category: " + dish_category + RESET);
         }
+    }
+    public static Models.Dish getDishByIdAndRestaurant(String dishId, String restaurantId) {
+        try {
+            java.sql.PreparedStatement stmt = AppConstants.connection.prepareStatement(
+                    "SELECT * FROM dishes WHERE dish_id = ? AND restaurant = ?;");
+            stmt.setString(1, dishId);
+            stmt.setString(2, restaurantId);
+            java.sql.ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Models.Dish(
+                        rs.getString("dish_id"),
+                        rs.getString("name"),
+                        rs.getString("cuisine"),
+                        rs.getString("restaurant"),
+                        rs.getDouble("rating"),
+                        rs.getDouble("price")
+                );
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
     }
 }
