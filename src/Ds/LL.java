@@ -3,20 +3,22 @@ import Models.Dish;
 
 class Node {
     Dish data;
+    int quantity;
     Node next;
 
-    public Node(Dish data) {
+    public Node(Dish data,int quantity) {
         this.data = data;
+        this.quantity = quantity;
         this.next = null;
     }
 }
 
-class DishLinkedList {
+public class LL {
     private Node head;
 
     // Insert at end
-    public void insert(Dish dish) {
-        Node newNode = new Node(dish);
+    public void insert(Dish dish,int quantity) {
+        Node newNode = new Node(dish,quantity);
         if (head == null) {
             head = newNode;
         } else {
@@ -26,6 +28,7 @@ class DishLinkedList {
             current.next = newNode;
         }
         System.out.println("Dish inserted: " + dish.getName());
+        System.out.println("Quantity : " + quantity);
     }
 
     // Display all dishes
@@ -38,7 +41,7 @@ class DishLinkedList {
         Node current = head;
         System.out.println("Dish List:");
         while (current != null) {
-            System.out.println(current.data);
+            System.out.println(current.data + " " + current.quantity);
             current = current.next;
         }
     }
@@ -81,4 +84,3 @@ class DishLinkedList {
         System.out.println("All dishes have been removed from the list.");
     }
 }
-

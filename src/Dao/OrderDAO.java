@@ -11,6 +11,7 @@ import Models.*;
 import java.util.*;
 public class OrderDAO {
     public static void addToCart() {
+        AppConstants.s.nextLine();
         System.out.print("\nEnter restaurant name to select dishes :- ");
         String rest_name = AppConstants.s.nextLine();
         System.out.print("Enter dish name to select :- ");
