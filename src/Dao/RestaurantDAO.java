@@ -185,7 +185,7 @@ public class RestaurantDAO {
                 }
                 else {
                     AppConstants.connection.rollback();
-                    System.out.println("\nIncorrect password. Restaurant not deleted.");
+                    System.out.println("\nIncorrect password. Restaurant not deleted!");
                 }
             }
             else {
