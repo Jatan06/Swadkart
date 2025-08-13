@@ -5,6 +5,7 @@ import Utils.*;
 import Services.*;
 import Dao.*;
 import Session.*;
+import Ds.*;
 public class CustomerMenu {
     //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
     public static void newCustomer() {
@@ -206,8 +207,8 @@ public class CustomerMenu {
                 AppConstants.s.nextLine();
             }
             case 4 -> UserService.addToCart();
-            case 5 -> OrderDAO.viewCart();
-            case 6 -> PaymentDAO.placeOrder();
+            case 5 -> UserService.Cart.display();
+            case 6 -> PaymentDAO.placeOrder(id);
             case 7 -> OrderDAO.orderHistory();
             case 8 -> UserDAO.profile(id);
             case 9 -> {

@@ -34,7 +34,7 @@ public class LL {
     // Display all dishes
     public void display() {
         if (head == null) {
-            System.out.println("Dish list is empty.");
+            System.out.println("\nCart is empty, Nothing to display.");
             return;
         }
 

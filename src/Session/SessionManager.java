@@ -13,10 +13,10 @@ public class SessionManager {
     static {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
-            Writer.write(AppConstants.HEADER);
-            Writer.newLine();
-            Writer.newLine();
-            Writer.newLine();
+//            Writer.write(AppConstants.HEADER);
+//            Writer.newLine();
+//            Writer.newLine();
+//            Writer.newLine();
             Writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

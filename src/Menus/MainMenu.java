@@ -16,6 +16,7 @@ public class MainMenu {
             AppConstants.show = true;
             while (AppConstants.show) {
             try {
+                Thread.sleep(1000);
                 System.out.println("===================================");
                 System.out.println("|           Main Menu             |");
                 System.out.println("===================================");
@@ -30,7 +31,8 @@ public class MainMenu {
                             CustomerMenu.newCustomer();
                             break;
                         case 2:
-                            System.out.print("\n========= Login =========");
+                            Thread.sleep(500);
+                            System.out.print("\n============== Login ==============\n");
                             System.out.print("\nEnter id : ");
                             String id = AppConstants.s.next();
                             System.out.print("Enter password : ");
