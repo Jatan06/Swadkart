@@ -28,27 +28,6 @@ public class AppConstants {
     public static final String PAYMENT_STATUS_COMPLETED = "completed";
     public static final String PAYMENT_STATUS_FAILED = "failed";
 
-    // ID Generation Constants
-    public static final String RESTAURANT_ID_PREFIX = "R-";
-    public static final String DISH_ID_PREFIX = "D-";
-    public static final String ORDER_ID_PREFIX = "ORD-";
-    public static final String PAYMENT_ID_PREFIX = "PAY-";
-
-    // Validation Constants
-    public static final int MIN_PASSWORD_LENGTH = 6;
-    public static final int MIN_NAME_LENGTH = 2;
-    public static final int MAX_NAME_LENGTH = 50;
-    public static final int MIN_RATING = 1;
-    public static final int MAX_RATING = 5;
-    public static final double MIN_PRICE = 0.01;
-    public static final int MIN_QUANTITY = 1;
-    public static final int MAX_QUANTITY = 99;
-
-    // System Messages
-    public static final String MSG_INVALID_CHOICE = "\nInvalid choice. Please try again.";
-    public static final String MSG_OPERATION_SUCCESS = "\nOperation completed successfully!";
-    public static final String MSG_NO_DATA = "\nNo data found.";
-
     // Error Messages
     public static final String ERR_INVALID_INPUT = "\nInvalid input. Please try again.";
     public static final String ERR_USER_NOT_FOUND = "\nUser not found.";
