@@ -6,6 +6,7 @@ import Services.*;
 import Dao.*;
 import Session.*;
 import Ds.*;
+
 public class CustomerMenu {
     //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
     public static void newCustomer() {
@@ -104,7 +105,6 @@ public class CustomerMenu {
                             }
                         }
                         System.out.print("Enter address : ");
-//                        AppConstants.s.nextLine();
                         String address = AppConstants.s.nextLine();
                         while (true) {
                             if (Validators.validateAddress(address)) {
@@ -135,37 +135,52 @@ public class CustomerMenu {
                 }
             } catch (Exception e) {
                 throw new RuntimeException("An error occurred in the Customer Menu in new customer ", e);
-//                System.out.println("\nException: InputMismatchException in new Customer Menu. Please provide valid input.");
-//                AppConstants.s.nextLine(); // Clear scanner buffer
             }
         }
     }
+
+    // Safer, precise validator that only logs session on success
     public static boolean customerValidator(String id, String password) throws Exception {
-        Statement s = AppConstants.connection.createStatement();
-        ResultSet rs = s.executeQuery("select * from users;");
-        while (rs.next()) {
-            if (rs.getString(1).equals(id) && rs.getString(7).equals(password)) {
-                AppConstants.customerValid = true;
-                break;
-            } else {
-                AppConstants.customerValid = false;
+        String sql = "SELECT password FROM users WHERE id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    // user id not found
+                    return false;
+                }
+                String storedPassword = rs.getString(1);
+                boolean ok = storedPassword != null && storedPassword.equals(password);
+                if (ok) {
+                    AppConstants.customerValid = true;
+                    SessionManager.Login(id);
+                    return true;
+                } else {
+                    AppConstants.customerValid = false;
+                    return false;
+                }
             }
         }
-        SessionManager.Login(id);
-        return AppConstants.customerValid;
     }
+
     public static void customerMenu(String id) {
-        try {
-            AppConstants.run = true;
-            while (AppConstants.run) {
+        AppConstants.run = true;
+        while (AppConstants.run) {
+            try {
                 displayMenu();
                 int option = getUserInput();
-                processAction(option,id);
+                processAction(option, id);
+            } catch (java.util.InputMismatchException ime) {
+                System.out.println("Invalid input. Please enter a number.");
+                AppConstants.s.nextLine(); // clear buffer
+            } catch (Exception e) {
+                // Surface the underlying cause clearly and stop the loop
+                e.printStackTrace();
+                throw new RuntimeException("An error occurred in the Customer Menu loop while processing an action", e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred in the Customer Menu in customer validator ", e);
         }
     }
+
     private static void displayMenu() {
         System.out.println("\n=================================");
         System.out.println("|              Menu              |");
@@ -182,33 +197,36 @@ public class CustomerMenu {
         System.out.println("=================================");
         System.out.print("\nPlease select an option: ");
     }
+
     private static int getUserInput() {
         while (true) {
             if (AppConstants.s.hasNextInt()) {
-                return AppConstants.s.nextInt();
+                int v = AppConstants.s.nextInt();
+                AppConstants.s.nextLine(); // consume trailing newline to make nextLine safe everywhere
+                return v;
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                AppConstants.s.next(); // Clear invalid input
+                AppConstants.s.next(); // Clear invalid token
             }
         }
     }
+
     private static void processAction(int option,String id) throws Exception {
         switch (option) {
             case 1 -> RestaurantDAO.browseRestaurants();
             case 2 -> {
                 System.out.print("Enter Restaurant name: ");
-                AppConstants.s.nextLine();
                 String resName = AppConstants.s.nextLine();
                 DishDAO.browseDishesByRestaurant(resName);
             }
             case 3 -> {
                 System.out.print("Enter dish category: ");
-                DishDAO.browseDishesByCuisine(AppConstants.s.next());
-                AppConstants.s.nextLine();
+                String cuisine = AppConstants.s.nextLine();
+                DishDAO.browseDishesByCuisine(cuisine);
             }
             case 4 -> UserService.addToCart();
             case 5 -> UserService.Cart.display();
-            case 6 -> PaymentDAO.placeOrder(id);
+            case 6 -> OrderDAO.placeOrder(id);
             case 7 -> OrderDAO.orderHistory();
             case 8 -> UserDAO.profile(id);
             case 9 -> {
@@ -217,6 +235,6 @@ public class CustomerMenu {
                 AppConstants.run = false;
             }
             default -> System.out.println("Invalid choice. Please try again.");
- }
-}
+        }
+    }
 }

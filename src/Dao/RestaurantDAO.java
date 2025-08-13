@@ -196,4 +196,18 @@ public class RestaurantDAO {
             System.out.println("Error deleting restaurant.");
         }
     }
+    static public String getRestaurantIdByName(String name) {
+        String id = null;
+        try {
+            PreparedStatement ps = AppConstants.connection.prepareCall("select id from restaurants where name = ?;");
+            ps.setString(1,name);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                id = rs.getString("id");
+            }
+        } catch (SQLException e) {
+            System.out.printf("Exception :- "+e);
+        }
+        return id;
+    }
 }

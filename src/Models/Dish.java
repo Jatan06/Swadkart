@@ -1,5 +1,7 @@
 package Models;
 
+import Dao.RestaurantDAO;
+
 public class Dish {
     private String dish_id;
     private String name;
@@ -33,6 +35,10 @@ public class Dish {
         return restaurant;
     }
 
+    public String getRestaurantId(String name) {
+        return RestaurantDAO.getRestaurantIdByName(name);
+    }
+
     public double getRating() {
         return rating;
     }
@@ -40,4 +46,5 @@ public class Dish {
     public double getPrice() {
         return price;
     }
+
 }

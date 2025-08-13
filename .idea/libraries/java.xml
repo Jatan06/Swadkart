@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="java">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Downloads/jlayer-1.0.3.zip!/jlayer-1.0.3/src/main/java" />
+      <root url="jar://$USER_HOME$/Downloads/jlayer-1.0.3.zip!/jlayer-1.0.3/src/test/java" />
+    </SOURCES>
+  </library>
+</component>

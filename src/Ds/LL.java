@@ -1,20 +1,21 @@
 package Ds;
 import Models.Dish;
 
-class Node {
-    Dish data;
-    int quantity;
-    Node next;
 
-    public Node(Dish data,int quantity) {
-        this.data = data;
-        this.quantity = quantity;
-        this.next = null;
-    }
-}
 
 public class LL {
-    private Node head;
+    public class Node {
+        public Dish data;
+        public int quantity;
+        public Node next;
+
+        public Node(Dish data,int quantity) {
+            this.data = data;
+            this.quantity = quantity;
+            this.next = null;
+        }
+    }
+    public Node head;
 
     // Insert at the end
     public void insert(Dish dish,int quantity) {
