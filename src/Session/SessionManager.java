@@ -12,7 +12,7 @@ public class SessionManager {
     static File logs = new File("LogsInfo.txt");
     static {
         try {
-            BufferedWriter Writer = new BufferedWriter(new FileWriter(logs));
+            BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
             Writer.write(AppConstants.HEADER);
             Writer.newLine();
             Writer.newLine();
@@ -29,7 +29,7 @@ public class SessionManager {
             String s = (isCreated)?(AppConstants.NEW_USER_SUCCESS + " (" + timestamp + "): " +  id):AppConstants.NEW_USER_FAIL;
             Writer.write(s);
             Writer.newLine();
-            Writer.flush();
+            Writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -41,7 +41,7 @@ public class SessionManager {
             String s = (AppConstants.customerValid) ? AppConstants.LOG_SUCCESS + " (" + timestamp + "): " + id : AppConstants.LOG_FAIL + " (" + timestamp + "): " + id;
             Writer.write(s);
             Writer.newLine();
-            Writer.flush();
+            Writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

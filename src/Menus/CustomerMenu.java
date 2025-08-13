@@ -205,7 +205,7 @@ public class CustomerMenu {
                 DishDAO.browseDishesByCuisine(AppConstants.s.next());
                 AppConstants.s.nextLine();
             }
-            //case 4 -> OrderDAO.addToCart();
+            case 4 -> UserService.addToCart();
             case 5 -> OrderDAO.viewCart();
             case 6 -> PaymentDAO.placeOrder();
             case 7 -> OrderDAO.orderHistory();

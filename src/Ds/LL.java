@@ -16,7 +16,7 @@ class Node {
 public class LL {
     private Node head;
 
-    // Insert at end
+    // Insert at the end
     public void insert(Dish dish,int quantity) {
         Node newNode = new Node(dish,quantity);
         if (head == null) {
@@ -41,7 +41,7 @@ public class LL {
         Node current = head;
         System.out.println("Dish List:");
         while (current != null) {
-            System.out.println(current.data + " " + current.quantity);
+            System.out.println("\nDish Id :- " +current.data.getDish_id()+"\nDish Name :- "+current.data.getName() + "\nQuantity " + current.quantity+"\nPer unit price :- "+current.data.getPrice()+"\nTotal Price :- "+current.quantity*current.data.getPrice()+"\n");
             current = current.next;
         }
     }

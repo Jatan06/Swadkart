@@ -143,12 +143,11 @@ public class DishDAO {
             System.out.println(RED + "No dish found with the category: " + dish_category + RESET);
         }
     }
-    public static Models.Dish getDishByIdAndRestaurant(String dishId, String restaurantId) {
+    public static Models.Dish getDishByIdAndRestaurant(String dishId) {
         try {
             java.sql.PreparedStatement stmt = AppConstants.connection.prepareStatement(
-                    "SELECT * FROM dishes WHERE dish_id = ? AND restaurant = ?;");
+                    "SELECT * FROM dishes WHERE dish_id = ?");
             stmt.setString(1, dishId);
-            stmt.setString(2, restaurantId);
             java.sql.ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Models.Dish(
@@ -164,5 +163,23 @@ public class DishDAO {
             // ignore
         }
         return null;
+    }
+    public static String getRestaurantNameById(String resId) {
+        String resName = null;
+        try {
+            java.sql.PreparedStatement stmt = AppConstants.connection.prepareStatement(
+                    "SELECT name FROM restaurants WHERE id = ?;");
+            stmt.setString(1, resId);
+            java.sql.ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                resName = rs.getString("name");
+            }
+            else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.out.printf("Exception %s arise in getRestaurantNameById.");
+        }
+        return resName;
     }
 }

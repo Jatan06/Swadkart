@@ -1,22 +1,22 @@
 //UserService.java
 package Services;
-
 import Constants.AppConstants;
 import Dao.DishDAO;
 import Utils.Validators;
 import Ds.*;
 
+import java.util.Objects;
 import java.util.Scanner;
 
 public class UserService {
     static Scanner scanner = AppConstants.s;
-    static Boolean isEmpty = true;
+    static boolean isEmpty = true;
     public static LL Cart = new LL();
     public static void addToCart() throws Exception {
         String r_id = null;
         if(isEmpty){
             while(!Validators.validateRestaurantName(r_id)) {
-                System.out.println("Enter Restaurant Id: ");
+                System.out.print("\nEnter Restaurant Id: ");
                 r_id = scanner.next();
             }
             isEmpty= false;
@@ -32,10 +32,10 @@ public class UserService {
             String option = scanner.next();
             switch (option) {
                 case "1":
-                    DishDAO.browseDishesByRestaurant(r_id);
+                    DishDAO.browseDishesByRestaurant(Objects.requireNonNull(DishDAO.getRestaurantNameById(r_id)));
                     System.out.print("Enter Dish id to add: ");
                     String dishInput = scanner.next();
-                    Models.Dish dish = DishDAO.getDishByIdAndRestaurant(dishInput, r_id);
+                    Models.Dish dish = DishDAO.getDishByIdAndRestaurant(dishInput);
                     if (dish == null) {
                         System.out.println("Invalid Dish ID or dish does not belong to this restaurant. Try again.");
                         break;
