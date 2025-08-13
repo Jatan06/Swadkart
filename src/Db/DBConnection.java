@@ -4,7 +4,7 @@ import java.sql.*;
 public class DBConnection {
     public static boolean DbConnection() {
         try {
-            AppConstants.connection = DriverManager.getConnection("jdbc:mysql://192.168.29.166:3306/swadkart", "root", "");
+            AppConstants.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/swadkart", "root", "");
             return true;
         } catch (SQLException e) {
             System.out.println("\nException :- Java Connection to Swadkart Database is unsuccessful.");
