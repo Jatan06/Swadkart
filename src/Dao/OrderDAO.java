@@ -12,6 +12,7 @@ import java.util.*;
 
 public class OrderDAO {
     public static int totalOrders;
+
     public static void getOrderNumber() throws Exception {
         String q = "SELECT COUNT(o_id) FROM orders;";
         PreparedStatement ps = AppConstants.connection.prepareStatement(q);
@@ -20,6 +21,7 @@ public class OrderDAO {
         totalOrders = rs.getInt(1);
         totalOrders++;
     }
+
     public static void orderHistory() throws Exception {
         PreparedStatement ps = AppConstants.connection.prepareCall("SELECT o_id, uid, did, rid, order_time, quantity FROM orders");
         ResultSet rs = ps.executeQuery();
@@ -72,76 +74,93 @@ public class OrderDAO {
         System.out.println(BOLD + GREEN + "📊 Total Orders: " + count + RESET);
         System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
     }
+
     public static void placeOrder(String uid) throws Exception {
-        // Basic guard: ensure the cart is not null/empty to avoid NPEs
-        if (Services.UserService.Cart == null || Services.UserService.Cart.head == null) {
+        if (UserService.Cart == null || UserService.Cart.head == null) {
             System.out.println("\nCart is empty. Nothing to place.");
             return;
         }
 
-        Dish ob = null;
-        // Ensure Payment.payment exists elsewhere before this method is called
-        Payment.payment.user_id = uid;
+        // Derive a restaurant for this order from the first cart item
+        LL.Node head = UserService.Cart.head;
+        String restaurantId = head.data.getRestaurantId(head.data.getRestaurant());
+        if (restaurantId == null || restaurantId.isBlank()) {
+            throw new IllegalStateException("Restaurant ID could not be determined from cart.");
+        }
 
+        boolean previousAutoCommit = AppConstants.connection.getAutoCommit();
         AppConstants.connection.setAutoCommit(false);
+        Savepoint sp = null;
 
-        LL.Node n = UserService.Cart.head;
-        long lastInsertedOrderId = -1L;
+        Integer orderId = null;
 
-        while (n != null) {
-            ob = n.data;
+        try {
+            sp = AppConstants.connection.setSavepoint();
 
-            final String addOrder = "INSERT INTO orders(uid, did, rid, quantity) VALUES (?, ?, ?, ?)";
-
-            try (PreparedStatement ps = AppConstants.connection.prepareStatement(
-                    addOrder, Statement.RETURN_GENERATED_KEYS)) {
-
-                ps.setString(1, uid);
-                ps.setString(2, ob.getDish_id());
-                ps.setString(3, ob.getRestaurantId(ob.getRestaurant()));
-                ps.setInt(4, n.quantity);
-
-                int affected = ps.executeUpdate();
-                if (affected <= 0) {
-                    System.out.printf("\nInsertion in orders table failed for uid,did: %s,%s", uid, ob.getDish_id());
-                    AppConstants.connection.rollback();
-                    return;
-                }
-
-                try (ResultSet gk = ps.getGeneratedKeys()) {
-                    if (gk.next()) {
-                        lastInsertedOrderId = gk.getLong(1);
+            // 1) Insert record into the order table.
+            // If your DB provides a default timestamp, you can omit order_time.
+            String insertOrderSQL = "INSERT INTO orders(uid, rid, order_time_stamp) VALUES(?, ?, CURRENT_TIMESTAMP)";
+            try (PreparedStatement psOrder = AppConstants.connection.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
+                psOrder.setString(1, uid);
+                psOrder.setString(2, restaurantId);
+                psOrder.executeUpdate();
+                try (ResultSet rs = psOrder.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        orderId = rs.getInt(1);
+                    } else {
+                        throw new SQLException("Failed to obtain generated order ID.");
                     }
                 }
             }
 
-            n = n.next;
-        }
+            // 2) Insert all cart items into order_items (batched)
+            String insertItemSQL = "INSERT INTO order_items(o_id, did, quantity) VALUES(?, ?, ?)";
+            try (PreparedStatement psItem = AppConstants.connection.prepareStatement(insertItemSQL)) {
+                LL.Node n = head;
+                while (n != null) {
+                    psItem.setInt(1, orderId);
+                    psItem.setString(2, n.data.getDish_id());
+                    psItem.setInt(3, n.quantity);
+                    psItem.addBatch();
+                    n = n.next;
+                }
+                psItem.executeBatch();
+            }
 
-        if (ob == null) {
-            // Should not happen due to earlier guard, but be safe
-            AppConstants.connection.rollback();
-            System.out.print("\nNo items were processed for the order.");
-            return;
-        }
+            // 3) Prepare payment info before invoking payment routine
+            Payment.payment = new Payment();
+            Payment.payment.user_id = uid;
+            Payment.payment.order_id = String.valueOf(orderId);
+            Payment.payment.restaurant_id = restaurantId;
+            // Optional: if your flow requires defaults before PaymentService sets them
+            if (Payment.payment.paymentType == null) Payment.payment.paymentType = "UNKNOWN";
+            if (Payment.payment.paymentStatus == null) Payment.payment.paymentStatus = "PENDING";
 
-        // Set payment metadata from the last processed dish and actual generated order id
-        Payment.payment.restaurant_id = ob.getRestaurantId(ob.getRestaurant());
-        if (lastInsertedOrderId <= 0) {
-            // Could not retrieve generated key; this is a hard failure
-            AppConstants.connection.rollback();
-            throw new IllegalStateException("Failed to retrieve generated order ID for payment linkage.");
-        }
-        Payment.payment.order_id = String.valueOf(lastInsertedOrderId);
+            // 4) Process payment
+            boolean paymentSuccess = PaymentService.paymentInterface();
 
-        // Process payment
-        if (PaymentService.paymentInterface()) {
-            Sound.playWav("/zomato_app.wav");
-            Thread.sleep(1000);
+            // 6) Commit and finalize
             AppConstants.connection.commit();
-        } else {
-            AppConstants.connection.rollback();
-            System.out.print("\nPayment not completed. Please try again.");
+            Thread.sleep(1000);
+            Sound.playWav("/zomato_app.wav"); // starting slash is important
+            System.out.println("Order placed and payment completed successfully!");
+
+            // Clear the cart only after a successful commit
+            UserService.Cart.clearList();
+            UserService.isEmpty = true;
+
+        } catch (Exception ex) {
+            try {
+                if (sp != null) AppConstants.connection.rollback(sp);
+            } catch (Exception ignore) {
+            }
+            // Re-throw so the caller can log/ handle or print a friendly message here
+            throw ex;
+        } finally {
+            try {
+                AppConstants.connection.setAutoCommit(previousAutoCommit);
+            } catch (Exception ignore) {
+            }
         }
     }
 }

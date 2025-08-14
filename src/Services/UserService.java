@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class UserService {
     static Scanner scanner = AppConstants.s;
-    static boolean isEmpty = true;
+    public static boolean isEmpty = true;
     public static LL Cart = new LL();
     public static void addToCart() throws Exception {
         String r_id = null;

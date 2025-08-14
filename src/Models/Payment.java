@@ -8,7 +8,7 @@ public class Payment {
     public String user_id;
     public String order_id;
     public String restaurant_id;
-    Payment() {}
+    public Payment() {}
     public Payment(String paymentType, String paymentStatus, double amount, String user_id, String order_id, String restaurant_id) {
         this.paymentType = paymentType;
         this.paymentStatus = paymentStatus;
