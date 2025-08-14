@@ -143,6 +143,7 @@ public class OrderDAO {
             AppConstants.connection.commit();
             Thread.sleep(1000);
             Sound.playWav("/zomato_app.wav"); // starting slash is important
+            Thread.sleep(500);
             System.out.println("Order placed and payment completed successfully!");
 
             // Clear the cart only after a successful commit
