@@ -160,8 +160,8 @@ public class OrderDAO {
 
     // New: Display Orders and Order Items with smart FK handling and formatting
     public static void viewOrderAndOrderItems() throws Exception {
-        String sqlOrders = "SELECT * FROM orders";
-        String sqlOrderItems = "SELECT * FROM order_items";
+        String sqlOrders = "SELECT * FROM orders GROUP BY uid";
+        String sqlOrderItems = "SELECT * FROM order_items GROUP BY o_id";
 
         try (Statement st = AppConstants.connection.createStatement()) {
             try (ResultSet rs = st.executeQuery(sqlOrders)) {
