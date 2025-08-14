@@ -2,10 +2,10 @@ package Dao;
 
 import Constants.AppConstants;
 import Models.Payment;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 public class PaymentDAO {
-    public static void savePaymentDetails(boolean success,Payment p) throws Exception {
+    public static void savePaymentDetails(boolean success, Payment p) throws Exception {
         if (p == null) throw new Exception("Payment object is null.");
 
         String sql = "INSERT INTO payment (paymentType,paymentStatus,amount,u_id,o_id,r_id) VALUES(?,?,?,?,?,?)";
@@ -22,5 +22,60 @@ public class PaymentDAO {
         }
 
         if (!success) throw new Exception("Payment not completed. Transaction should be rolled back by caller.");
+    }
+
+    public static void viewTransactions() throws Exception {
+        String sql = "SELECT payment_id, paymentType, paymentStatus, amount, u_id, o_id, r_id FROM payment";
+
+        // Column headers and widths
+        String[] headers = {"payment_id", "paymentType", "paymentStatus", "amount", "u_id", "o_id", "r_id"};
+        int[] widths =    {11,           14,             15,              12,       12,     8,      12};
+
+        // Precompute format strings (right-align numerics, left-align text)
+        String rowFmt = String.format("| %%%ds | %%-%ds | %%-%ds | %%%ds | %%-%ds | %%%ds | %%-%ds |%%n",
+                widths[0], widths[1], widths[2], widths[3], widths[4], widths[5], widths[6]);
+
+        // Separator line
+        int totalWidth = 2 + 2; // starting and ending '|' plus newline elsewhere
+        for (int w : widths) totalWidth += w + 3; // space + content + space, plus '|' later
+        String sep = repeat('-', totalWidth - 1); // -1 to account for newline
+
+        try (Statement st = AppConstants.connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            // Print header
+            System.out.println(sep);
+            System.out.printf(rowFmt,
+                    headers[0], headers[1], headers[2], headers[3], headers[4], headers[5], headers[6]);
+            System.out.println(sep);
+
+            // Print rows
+            while (rs.next()) {
+                // Read values with null-safety
+                String paymentId = String.valueOf(rs.getInt("payment_id"));
+                String paymentType = nz(rs.getString("paymentType"));
+                String paymentStatus = nz(rs.getString("paymentStatus"));
+                String amount = String.format(java.util.Locale.US, "%,.2f", rs.getDouble("amount"));
+                String uId = nz(rs.getString("u_id"));
+                int oIdVal = rs.getInt("o_id");
+                String oId = rs.wasNull() ? "-" : String.valueOf(oIdVal);
+                String rId = nz(rs.getString("r_id"));
+
+                System.out.printf(rowFmt, paymentId, paymentType, paymentStatus, amount, uId, oId, rId);
+            }
+
+            System.out.println(sep);
+        }
+    }
+
+    private static String repeat(char c, int count) {
+        if (count <= 0) return "";
+        StringBuilder sb = new StringBuilder(count);
+        for (int i = 0; i < count; i++) sb.append(c);
+        return sb.toString();
+    }
+
+    private static String nz(String s) {
+        return (s == null || s.isEmpty()) ? "-" : s;
     }
 }

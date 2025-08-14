@@ -1,15 +1,11 @@
 package Dao;
-import java.sql.*;
-import java.io.*;
-import Constants.*;
-import Ds.*;
-import Utils.*;
-import Services.*;
-import Db.*;
-import Menus.*;
-import Models.*;
-import java.util.*;
 
+import Constants.*;
+import java.sql.*;
+import java.util.*;
+import Models.*;
+import Services.*;
+import Ds.*;
 public class OrderDAO {
     public static int totalOrders;
 
@@ -98,7 +94,6 @@ public class OrderDAO {
             sp = AppConstants.connection.setSavepoint();
 
             // 1) Insert record into the order table.
-            // If your DB provides a default timestamp, you can omit order_time.
             String insertOrderSQL = "INSERT INTO orders(uid, rid, order_time_stamp) VALUES(?, ?, CURRENT_TIMESTAMP)";
             try (PreparedStatement psOrder = AppConstants.connection.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setString(1, uid);
@@ -132,7 +127,6 @@ public class OrderDAO {
             Payment.payment.user_id = uid;
             Payment.payment.order_id = String.valueOf(orderId);
             Payment.payment.restaurant_id = restaurantId;
-            // Optional: if your flow requires defaults before PaymentService sets them
             if (Payment.payment.paymentType == null) Payment.payment.paymentType = "UNKNOWN";
             if (Payment.payment.paymentStatus == null) Payment.payment.paymentStatus = "PENDING";
 
@@ -142,7 +136,7 @@ public class OrderDAO {
             // 6) Commit and finalize
             AppConstants.connection.commit();
             Thread.sleep(1000);
-            Sound.playWav("/zomato_app.wav"); // starting slash is important
+            Sound.playWav("/zomato_app.wav");
             Thread.sleep(500);
             System.out.println("Order placed and payment completed successfully!");
 
@@ -155,7 +149,6 @@ public class OrderDAO {
                 if (sp != null) AppConstants.connection.rollback(sp);
             } catch (Exception ignore) {
             }
-            // Re-throw so the caller can log/ handle or print a friendly message here
             throw ex;
         } finally {
             try {
@@ -163,5 +156,166 @@ public class OrderDAO {
             } catch (Exception ignore) {
             }
         }
+    }
+
+    // New: Display Orders and Order Items with smart FK handling and formatting
+    public static void viewOrderAndOrderItems() throws Exception {
+        String sqlOrders = "SELECT * FROM orders";
+        String sqlOrderItems = "SELECT * FROM order_items";
+
+        try (Statement st = AppConstants.connection.createStatement()) {
+            try (ResultSet rs = st.executeQuery(sqlOrders)) {
+                printResultSetAsTable("ORDERS", rs);
+            }
+            try (ResultSet rs = st.executeQuery(sqlOrderItems)) {
+                printResultSetAsTable("ORDER ITEMS", rs);
+            }
+        }
+    }
+
+    // ---------- Helpers for tabular display ----------
+
+    private static void printResultSetAsTable(String title, ResultSet rs) throws SQLException {
+        ResultSetMetaData md = rs.getMetaData();
+        int colCount = md.getColumnCount();
+
+        List<String[]> rows = new ArrayList<>();
+        int[] widths = new int[colCount];
+        String[] headers = new String[colCount];
+        int[] types = new int[colCount];
+
+        for (int i = 1; i <= colCount; i++) {
+            headers[i - 1] = md.getColumnLabel(i);
+            types[i - 1] = md.getColumnType(i);
+            widths[i - 1] = Math.max(3, headers[i - 1].length());
+        }
+
+        while (rs.next()) {
+            String[] row = new String[colCount];
+            for (int i = 1; i <= colCount; i++) {
+                String colName = headers[i - 1];
+                int sqlType = types[i - 1];
+
+                Object val = rs.getObject(i);
+                String txt = formatValue(colName, sqlType, val);
+                row[i - 1] = txt;
+                widths[i - 1] = Math.max(widths[i - 1], txt.length());
+            }
+            rows.add(row);
+        }
+
+        // Build format strings
+        String[] colFmts = new String[colCount];
+        for (int i = 0; i < colCount; i++) {
+            boolean rightAlign = isNumeric(types[i]);
+            colFmts[i] = rightAlign ? "%"+widths[i]+"s" : "%-"+widths[i]+"s";
+        }
+
+        String sep = buildSeparator(widths);
+
+        StringBuilder headerFmt = new StringBuilder("| ");
+        for (int i = 0; i < colCount; i++) {
+            headerFmt.append(String.format("%%-%ds", widths[i])).append(" | ");
+        }
+        headerFmt.append("%n");
+
+        StringBuilder rowFmt = new StringBuilder("| ");
+        for (int i = 0; i < colCount; i++) {
+            rowFmt.append(colFmts[i]).append(" | ");
+        }
+        rowFmt.append("%n");
+
+        // Print table
+        System.out.println();
+        System.out.println(centerTitleInSeparator(title, sep));
+        System.out.println(sep);
+        System.out.printf(headerFmt.toString(), (Object[]) headers);
+        System.out.println(sep);
+
+        if (rows.isEmpty()) {
+            System.out.printf("| %s |%n", padRight("No records found.", sep.length() - 4));
+            System.out.println(sep);
+            return;
+        }
+
+        for (String[] row : rows) {
+            System.out.printf(rowFmt.toString(), (Object[]) row);
+        }
+        System.out.println(sep);
+    }
+
+    private static String formatValue(String colName, int sqlType, Object val) {
+        if (val == null) {
+            // For foreign keys, show "-"
+            if (looksLikeForeignKey(colName)) return "-";
+            return "-";
+        }
+
+        // Money-like formatting
+        if (looksLikeMoney(colName) && val instanceof Number) {
+            return String.format(java.util.Locale.US, "%,.2f", ((Number) val).doubleValue());
+        }
+
+        if (isNumeric(sqlType)) {
+            return val.toString();
+        }
+
+        if (val instanceof java.sql.Timestamp || val instanceof java.sql.Date || val instanceof java.sql.Time) {
+            return val.toString();
+        }
+
+        String s = val.toString();
+        return (s == null || s.isEmpty()) ? "-" : s;
+    }
+
+    private static boolean looksLikeForeignKey(String colName) {
+        String n = colName.toLowerCase(java.util.Locale.ROOT);
+        return n.endsWith("_id")
+                || n.equals("o_id") || n.equals("uid") || n.equals("did") || n.equals("rid")
+                || n.equals("order_id") || n.equals("item_id") || n.equals("payment_id");
+    }
+
+    private static boolean looksLikeMoney(String colName) {
+        String n = colName.toLowerCase(java.util.Locale.ROOT);
+        return n.contains("amount") || n.contains("price") || n.contains("total");
+    }
+
+    private static boolean isNumeric(int sqlType) {
+        return switch (sqlType) {
+            case Types.BIT, Types.BOOLEAN,
+                 Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT,
+                 Types.FLOAT, Types.REAL, Types.DOUBLE,
+                 Types.NUMERIC, Types.DECIMAL -> true;
+            default -> false;
+        };
+    }
+
+    private static String buildSeparator(int[] widths) {
+        int total = 1; // starting '|'
+        for (int w : widths) total += 1 + w + 1 + 1; // " " + content + " " + "|"
+        return repeat('-', total);
+    }
+
+    private static String centerTitleInSeparator(String title, String sep) {
+        int len = sep.length();
+        String t = " " + title + " ";
+        if (t.length() >= len) return t.substring(0, len);
+        int pad = (len - t.length()) / 2;
+        return repeat('-', pad) + t + repeat('-', len - pad - t.length());
+    }
+
+    private static String repeat(char c, int count) {
+        if (count <= 0) return "";
+        StringBuilder sb = new StringBuilder(count);
+        for (int i = 0; i < count; i++) sb.append(c);
+        return sb.toString();
+    }
+
+    private static String padRight(String s, int w) {
+        if (s.length() >= w) return s;
+        StringBuilder sb = new StringBuilder(w);
+        sb.append(s);
+        for (int i = s.length(); i < w; i++) sb.append(' ');
+        return sb.toString();
     }
 }

@@ -3,9 +3,11 @@ import Admin.Admin;
 import Constants.*;
 import java.sql.*;
 public class RestaurantDAO {
-    public static void browseRestaurants() throws Exception{
-        PreparedStatement br = AppConstants.connection.prepareCall("select * from restaurants");
-        ResultSet restaurants = br.executeQuery();
+
+public static void browseRestaurants() throws Exception {
+    try (PreparedStatement br = AppConstants.connection.prepareStatement("SELECT * FROM restaurants");
+         ResultSet restaurants = br.executeQuery()) {
+
         // ANSI color codes for terminal
         final String RESET = "\u001B[0m";
         final String BOLD = "\u001B[1m";
@@ -14,30 +16,40 @@ public class RestaurantDAO {
         final String RED = "\u001B[31m";
         final String BLUE = "\u001B[34m";
         final String CYAN = "\u001B[36m";
-        // Print header with styling
+
+        // Fixed column widths to keep a stable table
+        final int W_ID = 8, W_NAME = 25, W_CUISINE = 18, W_PHONE = 14, W_ADDRESS = 35, W_RATING = 8, W_STATUS = 12;
+
+        // Header
         System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
         System.out.println(BOLD + BLUE + "\t\t\t                                       🍽️  RESTAURANTS  🍽️" + RESET);
         System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-        // Print column headers
-        System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s %-12s%n" + RESET,
-                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating", "Status");
+
+        // Column headers
+        System.out.printf(
+                BOLD + "%-" + W_ID + "s %-" + W_NAME + "s %-" + W_CUISINE + "s %-" + W_PHONE + "s %-" + W_ADDRESS + "s %-" + W_RATING + "s %-" + W_STATUS + "s%n" + RESET,
+                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating", "Status"
+        );
         System.out.println(CYAN + "-".repeat(130) + RESET);
+
         int count = 0;
+
         while (restaurants.next()) {
-            String id = restaurants.getString("id");
-            String name = restaurants.getString("name");
-            String cuisine = restaurants.getString("cuisine");
-            String phone = restaurants.getString("phone_no");
-            String address = restaurants.getString("address");
+            String id = nz(restaurants.getString("id"));
+            String name = nz(restaurants.getString("name"));
+            String cuisine = nz(restaurants.getString("cuisine"));
+            String phone = nz(restaurants.getString("phone_no"));
+            String address = nz(restaurants.getString("address"));
             double rating = restaurants.getDouble("rating");
+            if (restaurants.wasNull()) rating = 0.0;
 
-            // Truncate long text
-            String displayName = name.length() > 25 ? name.substring(0, 22) + "..." : name;
-            String displayAddress = address.length() > 35 ? address.substring(0, 32) + "..." : address;
+            // Truncate long text to fit columns
+            String displayName = truncate(name, W_NAME);
+            String displayAddress = truncate(address, W_ADDRESS);
 
-            // Color code based on rating
-            String ratingColor = "";
-            String statusText = "";
+            // Color/status based on rating
+            String ratingColor;
+            String statusText;
             if (rating >= 4.5) {
                 ratingColor = GREEN;
                 statusText = "⭐ Excellent";
@@ -52,23 +64,111 @@ public class RestaurantDAO {
                 statusText = "👎 Below Avg";
             }
 
-            // Print restaurant data with color coding
-            System.out.printf("%-8s %-25s %-18s %-14s %-35s %s%-8.1f%s %-12s%n",
+            System.out.printf(
+                    "%-" + W_ID + "s %-" + W_NAME + "s %-" + W_CUISINE + "s %-" + W_PHONE + "s %-" + W_ADDRESS + "s %s%" + (W_RATING - 3) + ".1f%s %-" + W_STATUS + "s%n",
                     id, displayName, cuisine, phone, displayAddress,
-                    ratingColor, rating, RESET, statusText);
+                    ratingColor, rating, RESET, statusText
+            );
+
             count++;
-            // Add a separator every 15 rows
             if (count % 15 == 0) {
                 System.out.println(CYAN + "-".repeat(130) + RESET);
             }
         }
+
+        if (count == 0) {
+            System.out.printf("| %s |%n", padRight("No restaurants found.", 126));
+        }
+
+        // Footer
         System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
         System.out.println(BOLD + GREEN + "📊 Total Restaurants: " + count + RESET);
-//        System.out.println(BOLD + BLUE + "💡 Sorted by Rating (Highest to Lowest)" + RESET);
         System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-        restaurants.close();
-        br.close();
     }
+}
+private static String nz(String s) {
+    return (s == null || s.isBlank()) ? "-" : s;
+}
+private static String truncate(String s, int width) {
+    if (s == null) return "-";
+    if (s.length() <= width) return s;
+    // Leave room for "..."
+    return (width >= 3) ? s.substring(0, width - 3) + "..." : s.substring(0, width);
+}
+private static String padRight(String s, int w) {
+    if (s.length() >= w) return s;
+    StringBuilder sb = new StringBuilder(w);
+    sb.append(s);
+    while (sb.length() < w) sb.append(' ');
+    return sb.toString();
+}
+
+//    public static void browseRestaurants() throws Exception{
+//        PreparedStatement br = AppConstants.connection.prepareCall("select * from restaurants");
+//        ResultSet restaurants = br.executeQuery();
+//        // ANSI color codes for terminal
+//        final String RESET = "\u001B[0m";
+//        final String BOLD = "\u001B[1m";
+//        final String GREEN = "\u001B[32m";
+//        final String YELLOW = "\u001B[33m";
+//        final String RED = "\u001B[31m";
+//        final String BLUE = "\u001B[34m";
+//        final String CYAN = "\u001B[36m";
+//        // Print header with styling
+//        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
+//        System.out.println(BOLD + BLUE + "\t\t\t                                       🍽️  RESTAURANTS  🍽️" + RESET);
+//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
+//        // Print column headers
+//        System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s %-12s%n" + RESET,
+//                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating", "Status");
+//        System.out.println(CYAN + "-".repeat(130) + RESET);
+//        int count = 0;
+//        while (restaurants.next()) {
+//            String id = restaurants.getString("id");
+//            String name = restaurants.getString("name");
+//            String cuisine = restaurants.getString("cuisine");
+//            String phone = restaurants.getString("phone_no");
+//            String address = restaurants.getString("address");
+//            double rating = restaurants.getDouble("rating");
+//
+//            // Truncate long text
+//            String displayName = name.length() > 25 ? name.substring(0, 22) + "..." : name;
+//            String displayAddress = address.length() > 35 ? address.substring(0, 32) + "..." : address;
+//
+//            // Color code based on rating
+//            String ratingColor = "";
+//            String statusText = "";
+//            if (rating >= 4.5) {
+//                ratingColor = GREEN;
+//                statusText = "⭐ Excellent";
+//            } else if (rating >= 4.0) {
+//                ratingColor = YELLOW;
+//                statusText = "👍 Good";
+//            } else if (rating >= 3.5) {
+//                ratingColor = "";
+//                statusText = "👌 Average";
+//            } else {
+//                ratingColor = RED;
+//                statusText = "👎 Below Avg";
+//            }
+//
+//            // Print restaurant data with color coding
+//            System.out.printf("%-8s %-25s %-18s %-14s %-35s %s%-8.1f%s %-12s%n",
+//                    id, displayName, cuisine, phone, displayAddress,
+//                    ratingColor, rating, RESET, statusText);
+//            count++;
+//            // Add a separator every 15 rows
+//            if (count % 15 == 0) {
+//                System.out.println(CYAN + "-".repeat(130) + RESET);
+//            }
+//        }
+//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
+//        System.out.println(BOLD + GREEN + "📊 Total Restaurants: " + count + RESET);
+//// System.out.println(BOLD + BLUE + "💡 Sorted by Rating (Highest to Lowest)" + RESET);
+//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
+//        restaurants.close();
+//        br.close();
+//    }
 //    public static void browseRestaurantsByCuisine() throws Exception {
 //        System.out.print("Enter cuisine type (or 'ALL' for all cuisines): ");
 //        String cuisineInput = AppConstants.s.nextLine().trim();
@@ -140,6 +240,7 @@ public class RestaurantDAO {
 //        restaurants.close();
 //        br.close();
 //    }
+
     public static void addRestaurant() throws Exception {
         AppConstants.s.nextLine();
         System.out.print("\nEnter Restaurant ID: ");

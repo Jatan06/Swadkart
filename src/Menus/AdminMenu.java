@@ -21,7 +21,8 @@ public class AdminMenu {
             System.out.println("|  1. Edit Restaurants          |");
             System.out.println("|  2. View Restaurants          |");
             System.out.println("|  3. View Orders               |");
-            System.out.println("|  4. Logout                    |");
+            System.out.println("|  4. View Transaction          |");
+            System.out.println("|  5. Logout                    |");
             System.out.println("=================================");
             System.out.print("\nPlease enter your choice: ");
             switch (AppConstants.s.nextInt()) {
@@ -52,8 +53,12 @@ public class AdminMenu {
                     RestaurantDAO.browseRestaurants();
                     break;
                 case 3:
+                    OrderDAO.viewOrderAndOrderItems();
                     break;
                 case 4:
+                    PaymentDAO.viewTransactions();
+                    break;
+                case 5:
                     System.out.println();
                     AppConstants.adminRun = false;
                     break;
