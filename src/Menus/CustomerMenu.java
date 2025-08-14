@@ -227,7 +227,7 @@ public class CustomerMenu {
             case 4 -> UserService.addToCart();
             case 5 -> UserService.Cart.display();
             case 6 -> OrderDAO.placeOrder(id);
-            case 7 -> OrderDAO.orderHistory();
+            case 7 -> OrderDAO.viewOrderAndOrderItems(id);
             case 8 -> UserDAO.profile(id);
             case 9 -> {
                 System.out.println();

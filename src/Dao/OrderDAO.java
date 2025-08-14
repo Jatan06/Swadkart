@@ -19,7 +19,7 @@ public class OrderDAO {
     }
 
     public static void orderHistory() throws Exception {
-        PreparedStatement ps = AppConstants.connection.prepareCall("SELECT o_id, uid, did, rid, order_time, quantity FROM orders");
+        PreparedStatement ps = AppConstants.connection.prepareCall("SELECT * FROM orders");
         ResultSet rs = ps.executeQuery();
 
         // ANSI escape codes for styling
@@ -169,6 +169,39 @@ public class OrderDAO {
             }
             try (ResultSet rs = st.executeQuery(sqlOrderItems)) {
                 printResultSetAsTable("ORDER ITEMS", rs);
+            }
+        }
+    }
+
+    public static void viewOrderAndOrderItems(String uid) throws Exception {
+        // Single, FK-based joined view across orders, order_items, and payment
+        String sql = ""
+                + "SELECT "
+                + "  o.o_id               AS o_id, "
+                + "  o.uid                AS uid, "
+                + "  o.rid                AS rid, "
+                + "  o.order_time_stamp   AS order_time_stamp, "
+                + "  oi.item_id           AS item_id, "
+                + "  oi.did               AS did, "
+                + "  oi.quantity          AS quantity, "
+                + "  p.payment_id         AS payment_id, "
+                + "  p.paymentType        AS paymentType, "
+                + "  p.paymentStatus      AS paymentStatus, "
+                + "  p.amount             AS amount "
+                + "FROM orders o "
+                + "LEFT JOIN order_items oi "
+                + "  ON oi.o_id = o.o_id "
+                + "LEFT JOIN payment p "
+                + "  ON p.o_id = o.o_id "
+                + " AND p.u_id = o.uid "
+                + " AND p.r_id = o.rid "
+                + "WHERE o.uid = ? "
+                + "ORDER BY o.o_id, oi.item_id, p.payment_id";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, uid);
+            try (ResultSet rs = ps.executeQuery()) {
+                printResultSetAsTable("ORDERS AND TRANSACTIONS", rs);
             }
         }
     }
