@@ -2,244 +2,167 @@ package Dao;
 import Admin.Admin;
 import Constants.*;
 import java.sql.*;
+import java.util.*;
+
 public class RestaurantDAO {
 
-public static void browseRestaurants() throws Exception {
-    try (PreparedStatement br = AppConstants.connection.prepareStatement("SELECT * FROM restaurants");
-         ResultSet restaurants = br.executeQuery()) {
+    public static void browseRestaurants() throws Exception {
+        String sql =
+                "SELECT " +
+                "  id AS restaurant_id, " +
+                "  name, " +
+                "  cuisine, " +
+                "  phone_no AS phone, " +
+                "  address, " +
+                "  rating, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '⭐ Excellent' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Below Avg' " +
+                "  END AS status " +
+                "FROM restaurants " +
+                "ORDER BY rating DESC, name ASC";
 
-        // ANSI color codes for terminal
-        final String RESET = "\u001B[0m";
-        final String BOLD = "\u001B[1m";
-        final String GREEN = "\u001B[32m";
-        final String YELLOW = "\u001B[33m";
-        final String RED = "\u001B[31m";
-        final String BLUE = "\u001B[34m";
-        final String CYAN = "\u001B[36m";
-
-        // Fixed column widths to keep a stable table
-        final int W_ID = 8, W_NAME = 25, W_CUISINE = 18, W_PHONE = 14, W_ADDRESS = 35, W_RATING = 8, W_STATUS = 12;
-
-        // Header
-        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
-        System.out.println(BOLD + BLUE + "\t\t\t                                       🍽️  RESTAURANTS  🍽️" + RESET);
-        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-
-        // Column headers
-        System.out.printf(
-                BOLD + "%-" + W_ID + "s %-" + W_NAME + "s %-" + W_CUISINE + "s %-" + W_PHONE + "s %-" + W_ADDRESS + "s %-" + W_RATING + "s %-" + W_STATUS + "s%n" + RESET,
-                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating", "Status"
-        );
-        System.out.println(CYAN + "-".repeat(130) + RESET);
-
-        int count = 0;
-
-        while (restaurants.next()) {
-            String id = nz(restaurants.getString("id"));
-            String name = nz(restaurants.getString("name"));
-            String cuisine = nz(restaurants.getString("cuisine"));
-            String phone = nz(restaurants.getString("phone_no"));
-            String address = nz(restaurants.getString("address"));
-            double rating = restaurants.getDouble("rating");
-            if (restaurants.wasNull()) rating = 0.0;
-
-            // Truncate long text to fit columns
-            String displayName = truncate(name, W_NAME);
-            String displayAddress = truncate(address, W_ADDRESS);
-
-            // Color/status based on rating
-            String ratingColor;
-            String statusText;
-            if (rating >= 4.5) {
-                ratingColor = GREEN;
-                statusText = "⭐ Excellent";
-            } else if (rating >= 4.0) {
-                ratingColor = YELLOW;
-                statusText = "👍 Good";
-            } else if (rating >= 3.5) {
-                ratingColor = "";
-                statusText = "👌 Average";
-            } else {
-                ratingColor = RED;
-                statusText = "👎 Below Avg";
-            }
-
-            System.out.printf(
-                    "%-" + W_ID + "s %-" + W_NAME + "s %-" + W_CUISINE + "s %-" + W_PHONE + "s %-" + W_ADDRESS + "s %s%" + (W_RATING - 3) + ".1f%s %-" + W_STATUS + "s%n",
-                    id, displayName, cuisine, phone, displayAddress,
-                    ratingColor, rating, RESET, statusText
-            );
-
-            count++;
-            if (count % 15 == 0) {
-                System.out.println(CYAN + "-".repeat(130) + RESET);
-            }
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("RESTAURANTS", rs);
         }
-
-        if (count == 0) {
-            System.out.printf("| %s |%n", padRight("No restaurants found.", 126));
-        }
-
-        // Footer
-        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-        System.out.println(BOLD + GREEN + "📊 Total Restaurants: " + count + RESET);
-        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
     }
-}
-private static String nz(String s) {
-    return (s == null || s.isBlank()) ? "-" : s;
-}
-private static String truncate(String s, int width) {
-    if (s == null) return "-";
-    if (s.length() <= width) return s;
-    // Leave room for "..."
-    return (width >= 3) ? s.substring(0, width - 3) + "..." : s.substring(0, width);
-}
-private static String padRight(String s, int w) {
-    if (s.length() >= w) return s;
-    StringBuilder sb = new StringBuilder(w);
-    sb.append(s);
-    while (sb.length() < w) sb.append(' ');
-    return sb.toString();
-}
 
-//    public static void browseRestaurants() throws Exception{
-//        PreparedStatement br = AppConstants.connection.prepareCall("select * from restaurants");
-//        ResultSet restaurants = br.executeQuery();
-//        // ANSI color codes for terminal
-//        final String RESET = "\u001B[0m";
-//        final String BOLD = "\u001B[1m";
-//        final String GREEN = "\u001B[32m";
-//        final String YELLOW = "\u001B[33m";
-//        final String RED = "\u001B[31m";
-//        final String BLUE = "\u001B[34m";
-//        final String CYAN = "\u001B[36m";
-//        // Print header with styling
-//        System.out.println("\n" + BOLD + CYAN + "=".repeat(130) + RESET);
-//        System.out.println(BOLD + BLUE + "\t\t\t                                       🍽️  RESTAURANTS  🍽️" + RESET);
-//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-//        // Print column headers
-//        System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s %-12s%n" + RESET,
-//                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating", "Status");
-//        System.out.println(CYAN + "-".repeat(130) + RESET);
-//        int count = 0;
-//        while (restaurants.next()) {
-//            String id = restaurants.getString("id");
-//            String name = restaurants.getString("name");
-//            String cuisine = restaurants.getString("cuisine");
-//            String phone = restaurants.getString("phone_no");
-//            String address = restaurants.getString("address");
-//            double rating = restaurants.getDouble("rating");
-//
-//            // Truncate long text
-//            String displayName = name.length() > 25 ? name.substring(0, 22) + "..." : name;
-//            String displayAddress = address.length() > 35 ? address.substring(0, 32) + "..." : address;
-//
-//            // Color code based on rating
-//            String ratingColor = "";
-//            String statusText = "";
-//            if (rating >= 4.5) {
-//                ratingColor = GREEN;
-//                statusText = "⭐ Excellent";
-//            } else if (rating >= 4.0) {
-//                ratingColor = YELLOW;
-//                statusText = "👍 Good";
-//            } else if (rating >= 3.5) {
-//                ratingColor = "";
-//                statusText = "👌 Average";
-//            } else {
-//                ratingColor = RED;
-//                statusText = "👎 Below Avg";
-//            }
-//
-//            // Print restaurant data with color coding
-//            System.out.printf("%-8s %-25s %-18s %-14s %-35s %s%-8.1f%s %-12s%n",
-//                    id, displayName, cuisine, phone, displayAddress,
-//                    ratingColor, rating, RESET, statusText);
-//            count++;
-//            // Add a separator every 15 rows
-//            if (count % 15 == 0) {
-//                System.out.println(CYAN + "-".repeat(130) + RESET);
-//            }
-//        }
-//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-//        System.out.println(BOLD + GREEN + "📊 Total Restaurants: " + count + RESET);
-//// System.out.println(BOLD + BLUE + "💡 Sorted by Rating (Highest to Lowest)" + RESET);
-//        System.out.println(BOLD + CYAN + "=".repeat(130) + RESET);
-//        restaurants.close();
-//        br.close();
-//    }
-//    public static void browseRestaurantsByCuisine() throws Exception {
-//        System.out.print("Enter cuisine type (or 'ALL' for all cuisines): ");
-//        String cuisineInput = AppConstants.s.nextLine().trim();
-//
-//        String query;
-//        PreparedStatement br;
-//
-//        if (cuisineInput.equalsIgnoreCase("ALL")) {
-//            query = "SELECT * FROM restaurants ORDER BY cuisine, rating DESC";
-//            br = AppConstants.connection.prepareStatement(query);
-//        } else {
-//            query = "SELECT * FROM restaurants WHERE cuisine LIKE ? ORDER BY rating DESC";
-//            br = AppConstants.connection.prepareStatement(query);
-//            br.setString(1, "%" + cuisineInput + "%");
-//        }
-//
-//        ResultSet restaurants = br.executeQuery();
-//
-//        // Similar formatting as above method
-//        final String RESET = "\u001B[0m";
-//        final String BOLD = "\u001B[1m";
-//        final String GREEN = "\u001B[32m";
-//        final String BLUE = "\u001B[34m";
-//        final String CYAN = "\u001B[36m";
-//
-//        System.out.println("\n" + BOLD + CYAN + "=".repeat(120) + RESET);
-//        System.out.println(BOLD + BLUE + "🔍 FILTERED RESTAURANTS - " + cuisineInput.toUpperCase() + RESET);
-//        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-//
-//        System.out.printf(BOLD + "%-8s %-25s %-18s %-14s %-35s %-8s%n" + RESET,
-//                "ID", "Restaurant Name", "Cuisine", "Phone", "Address", "Rating");
-//        System.out.println(CYAN + "-".repeat(120) + RESET);
-//
-//        int count = 0;
-//        String currentCuisine = "";
-//
-//        while (restaurants.next()) {
-//            String cuisine = restaurants.getString("cuisine");
-//
-//            // Add cuisine separator when cuisine changes
-//            if (!cuisine.equals(currentCuisine) && cuisineInput.equalsIgnoreCase("ALL")) {
-//                if (count > 0) System.out.println();
-//                System.out.println(BOLD + BLUE + "📍 " + cuisine.toUpperCase() + " RESTAURANTS:" + RESET);
-//                System.out.println(CYAN + "-".repeat(60) + RESET);
-//                currentCuisine = cuisine;
-//            }
-//
-//            String id = restaurants.getString("id");
-//            String name = restaurants.getString("name");
-//            String phone = restaurants.getString("phone_no");
-//            String address = restaurants.getString("address");
-//            double rating = restaurants.getDouble("rating");
-//
-//            String displayName = name.length() > 25 ? name.substring(0, 22) + "..." : name;
-//            String displayAddress = address.length() > 35 ? address.substring(0, 32) + "..." : address;
-//
-//            String ratingColor = rating >= 4.5 ? GREEN : rating >= 4.0 ? "\u001B[33m" : "";
-//
-//            System.out.printf("%-8s %-25s %-18s %-14s %-35s %s%-8.1f%s%n",
-//                    id, displayName, cuisine, phone, displayAddress,
-//                    ratingColor, rating, RESET);
-//            count++;
-//        }
-//
-//        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-//        System.out.println(BOLD + GREEN + "📊 Total Matching Restaurants: " + count + RESET);
-//        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-//
-//        restaurants.close();
-//        br.close();
-//    }
+    private static void printResultSetAsTable(String title, ResultSet rs) throws SQLException {
+        ResultSetMetaData md = rs.getMetaData();
+        int colCount = md.getColumnCount();
+
+        List<String[]> rows = new ArrayList<>();
+        int[] widths = new int[colCount];
+        String[] headers = new String[colCount];
+        int[] types = new int[colCount];
+
+        for (int i = 1; i <= colCount; i++) {
+            headers[i - 1] = md.getColumnLabel(i);
+            types[i - 1] = md.getColumnType(i);
+            widths[i - 1] = Math.max(3, headers[i - 1].length());
+        }
+
+        while (rs.next()) {
+            String[] row = new String[colCount];
+            for (int i = 1; i <= colCount; i++) {
+                String colName = headers[i - 1];
+                int sqlType = types[i - 1];
+
+                Object val = rs.getObject(i);
+                String txt = formatValue(colName, sqlType, val);
+                row[i - 1] = txt;
+                widths[i - 1] = Math.max(widths[i - 1], txt.length());
+            }
+            rows.add(row);
+        }
+
+        String[] colFmts = new String[colCount];
+        for (int i = 0; i < colCount; i++) {
+            boolean rightAlign = isNumeric(types[i]) || looksLikeMoney(headers[i]);
+            colFmts[i] = rightAlign ? "%" + widths[i] + "s" : "%-" + widths[i] + "s";
+        }
+
+        String sep = buildSeparator(widths);
+
+        StringBuilder headerFmt = new StringBuilder("| ");
+        for (int i = 0; i < colCount; i++) {
+            headerFmt.append(String.format("%%-%ds", widths[i])).append(" | ");
+        }
+        headerFmt.append("%n");
+
+        StringBuilder rowFmt = new StringBuilder("| ");
+        for (int i = 0; i < colCount; i++) {
+            rowFmt.append(colFmts[i]).append(" | ");
+        }
+        rowFmt.append("%n");
+
+        System.out.println();
+        System.out.println(centerTitleInSeparator(title, sep));
+        System.out.println(sep);
+        System.out.printf(headerFmt.toString(), (Object[]) headers);
+        System.out.println(sep);
+
+        if (rows.isEmpty()) {
+            System.out.printf("| %s |%n", padRight("No records found.", sep.length() - 4));
+            System.out.println(sep);
+            return;
+        }
+
+        for (String[] row : rows) {
+            System.out.printf(rowFmt.toString(), (Object[]) row);
+        }
+        System.out.println(sep);
+    }
+
+    private static String formatValue(String colName, int sqlType, Object val) {
+        if (val == null) return "-";
+
+        if (looksLikeMoney(colName) && val instanceof Number) {
+            return String.format(java.util.Locale.US, "%,.2f", ((Number) val).doubleValue());
+        }
+
+        if (isNumeric(sqlType)) {
+            if (val instanceof Double || val instanceof Float) {
+                return String.format(java.util.Locale.US, "%.1f", ((Number) val).doubleValue());
+            }
+            return val.toString();
+        }
+
+        if (val instanceof java.sql.Timestamp || val instanceof java.sql.Date || val instanceof java.sql.Time) {
+            return val.toString();
+        }
+
+        String s = val.toString();
+        return (s == null || s.isEmpty()) ? "-" : s;
+    }
+
+    private static boolean looksLikeMoney(String colName) {
+        String n = colName.toLowerCase(Locale.ROOT);
+        return n.contains("amount") || n.contains("price") || n.contains("total");
+    }
+
+    private static boolean isNumeric(int sqlType) {
+        return switch (sqlType) {
+            case Types.BIT, Types.BOOLEAN,
+                    Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT,
+                    Types.FLOAT, Types.REAL, Types.DOUBLE,
+                    Types.NUMERIC, Types.DECIMAL -> true;
+            default -> false;
+        };
+    }
+
+    private static String buildSeparator(int[] widths) {
+        int total = 1;
+        for (int w : widths) total += 1 + w + 1 + 1;
+        return repeat('-', total);
+    }
+
+    private static String centerTitleInSeparator(String title, String sep) {
+        int len = sep.length();
+        String t = " " + title + " ";
+        if (t.length() >= len) return t.substring(0, len);
+        int pad = (len - t.length()) / 2;
+        return repeat('-', pad) + t + repeat('-', len - pad - t.length());
+    }
+
+    private static String repeat(char c, int count) {
+        if (count <= 0) return "";
+        StringBuilder sb = new StringBuilder(count);
+        for (int i = 0; i < count; i++) sb.append(c);
+        return sb.toString();
+    }
+
+    private static String padRight(String s, int w) {
+        if (s == null) s = "-";
+        if (s.length() >= w) return s;
+        StringBuilder sb = new StringBuilder(w);
+        sb.append(s);
+        for (int i = s.length(); i < w; i++) sb.append(' ');
+        return sb.toString();
+    }
 
     public static void addRestaurant() throws Exception {
         AppConstants.s.nextLine();
@@ -269,6 +192,7 @@ private static String padRight(String s, int w) {
             System.out.println("\nError adding restaurant.");
         }
     }
+
     public static void deleteRestaurant() throws Exception {
         AppConstants.connection.setAutoCommit(false);
         AppConstants.s.nextLine();
@@ -297,6 +221,7 @@ private static String padRight(String s, int w) {
             System.out.println("Error deleting restaurant.");
         }
     }
+
     static public String getRestaurantIdByName(String name) {
         String id = null;
         try {
@@ -310,5 +235,25 @@ private static String padRight(String s, int w) {
             System.out.printf("Exception :- "+e);
         }
         return id;
+    }
+
+    private static String nz(String s) {
+        return (s == null || s.isBlank()) ? "-" : s;
+    }
+
+    private static String truncate(String s) {
+        return truncate(s, 20);
+    }
+
+    private static String truncate(String s, int width, String fill) {
+        if (s == null) return "-";
+        if (s.length() <= width) return s;
+        return (width >= 3) ? s.substring(0, width - 3) + fill : s.substring(0, width);
+    }
+
+    private static String truncate(String s, int width) {
+        if (s == null) return "-";
+        if (s.length() <= width) return s;
+        return (width >= 3) ? s.substring(0, width - 3) + "..." : s.substring(0, width);
     }
 }

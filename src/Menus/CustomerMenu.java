@@ -215,12 +215,12 @@ public class CustomerMenu {
         switch (option) {
             case 1 -> RestaurantDAO.browseRestaurants();
             case 2 -> {
-                System.out.print("Enter Restaurant name: ");
+                System.out.print("\nEnter Restaurant name: ");
                 String resName = AppConstants.s.nextLine();
                 DishDAO.browseDishesByRestaurant(resName);
             }
             case 3 -> {
-                System.out.print("Enter dish category: ");
+                System.out.print("\nEnter dish category: ");
                 String cuisine = AppConstants.s.nextLine();
                 DishDAO.browseDishesByCuisine(cuisine);
             }
