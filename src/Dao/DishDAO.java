@@ -10,21 +10,21 @@ public class DishDAO {
     public static void browseDishesByRestaurant(String res_name) throws Exception {
         String sql =
                 "SELECT " +
-                "  dish_id AS dish_id, " +
-                "  name, " +
-                "  cuisine, " +
-                "  restaurant, " +
-                "  rating, " +
-                "  price, " +
-                "  CASE " +
-                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
-                "    WHEN rating >= 4.0 THEN '👍 Good' " +
-                "    WHEN rating >= 3.5 THEN '👌 Average' " +
-                "    ELSE '👎 Low Rated' " +
-                "  END AS status " +
-                "FROM dishes " +
-                "WHERE restaurant = ? " +
-                "ORDER BY rating DESC, name ASC";
+                        "  dish_id AS dish_id, " +
+                        "  name, " +
+                        "  cuisine, " +
+                        "  restaurant, " +
+                        "  rating, " +
+                        "  price, " +
+                        "  CASE " +
+                        "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                        "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                        "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                        "    ELSE '👎 Low Rated' " +
+                        "  END AS status " +
+                        "FROM dishes " +
+                        "WHERE restaurant = ? " +
+                        "ORDER BY rating DESC, name ASC";
 
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
             ps.setString(1, res_name);
@@ -37,21 +37,21 @@ public class DishDAO {
     public static void browseDishesByCuisine(String dish_category) throws Exception {
         String sql =
                 "SELECT " +
-                "  dish_id AS dish_id, " +
-                "  name, " +
-                "  cuisine, " +
-                "  restaurant, " +
-                "  rating, " +
-                "  price, " +
-                "  CASE " +
-                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
-                "    WHEN rating >= 4.0 THEN '👍 Good' " +
-                "    WHEN rating >= 3.5 THEN '👌 Average' " +
-                "    ELSE '👎 Low Rated' " +
-                "  END AS status " +
-                "FROM dishes " +
-                "WHERE cuisine = ? " +
-                "ORDER BY rating DESC, name ASC";
+                        "  dish_id AS dish_id, " +
+                        "  name, " +
+                        "  cuisine, " +
+                        "  restaurant, " +
+                        "  rating, " +
+                        "  price, " +
+                        "  CASE " +
+                        "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                        "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                        "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                        "    ELSE '👎 Low Rated' " +
+                        "  END AS status " +
+                        "FROM dishes " +
+                        "WHERE cuisine = ? " +
+                        "ORDER BY rating DESC, name ASC";
 
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
             ps.setString(1, dish_category);
@@ -83,6 +83,23 @@ public class DishDAO {
         return null;
     }
 
+    public static String getRestaurantNameByDishId(String d_Id) {
+        PreparedStatement stmt = null;
+        String resName = null;
+        try {
+            stmt = AppConstants.connection.prepareStatement(
+                    "SELECT restaurant FROM dishes WHERE dish_id = ?");
+            stmt.setString(1, d_Id);
+            java.sql.ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                resName = rs.getString("restaurant");
+            }
+        } catch (SQLException e) {
+            System.out.printf("Exception %s arise in getRestaurantNameByDishId.");
+        }
+        return resName;
+    }
+
     public static String getRestaurantNameById(String resId) {
         String resName = null;
         try {
@@ -92,8 +109,6 @@ public class DishDAO {
             java.sql.ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 resName = rs.getString("name");
-            } else {
-                return null;
             }
         } catch (Exception e) {
             System.out.printf("Exception %s arise in getRestaurantNameById.");

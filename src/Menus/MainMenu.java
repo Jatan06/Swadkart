@@ -44,10 +44,10 @@ public class MainMenu {
                         break;
                     case 2:
                         Thread.sleep(500);
-                        System.out.print("\n============== Login ==============\n");
+                        System.out.print("\n\n============== Login ==============\n");
                         System.out.print("\nEnter id : ");
                         String id = AppConstants.s.nextLine();
-                        System.out.print("Enter password : ");
+                        System.out.print("Enter password (Enter 'F' or 'f' for forgot password) : ");
                         String password = AppConstants.s.nextLine();
 
                         if (!id.isEmpty() && (id.charAt(0) == 'U' || id.charAt(0) == 'u')) {

@@ -36,9 +36,9 @@ public class PaymentDAO {
                 widths[0], widths[1], widths[2], widths[3], widths[4], widths[5], widths[6]);
 
         // Separator line
-        int totalWidth = 2 + 2; // starting and ending '|' plus newline elsewhere
+        int totalWidth = 2 + 2; // starting and ending '|' plus a newline elsewhere
         for (int w : widths) totalWidth += w + 3; // space + content + space, plus '|' later
-        String sep = repeat('-', totalWidth - 1); // -1 to account for newline
+        String sep = repeat('-', totalWidth - 1); // -1 to account for the newline
 
         try (Statement st = AppConstants.connection.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -71,7 +71,7 @@ public class PaymentDAO {
     private static String repeat(char c, int count) {
         if (count <= 0) return "";
         StringBuilder sb = new StringBuilder(count);
-        for (int i = 0; i < count; i++) sb.append(c);
+        sb.append(String.valueOf(c).repeat(count));
         return sb.toString();
     }
 

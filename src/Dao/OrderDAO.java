@@ -134,16 +134,19 @@ public class OrderDAO {
             boolean paymentSuccess = PaymentService.paymentInterface();
 
             // 6) Commit and finalize
-            AppConstants.connection.commit();
-            Thread.sleep(1000);
-            Sound.playWav("/zomato_app.wav");
-            Thread.sleep(500);
-            System.out.println("Order placed and payment completed successfully!");
-
-            // Clear the cart only after a successful commit
-            UserService.Cart.clearList();
-            UserService.isEmpty = true;
-
+            if(paymentSuccess) {
+                AppConstants.connection.commit();
+                Thread.sleep(1000);
+                String op = "\nOrder placed and payment completed successfully!";
+                Sound.playWav("/zomato_app.wav");
+                System.out.println(op);
+                UserService.Cart.clearList();
+                UserService.isEmpty = true;
+            }
+            else {
+                AppConstants.connection.rollback(sp);
+                System.out.println("Order placed but payment failed!");
+            }
         } catch (Exception ex) {
             try {
                 if (sp != null) AppConstants.connection.rollback(sp);
@@ -178,12 +181,9 @@ public class OrderDAO {
         String sql = ""
                 + "SELECT "
                 + "  o.o_id               AS o_id, "
-                + "  o.uid                AS uid, "
                 + "  o.rid                AS rid, "
                 + "  o.order_time_stamp   AS order_time_stamp, "
-                + "  oi.item_id           AS item_id, "
-                + "  oi.did               AS did, "
-                + "  oi.quantity          AS quantity, "
+                + "  GROUP_CONCAT(CONCAT(oi.did, ' (Qty: ', oi.quantity, ')') SEPARATOR ', ') AS items, "
                 + "  p.payment_id         AS payment_id, "
                 + "  p.paymentType        AS paymentType, "
                 + "  p.paymentStatus      AS paymentStatus, "
@@ -196,7 +196,9 @@ public class OrderDAO {
                 + " AND p.u_id = o.uid "
                 + " AND p.r_id = o.rid "
                 + "WHERE o.uid = ? "
-                + "ORDER BY o.o_id, oi.item_id, p.payment_id";
+                + "GROUP BY o.o_id, o.rid, o.order_time_stamp, p.payment_id, p.paymentType, p.paymentStatus, p.amount "
+                + "ORDER BY o.o_id, p.payment_id";
+
 
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
             ps.setString(1, uid);

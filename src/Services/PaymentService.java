@@ -46,33 +46,43 @@ public class PaymentService {
         System.out.println("1) Cash");
         System.out.println("2) Card");
         System.out.println("3) UPI");
-        System.out.print("Enter choice (1-3): ");
 
-        String choice = UserService.scanner.next().trim();
         boolean success = false;
-
-        switch (choice) {
-            case "1":
-                success = handleCash(total);
-                if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CASH;
-                break;
-            case "2":
-                success = handleCard(total);
-                if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CARD;
-                break;
-            case "3":
-                success = handleUpi(total);
-                if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_UPI;
-                break;
-            default:
-                System.out.println("Invalid choice. Payment cancelled.");
-                return false;
+        boolean payment_selection = true;
+        while (payment_selection) {
+            System.out.print("\nEnter choice (1-3) or enter 'exit' to go back : ");
+            String choice = UserService.scanner.next().trim();
+            switch (choice) {
+                case "1":
+                    success = handleCash(total);
+                    if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CASH;payment_selection = false;
+                    break;
+                case "2":
+                    success = handleCard(total);
+                    if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CARD;payment_selection = false;
+                    break;
+                case "3":
+                    success = handleUpi(total);
+                    if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_UPI;payment_selection = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Payment Please try again.");
+                    break;
+            }
         }
 
         // Simulate restaurant confirmation
         if (success) {
             success = simulateRestaurantConfirmation();
             if (Payment.payment != null) Payment.payment.paymentStatus = (success ? "success" : "failed");
+            if(!success) {
+                System.out.println("Order declined by restaurant.");
+                return false;
+            }
+        }
+        else {
+            System.out.println("Payment failed. Please try again.");
+            paymentInterface();
         }
 
         // On success: print receipt, clear cart, save payment
@@ -80,11 +90,6 @@ public class PaymentService {
             printReceipt(cart, subtotal, tax, total);
             cart.clearList();
             UserService.isEmpty = true;
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {}
-
             try {
                 Payment p = Payment.payment; // capture current payment
                 Payment.payment = null;      // reset global pointer immediately
@@ -158,7 +163,7 @@ public class PaymentService {
     private static boolean simulateRestaurantConfirmation() {
         System.out.print("\nConfirming order with restaurant ");
         for (int i = 0; i < 6; i++) {
-            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(700); } catch (InterruptedException ignored) {}
             System.out.print(".");
         }
         System.out.println();

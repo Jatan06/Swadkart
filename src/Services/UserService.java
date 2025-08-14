@@ -1,4 +1,5 @@
 //UserService.java
+//UserService.java
 package Services;
 import Constants.AppConstants;
 import Dao.DishDAO;
@@ -36,8 +37,8 @@ public class UserService {
                     System.out.print("Enter Dish id to add: ");
                     String dishInput = scanner.next();
                     Models.Dish dish = DishDAO.getDishByIdAndRestaurant(dishInput);
-                    if (dish == null) {
-                        System.out.println("Invalid Dish ID or dish does not belong to this restaurant. Try again.");
+                    if (dish == null || !DishDAO.getRestaurantNameById(r_id).equalsIgnoreCase(DishDAO.getRestaurantNameByDishId(dishInput))) {
+                        System.out.println("Invalid Dish ID or dish does not belong to this restaurant. Try again!!");
                         break;
                     }
                     System.out.print("Enter quantity: ");
