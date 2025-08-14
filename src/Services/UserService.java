@@ -59,6 +59,7 @@ public class UserService {
                     Cart.display();
                     break;
                 case "4":
+                    isEmpty = true;
                     running = false;
                     break;
                 default:

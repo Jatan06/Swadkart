@@ -1,19 +1,17 @@
 package Services;
 
+import Dao.PaymentDAO;
 import Ds.LL;
-
+import Models.Payment;
 public class PaymentService {
-
     // Processes payment for the current user's cart stored in UserService.Cart
     // Returns true on successful payment, otherwise false.
     public static boolean paymentInterface() {
         LL cart = UserService.Cart;
-
         if (cart == null || cart.head == null) {
             System.out.println("Cart is empty. Nothing to pay for.");
             return false;
         }
-
         // 1) Calculate subtotal and display summary
         double subtotal = 0.0;
         System.out.println("\n--- Order Summary ---");
@@ -28,7 +26,6 @@ public class PaymentService {
             current = current.next;
         }
         System.out.printf("Subtotal: %.2f%n", subtotal);
-
         // 2) Taxes (adjust as needed)
         final double taxRate = 0.05; // 5%
         double tax = round2(subtotal * taxRate);
@@ -36,6 +33,11 @@ public class PaymentService {
 
         System.out.printf("Tax (%.0f%%): %.2f%n", taxRate * 100, tax);
         System.out.printf("Total Due: %.2f%n", total);
+
+        // IMPORTANT: persist the total so PaymentDAO saves the correct amount
+        if (Payment.payment != null) {
+            Payment.payment.amount = total;
+        }
 
         // 3) Select a payment method
         System.out.println("\nSelect payment method:");
@@ -49,16 +51,26 @@ public class PaymentService {
         switch (choice) {
             case "1":
                 success = handleCash(total);
+                Payment.payment.paymentType = "cash";
                 break;
             case "2":
                 success = handleCard(total);
+                Payment.payment.paymentType = "card";
                 break;
             case "3":
                 success = handleUpi(total);
+                Payment.payment.paymentType = "upi";
                 break;
             default:
+                Payment.payment = null;
                 System.out.println("Invalid choice. Payment cancelled.");
                 return false;
+        }
+
+        // 3.5) Demo: Confirming order with the restaurant (like Zomato)
+        if (success) {
+            success = simulateRestaurantConfirmation();
+            Payment.payment.paymentStatus = (success ? "success" : "failed");
         }
 
         // 4) On success: print receipt, clear cart, and reset order state
@@ -66,6 +78,17 @@ public class PaymentService {
             printReceipt(cart, subtotal, tax, total);
             cart.clearList();
             UserService.isEmpty = true; // allow selecting a restaurant again for the next order
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                System.out.println("\nException :- "+e);
+            }
+            try {
+                PaymentDAO.savePaymentDetails(success);
+            }
+            catch (Exception e) {
+                throw new RuntimeException("An error occurred in saving payment details", e);
+            }
             System.out.println("Order placed successfully.");
         }
 
@@ -121,6 +144,30 @@ public class PaymentService {
         System.out.printf("UPI collect request for %.2f sent to %s...%n", total, upi);
         System.out.println("Payment successful.");
         return true;
+    }
+
+    // Demo: Simulate restaurant confirmation with a simple progress animation and random outcome.
+    private static boolean simulateRestaurantConfirmation() {
+        System.out.print("\nConfirming order with restaurant ");
+        // Simple “dot” animation
+        for (int i = 0; i < 6; i++) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ignored) {
+            }
+            System.out.print(".");
+        }
+        System.out.println();
+
+        // 90% accept rate for demo
+        boolean accepted = Math.random() < 0.99;
+        if (accepted) {
+            System.out.println("\nRestaurant confirmed your order! Preparing your food.");
+            return true;
+        } else {
+            System.out.println("\nRestaurant declined the order due to high load. Payment will be auto-refunded (demo).");
+            return false;
+        }
     }
 
     private static void printReceipt(LL cart, double subtotal, double tax, double total) {

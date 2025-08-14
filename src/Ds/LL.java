@@ -82,6 +82,5 @@ public class LL {
     // Clear the entire list
     public void clearList() {
         head = null;
-        System.out.println("All dishes have been removed from the list.");
     }
 }
