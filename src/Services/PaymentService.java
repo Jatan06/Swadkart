@@ -1,5 +1,6 @@
 package Services;
 
+import Constants.AppConstants;
 import Dao.PaymentDAO;
 import Ds.LL;
 import Models.Payment;
@@ -53,15 +54,15 @@ public class PaymentService {
         switch (choice) {
             case "1":
                 success = handleCash(total);
-                if (Payment.payment != null) Payment.payment.paymentType = "cash";
+                if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CASH;
                 break;
             case "2":
                 success = handleCard(total);
-                if (Payment.payment != null) Payment.payment.paymentType = "card";
+                if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CARD;
                 break;
             case "3":
                 success = handleUpi(total);
-                if (Payment.payment != null) Payment.payment.paymentType = "upi";
+                if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_UPI;
                 break;
             default:
                 System.out.println("Invalid choice. Payment cancelled.");

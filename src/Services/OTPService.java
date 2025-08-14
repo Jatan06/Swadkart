@@ -1,6 +1,6 @@
 package Services;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.*;
+import com.twilio.rest.api.v2010.account.*;
 import java.util.Random;
 public class OTPService {
     private static final String ACCOUNT_SID = "ACaab97c0aac083c2cc628ebb1c2c11733";

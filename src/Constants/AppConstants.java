@@ -11,9 +11,12 @@ public class AppConstants {
     public static boolean customerValid;
 
     // Welcome
-    public static String welcome = "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\uD83C\uDF2E\uD83C\uDF55\uD83C\uDF71\uD83C\uDF5CSwadkart - Food Ordering System\uD83C\uDF5B\uD83C\uDF54\uD83E\uDD57\uD83C\uDF69\n" +
-            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\uD83E\uDD62 Where every bite meets delight!\n" +
-            "\n";
+    public static String welcome = """
+            
+            \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\uD83C\uDF2E\uD83C\uDF55\uD83C\uDF71\uD83C\uDF5CSwadkart - Food Ordering System\uD83C\uDF5B\uD83C\uDF54\uD83E\uDD57\uD83C\uDF69
+            \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\uD83E\uDD62 Where every bite meets delight!
+            
+            """;
 
     // Database Variables
     public static Connection connection;
