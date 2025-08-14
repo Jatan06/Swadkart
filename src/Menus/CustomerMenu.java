@@ -66,7 +66,17 @@ public class CustomerMenu {
                                             System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
                                         }
                                     }
-                                    break;
+                                    System.out.print("\nRe-Enter password :- ");
+                                    String repass = AppConstants.s.next();
+                                    while (true) {
+                                        if(!password.equals(repass)) {
+                                            System.out.println("Please enter valid password which you have set :- ");
+                                            repass = AppConstants.s.next();
+                                        }
+                                        else {
+                                            break;
+                                        }
+                                    }
                                 } else {
                                     otpAttempts--;
                                     if (otpAttempts > 0) {
@@ -125,6 +135,7 @@ public class CustomerMenu {
                         }
                         UserDAO.insertNewUser(id, user_Name, email, ph_no, address,password);
                         SessionManager.NewRegistration(id,true);
+                        CustomerMenu.customerMenu(id);
                     case 2:
                         System.out.println("\nReturning to Main Menu...\n");
                         flag = false;

@@ -21,8 +21,8 @@ public class MainMenu {
                 System.out.println("===================================");
                 System.out.println("|           Main Menu             |");
                 System.out.println("===================================");
-                System.out.println("|  1. New Customer Registration   |");
-                System.out.println("|  2. Existing Customer Login     |");
+                System.out.println("|  1. New To Swadkart             |");
+                System.out.println("|  2. Login                       |");
                 System.out.println("|  3. Exit                        |");
                 System.out.println("===================================");
                 System.out.print("\nPlease select an option: ");
@@ -69,7 +69,7 @@ public class MainMenu {
                     case 3:
                         //Thank you for using SwadKart. Goodbye!
                         SpeakTextService.speak("SwadKart signing off... pet full, mood chill!");
-                        Thread.sleep(4000);
+                        Thread.sleep(2000);
                         System.out.println("\nSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
                         AppConstants.show = false;
                         break;
