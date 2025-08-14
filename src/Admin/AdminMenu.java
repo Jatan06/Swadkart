@@ -1,7 +1,6 @@
-package Menus;
-import Constants.*;
+package Admin;
+import Constants.AppConstants;
 import Dao.*;
-import Admin.Admin;
 public class AdminMenu {
     public static boolean adminValidator(String id,String password) {
         if(id.equals(Admin.getAdminId()) && password.equals(Admin.getAdminPassword())) {
