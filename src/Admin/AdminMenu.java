@@ -46,7 +46,7 @@ public class AdminMenu {
                         }
                         break;
                     case 2:
-                        RestaurantDAO.browseRestaurants();
+//                        RestaurantDAO.browseRestaurantsByRating();
                         break;
                     case 3:
                         OrderDAO.viewOrderAndOrderItems();

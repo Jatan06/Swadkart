@@ -94,11 +94,11 @@ public class Validators {
     }
 
     // Validate restaurant name (letters, numbers, spaces, hyphens)
-    public static boolean validateRestaurantName(String name) {
-        if (name == null || name.trim().isEmpty() || !name.startsWith("r-")) {
+    public static boolean validateRestaurantId(String id) {
+        if (id == null || id.trim().isEmpty() || !id.startsWith("r-")) {
             return false;
         }
-        String trimmed = name.trim();
+        String trimmed = id.trim();
         for (char c : trimmed.toCharArray()) {
             if (!Character.isLetterOrDigit(c) && c != ' ' && c != '-') {
                 return false;

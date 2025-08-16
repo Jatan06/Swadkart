@@ -7,6 +7,156 @@ import Constants.*;
 
 public class DishDAO {
 
+    public static void browseDishes() {
+        DishDAO dao = new DishDAO();
+        while (true) {
+            System.out.println("\n==== Browse Dishes ====");
+            System.out.println("1. By Rating (High → Low)");
+            System.out.println("2. By Price (Low → High)");
+            System.out.println("3. By Price (High → Low)");
+            System.out.println("4. By Name (A → Z)");
+            System.out.println("5. By Cuisine (Filter)");
+            System.out.println("6. By Restaurant (A → Z)");
+            System.out.println("7. Back");
+            System.out.print("Enter choice: ");
+
+            String choice = AppConstants.s.next().trim();
+            try {
+                switch (choice) {
+                    case "1" -> dao.browseDishesByRating();
+                    case "2" -> dao.browseDishesByPriceAsc();
+                    case "3" -> dao.browseDishesByPriceDesc();
+                    case "4" -> dao.browseDishesByName();
+                    case "5" -> dao.browseDishesByCuisineFilter();
+                    case "6" -> dao.browseDishesByRestaurant();
+                    case "7" -> { return; }
+                    default -> System.out.println("Invalid choice. Please try again.");
+                }
+            } catch (Exception e) {
+                System.out.println("\nError: " + e.getMessage());
+            }
+        }
+    }
+
+    private void browseDishesByRating() throws Exception {
+        String sql =
+                "SELECT " +
+                "  dish_id AS dish_id, " +
+                "  name, " +
+                "  cuisine, " +
+                "  restaurant, " +
+                "  rating, " +
+                "  price, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Low Rated' " +
+                "  END AS status " +
+                "FROM dishes " +
+                "ORDER BY rating DESC, name ASC";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("DISHES (BY RATING)", rs);
+        }
+    }
+
+    private void browseDishesByPriceAsc() throws Exception {
+        String sql =
+                "SELECT dish_id AS dish_id, name, cuisine, restaurant, rating, price, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Low Rated' " +
+                "  END AS status " +
+                "FROM dishes " +
+                "ORDER BY price ASC, rating DESC, name ASC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("DISHES (PRICE: LOW → HIGH)", rs);
+        }
+    }
+
+    private void browseDishesByPriceDesc() throws Exception {
+        String sql =
+                "SELECT dish_id AS dish_id, name, cuisine, restaurant, rating, price, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Low Rated' " +
+                "  END AS status " +
+                "FROM dishes " +
+                "ORDER BY price DESC, rating DESC, name ASC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("DISHES (PRICE: HIGH → LOW)", rs);
+        }
+    }
+
+    private void browseDishesByName() throws Exception {
+        String sql =
+                "SELECT dish_id AS dish_id, name, cuisine, restaurant, rating, price, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Low Rated' " +
+                "  END AS status " +
+                "FROM dishes " +
+                "ORDER BY name ASC, rating DESC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("DISHES (BY NAME)", rs);
+        }
+    }
+
+    private void browseDishesByCuisineFilter() throws Exception {
+        AppConstants.s.nextLine();
+        System.out.print("\nEnter Cuisine: ");
+        String cuisine = AppConstants.s.nextLine().trim();
+        if (cuisine.isEmpty()) {
+            System.out.println("\nInvalid cuisine.");
+            return;
+        }
+        String sql =
+                "SELECT dish_id AS dish_id, name, cuisine, restaurant, rating, price, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Low Rated' " +
+                "  END AS status " +
+                "FROM dishes " +
+                "WHERE cuisine = ? " +
+                "ORDER BY rating DESC, name ASC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, cuisine);
+            try (ResultSet rs = ps.executeQuery()) {
+                printResultSetAsTable("DISHES — " + cuisine, rs);
+            }
+        }
+    }
+
+    private void browseDishesByRestaurant() throws Exception {
+        String sql =
+                "SELECT dish_id AS dish_id, name, cuisine, restaurant, rating, price, " +
+                "  CASE " +
+                "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
+                "    WHEN rating >= 4.0 THEN '👍 Good' " +
+                "    WHEN rating >= 3.5 THEN '👌 Average' " +
+                "    ELSE '👎 Low Rated' " +
+                "  END AS status " +
+                "FROM dishes " +
+                "ORDER BY restaurant ASC, name ASC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("DISHES (BY RESTAURANT)", rs);
+        }
+    }
+
     public static void browseDishesByRestaurant(String res_name) throws Exception {
         String sql =
                 "SELECT " +
@@ -30,33 +180,6 @@ public class DishDAO {
             ps.setString(1, res_name);
             try (ResultSet rs = ps.executeQuery()) {
                 printResultSetAsTable("DISHES — " + res_name, rs);
-            }
-        }
-    }
-
-    public static void browseDishesByCuisine(String dish_category) throws Exception {
-        String sql =
-                "SELECT " +
-                        "  dish_id AS dish_id, " +
-                        "  name, " +
-                        "  cuisine, " +
-                        "  restaurant, " +
-                        "  rating, " +
-                        "  price, " +
-                        "  CASE " +
-                        "    WHEN rating >= 4.5 THEN '🌟 Top Rated' " +
-                        "    WHEN rating >= 4.0 THEN '👍 Good' " +
-                        "    WHEN rating >= 3.5 THEN '👌 Average' " +
-                        "    ELSE '👎 Low Rated' " +
-                        "  END AS status " +
-                        "FROM dishes " +
-                        "WHERE cuisine = ? " +
-                        "ORDER BY rating DESC, name ASC";
-
-        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
-            ps.setString(1, dish_category);
-            try (ResultSet rs = ps.executeQuery()) {
-                printResultSetAsTable("DISHES — " + dish_category, rs);
             }
         }
     }

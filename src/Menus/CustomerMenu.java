@@ -197,14 +197,13 @@ public class CustomerMenu {
         System.out.println("|              Menu              |");
         System.out.println("=================================");
         System.out.println("|  1. Browse Restaurants         |");
-        System.out.println("|  2. Browse Dishes by Restaurant|");
-        System.out.println("|  3. Browse Dishes by Cuisine   |");
-        System.out.println("|  4. Add to Cart                |");
-        System.out.println("|  5. View Cart                  |");
-        System.out.println("|  6. Place Order                |");
-        System.out.println("|  7. View Order History         |");
-        System.out.println("|  8. Profile                    |");
-        System.out.println("|  9. Log Out                    |");
+        System.out.println("|  2. Browse Dishes              |");
+        System.out.println("|  3. Add to Cart                |");
+        System.out.println("|  4. View Cart                  |");
+        System.out.println("|  5. Place Order                |");
+        System.out.println("|  6. View Order History         |");
+        System.out.println("|  7. Profile                    |");
+        System.out.println("|  8. Log Out                    |");
         System.out.println("=================================");
         System.out.print("\nPlease select an option: ");
     }
@@ -225,22 +224,13 @@ public class CustomerMenu {
     private static void processAction(int option,String id) throws Exception {
         switch (option) {
             case 1 -> RestaurantDAO.browseRestaurants();
-            case 2 -> {
-                System.out.print("\nEnter Restaurant name: ");
-                String resName = AppConstants.s.nextLine();
-                DishDAO.browseDishesByRestaurant(resName);
-            }
-            case 3 -> {
-                System.out.print("\nEnter dish category: ");
-                String cuisine = AppConstants.s.nextLine();
-                DishDAO.browseDishesByCuisine(cuisine);
-            }
-            case 4 -> UserService.addToCart();
-            case 5 -> UserService.Cart.display();
-            case 6 -> OrderDAO.placeOrder(id);
-            case 7 -> OrderDAO.viewOrderAndOrderItems(id);
-            case 8 -> UserDAO.profile(id);
-            case 9 -> {
+            case 2 -> DishDAO.browseDishes();
+            case 3 -> UserService.addToCart();
+            case 4 -> UserService.Cart.display();
+            case 5 -> OrderDAO.placeOrder(id);
+            case 6 -> OrderDAO.viewOrderAndOrderItems(id);
+            case 7 -> UserDAO.profile(id);
+            case 8 -> {
                 System.out.println();
                 Services.UserService.Cart = null;
                 AppConstants.run = false;

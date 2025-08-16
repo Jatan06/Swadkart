@@ -3,6 +3,7 @@
 package Services;
 import Constants.AppConstants;
 import Dao.DishDAO;
+import Dao.RestaurantDAO;
 import Utils.Validators;
 import Ds.*;
 
@@ -16,11 +17,20 @@ public class UserService {
     public static void addToCart() throws Exception {
         String r_id = null;
         if(isEmpty){
-            while(!Validators.validateRestaurantName(r_id)) {
+            while(!Validators.validateRestaurantId(r_id)) {
                 System.out.print("\nEnter Restaurant Id: ");
                 r_id = scanner.next();
             }
             isEmpty= false;
+        }
+        if(!RestaurantDAO.checkRestaurantId(r_id)) {
+            System.out.print("\nInvalid Restaurant Id. Try again. or enter 'b' to go back :- ");
+            if(AppConstants.s.next().equalsIgnoreCase("b")) {
+                return;
+            }
+            else {
+                addToCart();
+            }
         }
         boolean running = true;
         while (running) {
