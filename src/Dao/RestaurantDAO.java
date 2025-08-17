@@ -356,25 +356,27 @@ public class RestaurantDAO {
     }
 
     public static boolean checkRestaurantId(String id) {
-        PreparedStatement ps;
         boolean resfound = false;
-        String checkId = "call checkRestId(?,?)";
-        try {
-            ps = AppConstants.connection.prepareCall(checkId);
-            ps.setString(1, id);
-            boolean found = ps.execute();
-            if (found) {
-                ResultSet rs = ps.getResultSet();
-                if (rs.next()) {
-                    resfound = rs.getBoolean(1);
-                    return resfound;
-                }
-            }
+        String sql = "{ call checkRestId(?, ?) }"; // procedure with IN + OUT
+        try (CallableStatement cs = AppConstants.connection.prepareCall(sql)) {
+            // Set input param
+            cs.setString(1, id);
+
+            // Register OUT param (MySQL BOOLEAN = TINYINT(1))
+            cs.registerOutParameter(2, java.sql.Types.TINYINT);
+
+            // Execute procedure
+            cs.execute();
+
+            // Get OUT param
+            resfound = cs.getBoolean(2);
+
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error while checking restaurant ID", e);
         }
         return resfound;
     }
+
 
     private static String nz(String s) {
         return (s == null || s.isBlank()) ? "-" : s;
