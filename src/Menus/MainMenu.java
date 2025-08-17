@@ -53,6 +53,10 @@ public class MainMenu {
                             if(!CustomerMenu.forgotPassword(id)) {
                                 return;
                             }
+                            else {
+                                System.out.print("\nPlease enter new password :- ");
+                                password = AppConstants.s.next();
+                            }
                         }
                         if (!id.isEmpty() && (id.charAt(0) == 'U' || id.charAt(0) == 'u')) {
                             if (CustomerMenu.customerValidator(id, password)) {

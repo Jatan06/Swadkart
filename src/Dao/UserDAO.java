@@ -61,6 +61,26 @@ public class UserDAO {
         ResultSet rs = ps.executeQuery();
         return rs.next(); // true if phone number exists
     }
+    public static boolean changePass(String uid,String ph_no) throws Exception {
+        PreparedStatement ps = AppConstants.connection.prepareCall("SELECT * FROM users WHERE id = ? AND phone_number = ?;");
+        ps.setString(1, uid);
+        ps.setString(2, ph_no);
+        ResultSet rs = ps.executeQuery();
+        return rs.next();
+    }
+    public static void setNewPass(String id,String new_pass) {
+        try {
+            PreparedStatement ps = AppConstants.connection.prepareCall("UPDATE users SET password = ? WHERE id = ?;");
+            if(ps.executeUpdate()>0) {
+                System.out.println("\nYour password has been updated");
+            }
+            else {
+                System.out.println("\nPassword not updated, please try again !");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     private static void updateProfile(String id) {
         CallableStatement up;
         try {

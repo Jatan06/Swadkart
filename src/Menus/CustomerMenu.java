@@ -150,7 +150,73 @@ public class CustomerMenu {
     }
 
     public static boolean forgotPassword(String id) {
-        return false;
+        System.out.print("\nEnter Phone No. : ");
+        String ph_no = "+91" + AppConstants.s.next();
+        while(true) {
+            try {
+                if (UserDAO.changePass(id,ph_no)) {
+                    String generatedOTP = OTPService.generateOTP();
+                    // Send the same OTP
+                    if(OTPService.sendOTP(ph_no, generatedOTP)) {
+                        // Prompt user to enter OTP
+                        System.out.print("\nEnter the OTP sent to your phone: ");
+                        String userOTP = AppConstants.s.next();
+                        AppConstants.s.nextLine();
+                        int otpAttempts = 3;
+                        boolean otpValidated = false;
+                        while (otpAttempts > 0) {
+                            if (userOTP.equals(generatedOTP)) {
+                                otpValidated = true;
+                                System.out.println("\n✅ Phone number verified successfully!");
+                                System.out.print("\nEnter new password : ");
+                                String new_password = AppConstants.s.next();
+                                while (!Validators.validatePassword(new_password)) {
+                                    System.out.println("Enter valid password :-  ");
+                                    new_password = AppConstants.s.next();
+                                    if (!Validators.validatePassword(new_password)) {
+                                        System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
+                                    }
+                                }
+                                System.out.print("\nRe-Enter password :- ");
+                                String repass = AppConstants.s.next();
+                                while (true) {
+                                    if(!new_password.equals(repass)) {
+                                        System.out.println("Please enter valid password which you have set :- ");
+                                        repass = AppConstants.s.next();
+                                    }
+                                    else {
+                                        UserDAO.setNewPass(id,new_password);
+                                        return true;
+                                    }
+                                }
+                            } else {
+                                if (--otpAttempts > 0) {
+                                    System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
+                                    userOTP = AppConstants.s.nextLine();
+                                } else {
+                                    System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                        return false;
+                    }
+                    return true;
+                }
+                else {
+                    System.out.println("Your id "+id+" does not match with your phone number. Please try again, or enter 'b' to go back or enter any character except 'b' or 'B' to try again  :- ");
+                    if(AppConstants.s.next().equals("b")) {
+                        return false;
+                    }
+                }
+            }
+            catch(Exception e) {
+                System.out.println("INVALID PHONE NUMBER");
+            }
+        }
     }
 
     // Safer, precise validator that only logs session on success
