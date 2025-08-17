@@ -78,8 +78,7 @@ public class CustomerMenu {
                                         }
                                     }
                                 } else {
-                                    otpAttempts--;
-                                    if (otpAttempts > 0) {
+                                    if (--otpAttempts > 0) {
                                         System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
                                         userOTP = AppConstants.s.nextLine();
                                     } else {
@@ -148,6 +147,10 @@ public class CustomerMenu {
                 throw new RuntimeException("An error occurred in the Customer Menu in new customer ", e);
             }
         }
+    }
+
+    public static boolean forgotPassword(String id) {
+        return false;
     }
 
     // Safer, precise validator that only logs session on success

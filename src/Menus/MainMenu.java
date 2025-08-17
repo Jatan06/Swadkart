@@ -49,7 +49,11 @@ public class MainMenu {
                         String id = AppConstants.s.nextLine();
                         System.out.print("Enter password (Enter 'F' or 'f' for forgot password) : ");
                         String password = AppConstants.s.nextLine();
-
+                        if(password.charAt(0) == 'F' || password.charAt(0) == 'f') {
+                            if(!CustomerMenu.forgotPassword(id)) {
+                                return;
+                            }
+                        }
                         if (!id.isEmpty() && (id.charAt(0) == 'U' || id.charAt(0) == 'u')) {
                             if (CustomerMenu.customerValidator(id, password)) {
                                 CustomerMenu.customerMenu(id);
