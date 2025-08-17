@@ -140,6 +140,28 @@ public class OrderDAO {
                 String op = "\nOrder placed and payment completed successfully!";
                 Sound.playWav("/zomato_app.wav");
                 System.out.println(op);
+                Thread.sleep(1000);
+                System.out.print("\nWould you like to give review (y/n) :- ");
+                if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
+                    UserService.Cart.displayTabular();
+                    boolean review = true;
+                    while (review) {
+                        System.out.println("would you like to give all dishes (Enter 'all') review or enter dish id :- ");
+                        String dishId = AppConstants.s.next().trim();
+                        if (dishId.equalsIgnoreCase("all")) {
+                            ReviewDAO.insertReview(UserService.Cart, uid);
+                            review = false;
+                        } else {
+                            ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid);
+                            System.out.println("Would you like to give review for another dish (y/n) :-");
+                            if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
+                                continue;
+                            } else {
+                                review = false;
+                            }
+                        }
+                    }
+                }
                 UserService.Cart.clearList();
                 UserService.isEmpty = true;
             }
@@ -204,6 +226,30 @@ public class OrderDAO {
             ps.setString(1, uid);
             try (ResultSet rs = ps.executeQuery()) {
                 printResultSetAsTable("ORDERS AND TRANSACTIONS", rs);
+            }
+        }
+    }
+
+    /**
+     * Finds the latest order id (o_id) for a given user, restaurant, and dish.
+     * Returns null if no matching order exists.
+     */
+    public static String findOrderIdByUserRestaurantAndDish(String userId, String restaurantId, String dishId) throws Exception {
+        final String sql =
+                "SELECT o.o_id AS o_id " +
+                "FROM orders o " +
+                "JOIN order_items oi ON oi.o_id = o.o_id " +
+                "WHERE o.uid = ? AND o.rid = ? AND oi.did = ? " +
+                "ORDER BY o.order_time_stamp DESC " +
+                "LIMIT 1";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            ps.setString(2, restaurantId);
+            ps.setString(3, dishId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getString("o_id") : null;
             }
         }
     }

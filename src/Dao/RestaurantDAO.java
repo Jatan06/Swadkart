@@ -377,7 +377,6 @@ public class RestaurantDAO {
         return resfound;
     }
 
-
     private static String nz(String s) {
         return (s == null || s.isBlank()) ? "-" : s;
     }

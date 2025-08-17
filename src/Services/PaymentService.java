@@ -88,7 +88,6 @@ public class PaymentService {
         // On success: print receipt, clear cart, save payment
         if (success) {
             printReceipt(cart, subtotal, tax, total);
-            cart.clearList();
             UserService.isEmpty = true;
             try {
                 Payment p = Payment.payment; // capture current payment
