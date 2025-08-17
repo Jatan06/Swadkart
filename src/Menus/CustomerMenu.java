@@ -280,9 +280,10 @@ public class CustomerMenu {
         System.out.println("|  3. Add to Cart                |");
         System.out.println("|  4. View Cart                  |");
         System.out.println("|  5. Place Order                |");
-        System.out.println("|  6. View Order History         |");
-        System.out.println("|  7. Profile                    |");
-        System.out.println("|  8. Log Out                    |");
+        System.out.println("|  6. Order Reviews              |");
+        System.out.println("|  7. View Order History         |");
+        System.out.println("|  8. Profile                    |");
+        System.out.println("|  9. Log Out                    |");
         System.out.println("=================================");
         System.out.print("\nPlease select an option: ");
     }
@@ -307,11 +308,12 @@ public class CustomerMenu {
             case 3 -> UserService.addToCart();
             case 4 -> UserService.Cart.display();
             case 5 -> OrderDAO.placeOrder(id);
-            case 6 -> OrderDAO.viewOrderAndOrderItems(id);
-            case 7 -> UserDAO.profile(id);
-            case 8 -> {
+            case 6 -> ReviewService.showReviewMenu();
+            case 7 -> OrderDAO.viewOrderAndOrderItems(id);
+            case 8 -> UserDAO.profile(id);
+            case 9 -> {
                 System.out.println();
-                Services.UserService.Cart = null;
+                UserService.Cart = null;
                 AppConstants.run = false;
             }
             default -> System.out.println("Invalid choice. Please try again.");

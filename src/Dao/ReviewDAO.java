@@ -1,9 +1,12 @@
 package Dao;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import Constants.*;
 import Models.*;
 import Ds.*;
-
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 public class ReviewDAO {
     public static void insertReview(Ds.LL cart,String uid) throws Exception {
@@ -42,6 +45,7 @@ public class ReviewDAO {
             temp = temp.next;
         }
     }
+
     public static void insertReviewByDishId(Ds.LL cart,String dishId,String uid) throws Exception{
         Ds.LL.Node temp = cart.head;
         while (temp != null) {
@@ -80,5 +84,113 @@ public class ReviewDAO {
             }
             temp = temp.next;
         }
+    }
+    // Query helpers for browsing reviews
+    public static List<Review> getAll() throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            List<Review> list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+            return list;
+        }
+    }
+
+    public static List<Review> findByRestaurantId(String restaurantId) throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews WHERE r_id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, restaurantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Review> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }
+        }
+    }
+
+    public static List<Review> findByUserId(String userId) throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews WHERE u_id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Review> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }
+        }
+    }
+
+    public static List<Review> findByOrderId(String orderId) throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews WHERE o_id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Review> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }
+        }
+    }
+
+    public static List<Review> findByDishId(String dishId) throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews WHERE d_id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, dishId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Review> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }
+        }
+    }
+
+    public static List<Review> findByRatingRange(double minInclusive, double maxInclusive) throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews WHERE review BETWEEN ? AND ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setDouble(1, minInclusive);
+            ps.setDouble(2, maxInclusive);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Review> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }
+        }
+    }
+
+    public static List<Review> findByKeyword(String keyword) throws Exception {
+        String sql = "SELECT r_id, u_id, o_id, d_id, review, feedback FROM reviews WHERE LOWER(feedback) LIKE ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, "%" + (keyword == null ? "" : keyword.toLowerCase()) + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Review> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+                return list;
+            }
+        }
+    }
+
+    // Maps the current row of ResultSet to Review model
+    private static Review mapRow(ResultSet rs) throws Exception {
+        String rId = rs.getString("r_id");
+        String uId = rs.getString("u_id");
+        String oId = rs.getString("o_id");
+        String dId = rs.getString("d_id");
+        double rating = rs.getDouble("review");
+        String feedback = rs.getString("feedback");
+        return new Review(rId, uId, oId, dId, rating, feedback);
     }
 }

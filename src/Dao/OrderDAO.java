@@ -136,11 +136,17 @@ public class OrderDAO {
             // 6) Commit and finalize
             if(paymentSuccess) {
                 AppConstants.connection.commit();
-                Thread.sleep(1000);
+                Thread.sleep(2000);
                 String op = "\nOrder placed and payment completed successfully!";
-                Sound.playWav("/zomato_app.wav");
+                new Thread(() -> {
+                    try {
+                        Sound.playWav("/zomato_app.wav");
+                    } catch (Exception e) {
+                        // ignore sound errors
+                    }
+                }).start();
                 System.out.println(op);
-                Thread.sleep(1000);
+                Thread.sleep(5000);
                 System.out.print("\nWould you like to give review (y/n) :- ");
                 if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
                     UserService.Cart.displayTabular();

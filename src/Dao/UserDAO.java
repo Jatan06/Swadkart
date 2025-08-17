@@ -21,6 +21,7 @@ public class UserDAO {
             System.out.println("\nUser not added to the database!!");
         }
     }
+
     public static int countUsers() throws Exception {
         String q="select count(*) from users";
         Statement st=AppConstants.connection.createStatement();
@@ -28,8 +29,10 @@ public class UserDAO {
         rs.next();
         return rs.getInt(1);
     }
+
     public static void profile(String id) {
         boolean prof = true;
+        AppConstants.s.nextLine();
         while (prof) {
             System.out.println("\n\n===================================");
             System.out.println("|         Profile Menu            |");
@@ -54,6 +57,7 @@ public class UserDAO {
             }
         }
     }
+
     public static boolean phoneNumberExists(String number) throws Exception {
         String query = "SELECT phone_number FROM users WHERE phone_number = ?;";
         PreparedStatement ps = AppConstants.connection.prepareStatement(query);
@@ -61,6 +65,7 @@ public class UserDAO {
         ResultSet rs = ps.executeQuery();
         return rs.next(); // true if phone number exists
     }
+
     public static boolean changePass(String uid,String ph_no) throws Exception {
         PreparedStatement ps = AppConstants.connection.prepareCall("SELECT * FROM users WHERE id = ? AND phone_number = ?;");
         ps.setString(1, uid);
@@ -68,6 +73,7 @@ public class UserDAO {
         ResultSet rs = ps.executeQuery();
         return rs.next();
     }
+
     public static void setNewPass(String id,String new_pass) {
         try {
             PreparedStatement ps = AppConstants.connection.prepareCall("UPDATE users SET password = ? WHERE id = ?;");
@@ -83,6 +89,7 @@ public class UserDAO {
             throw new RuntimeException(e);
         }
     }
+
     private static void updateProfile(String id) {
         CallableStatement up;
         try {
@@ -190,32 +197,123 @@ public class UserDAO {
             System.out.print("\nException "+e+" arise in updateProfile. Please provide valid input.");
         }
     }
+
     private static void viewProfile(String id) {
         try {
-            // Prepare the SQL query to fetch user details
-            CallableStatement vp = AppConstants.connection.prepareCall("SELECT * FROM users WHERE id = ?;");
-            vp.setString(1, id);
-            // Execute the query and retrieve the profile details
-            ResultSet profile = vp.executeQuery();
-            // Check if the profile exists
-            if (profile.next()) {
-                System.out.println("\n===================================");
-                System.out.println("          User Profile            ");
-                System.out.println("===================================");
-                System.out.println("User ID:         " + profile.getString("id"));
-                System.out.println("Name:            " + profile.getString("name"));
-                System.out.println("Email:           " + profile.getString("email"));
-                System.out.println("Phone Number:    " + profile.getString("phone_number"));
-                System.out.println("Address:         " + profile.getString("address"));
-                System.out.println("===================================\n");
-            } else {
-                System.out.println("\nNo user profile found for the given ID: " + id);
+            String sql = "SELECT id, name, email, phone_number, address FROM users WHERE id = ?";
+            try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+                ps.setString(1, id);
+                try (ResultSet profile = ps.executeQuery()) {
+                    if (profile.next()) {
+                        final int width = 60;
+
+                        String userId = nvl(profile.getString("id"));
+                        String name = nvl(profile.getString("name"));
+                        String email = nvl(profile.getString("email"));
+                        String phone = nvl(profile.getString("phone_number"));
+                        String address = nvl(profile.getString("address"));
+
+                        String border = repeat('=', width);
+                        System.out.println();
+                        System.out.println(border);
+                        System.out.println(center("User Profile", width));
+                        System.out.println(border);
+                        System.out.println(formatRow("User ID", userId, width));
+                        System.out.println(formatRow("Name", name, width));
+                        System.out.println(formatRow("Email", email, width));
+                        System.out.println(formatRow("Phone Number", phone, width));
+                        System.out.println(formatMultilineRow("Address", address, width));
+                        System.out.println(border);
+                    } else {
+                        System.out.println("\nNo user profile found for the given ID: " + id);
+                    }
+                }
             }
-            profile.close();
-            vp.close();
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred in viewProfile. Please try again.");
         }
-        catch (Exception e) {
-            System.out.println("An unexpected error occurred in updateProfile. Please provide valid input.");
+    }
+
+    // Helper to avoid null/blank printing
+    private static String nvl(String s) {
+        return (s == null || s.trim().isEmpty()) ? "-" : s.trim();
+    }
+
+    // Draw a repeated character line
+    private static String repeat(char ch, int count) {
+        StringBuilder sb = new StringBuilder(Math.max(count, 0));
+        for (int i = 0; i < count; i++) sb.append(ch);
+        return sb.toString();
+    }
+
+    // Center text within a fixed width using spaces
+    private static String center(String text, int width) {
+        if (text == null) text = "";
+        if (text.length() >= width) return text.substring(0, width);
+        int padding = (width - text.length()) / 2;
+        StringBuilder sb = new StringBuilder(width);
+        for (int i = 0; i < padding; i++) sb.append(' ');
+        sb.append(text);
+        while (sb.length() < width) sb.append(' ');
+        return sb.toString();
+    }
+
+    // Format a single-line row like: | Label           : Value                         |
+    private static String formatRow(String label, String value, int width) {
+        final int labelWidth = 16; // fixed label width
+        // "| " + label + " : " + value + " |" => reserve spaces accordingly
+        int valueWidth = width - (2 + labelWidth + 3 + 2);
+        if (value.length() > valueWidth) value = value.substring(0, Math.max(valueWidth - 3, 0)) + (valueWidth > 3 ? "..." : "");
+        String lbl = (label.length() > labelWidth) ? label.substring(0, labelWidth) : label;
+        return String.format("| %-16s : %-"+valueWidth+"s |", lbl, value);
+    }
+
+    // Format a multi-line row for long fields like address
+    private static String formatMultilineRow(String label, String value, int width) {
+        final int labelWidth = 16;
+        int valueWidth = width - (2 + labelWidth + 3 + 2);
+        java.util.List<String> lines = wrap(value, valueWidth);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < lines.size(); i++) {
+            String lbl = (i == 0) ? label : "";
+            String row = String.format("| %-16s : %-"+valueWidth+"s |",
+                    (lbl.length() > labelWidth ? lbl.substring(0, labelWidth) : lbl),
+                    lines.get(i));
+            sb.append(row).append(System.lineSeparator());
         }
+        return sb.toString().trim();
+    }
+
+    // Simple word-wrap for a given width
+    private static java.util.List<String> wrap(String text, int width) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (text == null) {
+            out.add("-");
+            return out;
+        }
+        String[] words = text.split("\\s+");
+        StringBuilder line = new StringBuilder();
+        for (String w : words) {
+            if (line.length() == 0) {
+                line.append(w);
+            } else if (line.length() + 1 + w.length() <= width) {
+                line.append(' ').append(w);
+            } else {
+                out.add(padRight(line.toString(), width));
+                line.setLength(0);
+                line.append(w);
+            }
+        }
+        if (line.length() > 0) out.add(padRight(line.toString(), width));
+        if (out.isEmpty()) out.add(padRight("-", width));
+        return out;
+    }
+
+    private static String padRight(String s, int width) {
+        if (s.length() >= width) return s;
+        StringBuilder sb = new StringBuilder(width);
+        sb.append(s);
+        while (sb.length() < width) sb.append(' ');
+        return sb.toString();
     }
 }
