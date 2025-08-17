@@ -151,70 +151,80 @@ public class CustomerMenu {
 
     public static boolean forgotPassword(String id) {
         System.out.print("\nEnter Phone No. : ");
-        String ph_no = "+91" + AppConstants.s.next();
-        while(true) {
+        String ph_no = "+91" + AppConstants.s.nextLine().trim();
+        while (true) {
             try {
-                if (UserDAO.changePass(id,ph_no)) {
-                    String generatedOTP = OTPService.generateOTP();
-                    // Send the same OTP
-                    if(OTPService.sendOTP(ph_no, generatedOTP)) {
-                        // Prompt user to enter OTP
-                        System.out.print("\nEnter the OTP sent to your phone: ");
-                        String userOTP = AppConstants.s.next();
-                        AppConstants.s.nextLine();
+                if (UserDAO.changePass(id, ph_no)) {
+                    String generatedOTP = PasswordChangeOTPService.generateOTP();
+                    if (PasswordChangeOTPService.sendOTP(ph_no, generatedOTP)) {
                         int otpAttempts = 3;
                         boolean otpValidated = false;
                         while (otpAttempts > 0) {
+                            System.out.print("\nEnter the OTP sent to your phone: ");
+                            String userOTP = AppConstants.s.nextLine().trim();
                             if (userOTP.equals(generatedOTP)) {
                                 otpValidated = true;
-                                System.out.println("\n✅ Phone number verified successfully!");
-                                System.out.print("\nEnter new password : ");
-                                String new_password = AppConstants.s.next();
-                                while (!Validators.validatePassword(new_password)) {
-                                    System.out.println("Enter valid password :-  ");
-                                    new_password = AppConstants.s.next();
-                                    if (!Validators.validatePassword(new_password)) {
-                                        System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
-                                    }
-                                }
-                                System.out.print("\nRe-Enter password :- ");
-                                String repass = AppConstants.s.next();
-                                while (true) {
-                                    if(!new_password.equals(repass)) {
-                                        System.out.println("Please enter valid password which you have set :- ");
-                                        repass = AppConstants.s.next();
-                                    }
-                                    else {
-                                        UserDAO.setNewPass(id,new_password);
-                                        return true;
-                                    }
-                                }
+                                break;
                             } else {
-                                if (--otpAttempts > 0) {
-                                    System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
-                                    userOTP = AppConstants.s.nextLine();
-                                } else {
-                                    System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
-                                    return false;
+                                otpAttempts--;
+                                if (otpAttempts > 0) {
+                                    System.out.println("❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left).");
                                 }
                             }
                         }
-                    }
-                    else {
-                        System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                        if (!otpValidated) {
+                            System.out.println("\n🚫 Phone number verification failed. Operation terminated.\n");
+                            return false;
+                        }
+                        System.out.println("\n✅ Phone number verified successfully!");
+                        // New password setup with validation
+                        String new_password;
+                        while (true) {
+                            System.out.print("\nEnter new password : ");
+                            new_password = AppConstants.s.nextLine();
+                            if (Validators.validatePassword(new_password)) {
+                                break;
+                            }
+                            System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
+                        }
+                        while (true) {
+                            System.out.print("\nRe-Enter password :- ");
+                            String repass = AppConstants.s.nextLine();
+                            if (new_password.equals(repass)) {
+                                UserDAO.setNewPass(id, new_password);
+                                System.out.println("\n✅ Password has been updated successfully.");
+                                return true;
+                            } else {
+                                System.out.println("Passwords do not match. Please try again.");
+                            }
+                        }
+                    } else {
+                        System.out.println("\n🚫 Phone number verification failed. Operation terminated.\n");
                         return false;
                     }
-                    return true;
-                }
-                else {
-                    System.out.println("Your id "+id+" does not match with your phone number. Please try again, or enter 'b' to go back or enter any character except 'b' or 'B' to try again  :- ");
-                    if(AppConstants.s.next().equals("b")) {
+                } else {
+                    System.out.println("Phone number " + ph_no + " does not match with your id " + id + ".");
+                    System.out.print("Enter 'b' to go back, or any other key to try again: ");
+                    String choice = AppConstants.s.nextLine().trim();
+                    if (choice.equalsIgnoreCase("b")) {
                         return false;
                     }
+                    // If a user wants to try again, ask for the phone again
+                    System.out.print("\nEnter Phone No. : ");
+                    ph_no = "+91" + AppConstants.s.nextLine().trim();
+                    // continue the while(true)
                 }
-            }
-            catch(Exception e) {
-                System.out.println("INVALID PHONE NUMBER");
+            } catch (java.sql.SQLException se) {
+                System.out.println("A database error occurred while resetting the password. Please try again later.");
+                return false;
+            } catch (RuntimeException re) {
+                // Preserve runtime exceptions like NPE/illegal state with a user-friendly path
+                System.out.println("Unexpected error occurred while processing forgot password. Please try again.");
+                return false;
+            } catch (Exception e) {
+                // Do not kill the app; fail this operation gracefully
+                System.out.println("An error occurred while processing your request. Please try again.");
+                return false;
             }
         }
     }

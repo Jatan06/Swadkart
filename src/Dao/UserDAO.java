@@ -71,6 +71,8 @@ public class UserDAO {
     public static void setNewPass(String id,String new_pass) {
         try {
             PreparedStatement ps = AppConstants.connection.prepareCall("UPDATE users SET password = ? WHERE id = ?;");
+            ps.setString(1, new_pass);
+            ps.setString(2, id);
             if(ps.executeUpdate()>0) {
                 System.out.println("\nYour password has been updated");
             }
