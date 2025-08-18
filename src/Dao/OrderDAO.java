@@ -173,7 +173,7 @@ public class OrderDAO {
             }
             else {
                 AppConstants.connection.rollback(sp);
-                System.out.println("Order placed but payment failed!");
+                System.out.println("Order cancelled.");
             }
         } catch (Exception ex) {
             try {

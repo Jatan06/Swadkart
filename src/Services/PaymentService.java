@@ -16,17 +16,61 @@ public class PaymentService {
 
         // Calculate subtotal and display summary
         double subtotal = 0.0;
-        System.out.println("\n--- Order Summary ---");
+
+        // Build a nice table: Item | Qty | Price | Line Total
+        String[] headers = { "Item", "Qty", "Price", "Line Total" };
+        int[] widths = {
+                Math.max(4, headers[0].length()),
+                Math.max(3, headers[1].length()),
+                Math.max(5, headers[2].length()),
+                Math.max(10, headers[3].length())
+        };
+
+        java.util.List<String[]> rows = new java.util.ArrayList<>();
         LL.Node current = cart.head;
         while (current != null) {
-            double price = current.data.getPrice();
+            String item = current.data.getName();
             int qty = current.quantity;
+            double price = current.data.getPrice();
             double lineTotal = qty * price;
-            System.out.printf("• %s (x%d) @ %.2f = %.2f%n",
-                    current.data.getName(), qty, price, lineTotal);
+
+            String sItem = item;
+            String sQty = String.valueOf(qty);
+            String sPrice = String.format(java.util.Locale.US, "%.2f", price);
+            String sLine = String.format(java.util.Locale.US, "%.2f", lineTotal);
+
+            widths[0] = Math.max(widths[0], sItem.length());
+            widths[1] = Math.max(widths[1], sQty.length());
+            widths[2] = Math.max(widths[2], sPrice.length());
+            widths[3] = Math.max(widths[3], sLine.length());
+
+            rows.add(new String[] { sItem, sQty, sPrice, sLine });
             subtotal += lineTotal;
+
             current = current.next;
         }
+
+        // Build line separator
+        StringBuilder sep = new StringBuilder();
+        sep.append('+');
+        for (int w : widths) {
+            sep.append("-".repeat(w + 2)).append('+');
+        }
+
+        // Build row formats (left for text, right for numbers)
+        String rowFmt = "| %-" + widths[0] + "s | %" + widths[1] + "s | %" + widths[2] + "s | %" + widths[3] + "s |%n";
+
+        System.out.println("\n" + "-".repeat(Math.max(18, sep.length())));
+        System.out.println("Order Summary");
+        System.out.println("-".repeat(Math.max(18, sep.length())));
+        System.out.println(sep.toString());
+        System.out.printf(rowFmt,
+                headers[0], headers[1], headers[2], headers[3]);
+        System.out.println(sep.toString());
+        for (String[] r : rows) {
+            System.out.printf(rowFmt, r[0], r[1], r[2], r[3]);
+        }
+        System.out.println(sep.toString());
 
         double taxRate = 0.05;
         double tax = round2(subtotal * taxRate);
@@ -39,6 +83,14 @@ public class PaymentService {
         // Set the amount in a Payment object
         if (Payment.payment != null) {
             Payment.payment.amount = total;
+        }
+
+        System.out.print("\nAre you sure want to confirm order (y/n) :- ");
+        if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
+
+        }
+        else {
+            return false;
         }
 
         // Select a payment method

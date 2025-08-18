@@ -39,7 +39,7 @@ public class ReviewService {
             System.out.println("5) Show by Dish ID");
             System.out.println("6) Show by Rating Range");
             System.out.println("7) Search by Feedback Keyword");
-            System.out.println("0) Exit");
+            System.out.println("8) Exit");
             System.out.print("Choose an option: ");
 
             String choice = scanner.nextLine().trim();
@@ -77,7 +77,7 @@ public class ReviewService {
                         System.out.print("Enter keyword to search in feedback: ");
                         displayReviews(safeList(ReviewDAO.findByKeyword(scanner.nextLine().trim())));
                         break;
-                    case "0":
+                    case "8":
                         System.out.println("Exiting Review Browser.");
                         return;
                     default:
