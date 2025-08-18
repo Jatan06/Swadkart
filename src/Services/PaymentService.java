@@ -75,10 +75,6 @@ public class PaymentService {
         if (success) {
             success = simulateRestaurantConfirmation();
             if (Payment.payment != null) Payment.payment.paymentStatus = (success ? "success" : "failed");
-            if(!success) {
-                System.out.println("Order declined by restaurant.");
-                return false;
-            }
         }
         else {
             System.out.println("Payment failed. Please try again.");
@@ -166,14 +162,7 @@ public class PaymentService {
             System.out.print(".");
         }
         System.out.println();
-
-        boolean accepted = Math.random() < 0.99;
-        if (accepted) {
-            System.out.println("\nRestaurant confirmed your order! Preparing your food.");
-        } else {
-            System.out.println("\nRestaurant declined the order. Payment will be auto-refunded (demo).");
-        }
-        return accepted;
+        return true;
     }
 
     private static void printReceipt(LL cart, double subtotal, double tax, double total) {

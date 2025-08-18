@@ -1,6 +1,7 @@
 package Admin;
 import Constants.AppConstants;
 import Dao.*;
+import Services.ReviewService;
 import org.slf4j.*;
 public class AdminMenu {
     private static final Logger log = LoggerFactory.getLogger(AdminMenu.class);
@@ -18,7 +19,8 @@ public class AdminMenu {
                 System.out.println("|  2. View Restaurants          |");
                 System.out.println("|  3. View Orders               |");
                 System.out.println("|  4. View Transaction          |");
-                System.out.println("|  5. Logout                    |");
+                System.out.println("|  5. View Reviews              |");
+                System.out.println("|  6. Logout                    |");
                 System.out.println("=================================");
                 System.out.print("\nPlease enter your choice: ");
                 switch (AppConstants.s.nextInt()) {
@@ -55,6 +57,9 @@ public class AdminMenu {
                         PaymentDAO.viewTransactions();
                         break;
                     case 5:
+                        ReviewService.showReviewMenu();
+                        break;
+                    case 6:
                         System.out.println();
                         AppConstants.adminRun = false;
                         break;
