@@ -1,140 +1,182 @@
-# Swadkart
+# 🍴 Swadkart - Food Ordering System
 
-Swadkart is a command-line food ordering system that connects customers with restaurants. It delivers the full flow from browsing menus to ordering, tracking, and reviewing. Admins can manage restaurants, menus, and order lifecycles.
-
----
-
-## Table of Contents
-- Overview
-- Features
-- Architecture
-- Tech Stack
-- Prerequisites
-- Setup
-- Configuration
-- Database Setup
-- Run
-- Typical CLI Flow
-- Troubleshooting
-- Roadmap
-- Contributing
-- License
+Swadkart is a **CLI-based food ordering system** built in **Java**.  
+It simulates a real-world food delivery platform where customers can browse restaurants, view dishes, place orders, and make payments.  
 
 ---
 
-## Overview
-
-Swadkart offers a clean, menu-driven CLI to:
-- Explore restaurants and dishes
-- Add items to a cart and place orders
-- Simulate payments and track status
-- Leave ratings and reviews
-- Enable admins to manage restaurants, menus, and order statuses
-
----
-
-## Features
-
-### Customer
-- Browse restaurants and dishes (with categories, pricing, availability)
-- Add items to cart and place orders
-- Simulate payment
-- Track order status (Placed → Preparing → Out for Delivery → Delivered/Cancelled)
-- Rate and review dishes/restaurants
-- View past orders and reorder
-
-### Admin
-- Add, edit, and remove restaurants
-- Manage dishes for owned restaurants (create/update/toggle availability/delete)
-- View and update order statuses
-- Review customer feedback and aggregate ratings
-
-### Authentication & Sessions
-- Register as Customer or Admin
-- Secure login/logout
-- Session-aware menus
+## ✨ Features
+- 👤 Customer registration, login, and password reset  
+- 🍕 Browse and search dishes by restaurant or cuisine  
+- 🛒 Add dishes to cart (custom linked list implementation)  
+- 📦 Place and track orders  
+- 💳 Payment integration (Cash, Card, UPI)  
+- ⭐ Rate restaurants and dishes  
+- 📊 Admin access for data management  
 
 ---
 
-## Architecture
-
-- CLI interface with guided, validated input
-- Layered design for maintainability:
-  - UI: CLI navigation and input handling
-  - Service: business logic and orchestration
-  - DAO: data access via JDBC
-  - Model: core entities (User, Restaurant, Dish, Order, Review, etc.)
-- Parameterized queries and password hashing
-- Centralized error handling
+## 🛠️ Tech Stack
+- **Language**: Java  
+- **Database**: MySQL (via JDBC)  
+- **Tools**: IntelliJ IDEA / Eclipse  
+- **Version Control**: Git  
 
 ---
 
-## Tech Stack
+## ⚡ Getting Started
 
-- Java (JDK 24)
-- JDBC (Prepared Statements)
-- MySQL (8.x or compatible)
-- Build: Gradle or Maven
+### 1. Clone Repository
+```bash
+git clone https://github.com/your-username/swadkart.git
+cd swadkart
+```
 
-Notes
-- Replace <version> and your.main.Class as applicable.
-- Ensure the database is reachable and credentials are correct.
+### 2. Setup Database
+- Import `swadkart.sql` into MySQL  
+- Update DB credentials in `AppConstants.java`
 
----
-
-## Prerequisites
-
-- Java 24 installed and on PATH
-- MySQL running locally or accessible remotely
-- Gradle or Maven (or use project wrappers, if available)
-
----
-
-## Setup
-
-1) Clone the repository
-
-2) Create a database (see “Database Setup” below)
-
-3) Configure database credentials (see “Configuration” below)
+### 3. Run Application
+```bash
+javac App/Main.java
+java App.Main
+```
 
 ---
 
-## Configuration
+## 📂 Project Structure (High-level)
 
-Choose one approach:
-
-Option A: Environment variables
-- DB_URL=jdbc:mysql://localhost:3306/swadkart?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-- DB_USER=your_mysql_user
-- DB_PASSWORD=your_mysql_password
-
-Option B: Properties file
-Create a file named swadkart.properties in the project root with:
-- db.url=jdbc:mysql://localhost:3306/swadkart?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-- db.user=your_mysql_user
-- db.password=your_mysql_password
-
-Use only one configuration method to avoid conflicts.
+```
+Swadkart
+├── Ds/                  # Core data structures
+│   ├── Dish.java
+│   ├── Node.java
+│   ├── CustomerMenu.java
+│   ├── Payment.java
+│   └── ...
+├── Database/            # JDBC + DB operations
+│   ├── ConnectionFactory.java
+│   ├── QueryExecutor.java
+│   └── ...
+├── App/                 # Main entry + constants
+│   ├── AppConstants.java
+│   └── Main.java
+├── README.md
+```
 
 ---
 
-## Database Setup
+## 📦 Detailed Project Structure  
 
-2) Suggested tables (simplified)
-- users: id, role (CUSTOMER/ADMIN), name, email (unique), password_hash, created_at
-- restaurants: id, name, description, owner_user_id (FK), rating_avg, created_at
-- dishes: id, restaurant_id (FK), name, description, price, is_available, created_at
-- orders: id, user_id (FK), restaurant_id (FK), status, total_amount, created_at
-- order_items: id, order_id (FK), dish_id (FK), quantity, unit_price
-- reviews: id, user_id (FK), restaurant_id (FK), dish_id (nullable FK), rating (1–5), comment, created_at
+### Package: `Ds`
 
-3) Indexing recommendations
-- users(email)
-- dishes(restaurant_id, is_available)
-- orders(user_id, restaurant_id, status, created_at)
-- reviews(restaurant_id, dish_id, created_at)
+#### Class: `Dish`
+- **Attributes:**
+  - `String dish_id` → unique identifier for the dish
+  - `String name` → dish name
+  - `String cuisine` → cuisine type
+  - `String restaurant` → restaurant name
+  - `double rating` → dish rating
+  - `double price` → price of dish
+- **Methods:**
+  - `Dish(...)` → constructor to initialize dish
+  - `getDish_id()` → returns dish id
+  - `getName()` → returns dish name
+  - `getCuisine()` → returns cuisine type
+  - `getRestaurant()` → returns restaurant name
+  - `getRestaurantId(String name)` → retrieves restaurant id from name
+  - `getRating()` → returns dish rating
+  - `getPrice()` → returns price  
 
-4) Seed data (optional)
-- One Admin and one Customer
-- Sample Restaurants and Dishes
+---
+
+#### Class: `Node`
+- **Attributes:**
+  - `Dish data` → stores a Dish object
+  - `int quantity` → quantity ordered
+  - `Node next` → link to next node
+- **Methods:**
+  - `Node(Dish data,int quantity)` → constructor
+  - `insert(Dish dish, int quantity)` → adds new dish to linked list
+  - `display()` → prints node data
+  - `displayTabular()` → prints in tabular form
+  - `delete(String dishId)` → deletes a dish by id
+  - `clearList()` → clears the list
+  - `repeat(char ch, int count)` → helper for table formatting
+  - `safe(String s)` → avoids null pointer  
+
+---
+
+#### Class: `CustomerMenu`
+- **Methods:**
+  - `newCustomer()` → registers a new customer
+  - `forgotPassword(String id)` → handles password reset
+  - `customerValidator(String id, String password)` → validates login
+  - `customerMenu(String id)` → loads customer menu
+  - `displayMenu()` → prints menu options
+  - `getUserInput()` → takes input from user
+  - `processAction(int option, String id)` → processes menu actions  
+
+---
+
+#### Class: `MainMenu`
+- **Methods:**
+  - `run()` → starts main menu loop  
+  - `show()` → displays available options  
+
+---
+
+#### Class: `Payment`
+- **Attributes:**
+  - `double amount` → transaction amount
+  - `String mode` → payment mode (cash/card/UPI)
+- **Methods:**
+  - `pay(double amount, String mode)` → processes payment  
+
+---
+
+### Package: `Database`
+
+#### Class: `ConnectionFactory`
+- **Methods:**
+  - `getConnection()` → establishes and returns DB connection  
+
+---
+
+#### Class: `QueryExecutor`
+- **Methods:**
+  - `executeQuery(String sql)` → runs SQL query  
+  - `executeUpdate(String sql)` → runs insert/update/delete  
+
+---
+
+### Package: `App`
+
+#### Class: `AppConstants`
+- **Attributes:**
+  - `public static Connection connection` → DB connection reference  
+  - `public static Scanner s` → global scanner for input  
+  - `public static String dburl, dbuser, dbpass, driverName` → DB configs  
+
+---
+
+#### Class: `Main`
+- **Methods:**
+  - `main(String[] args)` → entry point of application  
+  - initializes DB connection  
+  - invokes `MainMenu.run()`  
+
+---
+
+## 🤝 Contributing
+1. Fork the repo  
+2. Create a feature branch  
+3. Commit changes  
+4. Submit a PR 🚀  
+
+---
+
+## 👨‍💻 Author
+- Developed by [Jatan Parikh](https://github.com/Jatan06),
+  [Raj Desai](https://github.com/RajDesai87),
+  [Nishtha Dave](https://github.com/DaveNishtha)
