@@ -5,11 +5,15 @@ import Services.SpeakTextService;
 import Admin.*;
 public class MainMenu {
     public static void run() {
-        if (DBConnection.DbConnection()) {
-            System.out.println(AppConstants.welcome);
-            show();
-        } else {
+        try
+        {
+            if(DBConnection.DbConnection()) {
+                System.out.println(AppConstants.welcome);
+                show();
+            }
             return;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -46,16 +50,16 @@ public class MainMenu {
                         Thread.sleep(500);
                         System.out.print("\n\n============== Login ==============\n");
                         System.out.print("\nEnter id : ");
-                        String id = AppConstants.s.nextLine();
+                        String id = AppConstants.s.nextLine().trim();
                         System.out.print("Enter password (Enter 'F' or 'f' for forgot password) : ");
-                        String password = AppConstants.s.nextLine();
+                        String password = AppConstants.s.nextLine().trim();
                         if(password.charAt(0) == 'F' || password.charAt(0) == 'f') {
                             if(!CustomerMenu.forgotPassword(id)) {
                                 return;
                             }
                             else {
                                 System.out.print("\nPlease enter new password :- ");
-                                password = AppConstants.s.next();
+                                password = AppConstants.s.nextLine().trim();
                             }
                         }
                         if (!id.isEmpty() && (id.charAt(0) == 'U' || id.charAt(0) == 'u')) {

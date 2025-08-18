@@ -28,7 +28,7 @@ public class CustomerMenu {
                         users++;
                         String password = "";
                         System.out.print("Enter Phone No. : ");
-                        String ph_no = "+91" + AppConstants.s.next();
+                        String ph_no = "+91" + AppConstants.s.next().trim();
                         while(true) {
                             if(UserDAO.phoneNumberExists(ph_no)) {
                                 System.out.print("\nPhone number already exists. Please enter a different number : ");
@@ -49,7 +49,7 @@ public class CustomerMenu {
                         if(OTPService.sendOTP(ph_no, generatedOTP)) {
                             // Prompt user to enter OTP
                             System.out.print("\nEnter the OTP sent to your phone: ");
-                            String userOTP = AppConstants.s.next();
+                            String userOTP = AppConstants.s.next().trim();
                             AppConstants.s.nextLine();
                             int otpAttempts = 3;
                             boolean otpValidated = false;
@@ -58,16 +58,16 @@ public class CustomerMenu {
                                     otpValidated = true;
                                     System.out.println("\n✅ Phone number verified successfully!");
                                     System.out.print("\nEnter password : ");
-                                    password = AppConstants.s.nextLine();
+                                    password = AppConstants.s.nextLine().trim();
                                     while (!Validators.validatePassword(password)) {
                                         System.out.println("Enter valid password :-  ");
-                                        password = AppConstants.s.nextLine();
+                                        password = AppConstants.s.nextLine().trim();
                                         if (!Validators.validatePassword(password)) {
                                             System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
                                         }
                                     }
                                     System.out.print("\nRe-Enter password :- ");
-                                    String repass = AppConstants.s.next();
+                                    String repass = AppConstants.s.next().trim();
                                     while (true) {
                                         if(!password.equals(repass)) {
                                             System.out.println("Please enter valid password which you have set :- ");
@@ -80,7 +80,7 @@ public class CustomerMenu {
                                 } else {
                                     if (--otpAttempts > 0) {
                                         System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
-                                        userOTP = AppConstants.s.nextLine();
+                                        userOTP = AppConstants.s.nextLine().trim();
                                     } else {
                                         System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
                                         return;
