@@ -7,8 +7,8 @@ public class SpeakTextService {
                     "$speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; " +
                     "$speak.Speak('" + message + "');\"";
             Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Exception at Services/SpeakTextService/speak at line 11");
         }
     }
 }

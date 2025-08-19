@@ -7,75 +7,18 @@ import Models.*;
 import Services.*;
 import Ds.*;
 public class OrderDAO {
-    public static int totalOrders;
-
-    public static void getOrderNumber() throws Exception {
-        String q = "SELECT COUNT(o_id) FROM orders;";
-        PreparedStatement ps = AppConstants.connection.prepareStatement(q);
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        totalOrders = rs.getInt(1);
-        totalOrders++;
-    }
-
-    public static void orderHistory() throws Exception {
-        PreparedStatement ps = AppConstants.connection.prepareCall("SELECT * FROM orders");
-        ResultSet rs = ps.executeQuery();
-
-        // ANSI escape codes for styling
-        final String RESET = "\u001B[0m";
-        final String BOLD = "\u001B[1m";
-        final String GREEN = "\u001B[32m";
-        final String YELLOW = "\u001B[33m";
-        final String CYAN = "\u001B[36m";
-
-        // Print table header
-        System.out.println("\n" + BOLD + CYAN + "=".repeat(120) + RESET);
-        System.out.println(BOLD + CYAN + "\t\t\t Orders Table" + RESET);
-        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-
-        System.out.printf(BOLD + "%-10s %-12s %-12s %-12s %-28s %-10s%n" + RESET,
-                "OID", "User ID", "Dish ID", "Rest ID", "Order Time", "Quantity");
-        System.out.println(CYAN + "-".repeat(120) + RESET);
-
-        int count = 0; // Row counter
-
-        // Process the ResultSet
-        while (rs.next()) {
-            String orderId = rs.getString("o_id");
-            String userId = rs.getString("uid");
-            String dishId = rs.getString("did");
-            String restaurantId = rs.getString("rid");
-            String orderTime = String.valueOf(rs.getTimestamp("order_time"));
-            int quantity = rs.getInt("quantity");
-
-            // Print record
-            System.out.printf("%-10s %-12s %-12s %-12s %-28s %-10d%n",
-                    orderId, userId, dishId, restaurantId, orderTime, quantity);
-            count++;
-
-            // Add a separator every 20 rows
-            if (count % 20 == 0) {
-                System.out.println(CYAN + "-".repeat(120) + RESET);
-            }
-        }
-
-        // Handle empty table case
-        if (count == 0) {
-            System.out.println(BOLD + CYAN + "No orders found." + RESET); // Empty message
-        }
-
-        // Footer
-        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-        System.out.println(BOLD + GREEN + "📊 Total Orders: " + count + RESET);
-        System.out.println(BOLD + CYAN + "=".repeat(120) + RESET);
-    }
-
+    public static double total;
     public static void placeOrder(String uid) throws Exception {
         if (UserService.Cart == null || UserService.Cart.head == null) {
             System.out.println("\nCart is empty. Nothing to place.");
             return;
         }
+
+        if (!confirmOrderPrompt()) {
+            System.out.println("\nOrder cancelled.");
+            return; // exit without inserting orders/payment or committing
+        }
+
 
         // Derive a restaurant for this order from the first cart item
         LL.Node head = UserService.Cart.head;
@@ -133,11 +76,25 @@ public class OrderDAO {
             // 4) Process payment
             boolean paymentSuccess = PaymentService.paymentInterface();
 
+            // Ask again for final confirmation; on "no" reset and refund
+            if (paymentSuccess && !confirmAfterPayment(sp)) {
+                // Reset cart state after rollback
+                UserService.Cart.clearList();
+                UserService.isEmpty = true;
+                if(!Objects.equals(PaymentService.choice, "1")) {
+                    System.out.println("\nOrder cancelled.");
+                }
+                else {
+                    System.out.println("\nOrder cancelled. Payment refunded.");
+                }
+                return;
+            }
+
             // 6) Commit and finalize
             if(paymentSuccess) {
                 AppConstants.connection.commit();
                 Thread.sleep(2000);
-                String op = "\nOrder placed and payment completed successfully!";
+                String op = "\nOrder placed successfully!";
                 new Thread(() -> {
                     try {
                         Sound.playWav("/zomato_app.wav");
@@ -147,6 +104,41 @@ public class OrderDAO {
                 }).start();
                 System.out.println(op);
                 Thread.sleep(5000);
+
+                // Derive the just-created orderId once using the first item in the cart
+                String OrderId = null;
+                if (UserService.Cart != null && UserService.Cart.head != null) {
+                    Ds.LL.Node first = UserService.Cart.head;
+                    String rid = first.data.getRestaurantId(first.data.getRestaurant());
+                    String did = first.data.getDish_id();
+                    try {
+                        OrderId = OrderDAO.findOrderIdByUserRestaurantAndDish(uid, rid, did);
+                    } catch (Exception ignore) {
+                        // If lookup fails, we keep orderId as null and let ReviewDAO guard it
+                    }
+                }
+
+                // --- Handle cash payment if choice was 1 ---
+                if ("1".equals(PaymentService.choice)) {
+                    boolean paid = false;
+                    while (!paid) {
+                        System.out.print("\nEnter cash received: ");
+                        String in = AppConstants.s.next().trim();
+                        try {
+                            double received = Double.parseDouble(in);
+                            if (received < total) {
+                                System.out.printf("❌ Insufficient amount. Need ₹%.2f more.%n", round2(total - received));
+                            } else {
+                                System.out.printf("✅ Cash received. Change: ₹%.2f%n", round2(received - total));
+                                paid = true;
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("❌ Invalid amount. Please enter a valid number.");
+                        }
+                    }
+                }
+
+
                 System.out.print("\nWould you like to give review (y/n) :- ");
                 if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
                     UserService.Cart.displayTabular();
@@ -155,10 +147,10 @@ public class OrderDAO {
                         System.out.println("would you like to give all dishes (Enter 'all') review or enter dish id :- ");
                         String dishId = AppConstants.s.next().trim();
                         if (dishId.equalsIgnoreCase("all")) {
-                            ReviewDAO.insertReview(UserService.Cart, uid);
+                            ReviewDAO.insertReview(UserService.Cart, uid, OrderId);
                             review = false;
                         } else {
-                            ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid);
+                            ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid, OrderId);
                             System.out.println("Would you like to give review for another dish (y/n) :-");
                             if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
                                 continue;
@@ -189,7 +181,59 @@ public class OrderDAO {
         }
     }
 
-    // New: Display Orders and Order Items with smart FK handling and formatting
+    private static boolean confirmOrderPrompt() {
+        System.out.print("\nAre you sure you want to confirm the order (y/n): ");
+        while (true) {
+            try {
+                String token = AppConstants.s.next().trim();
+                if (token.equalsIgnoreCase("y")) {
+                    return true;
+                } else if (token.equalsIgnoreCase("n")) {
+                    return false;
+                } else {
+                    System.out.print("Enter y/n only: ");
+                }
+            } catch (Exception e) {
+                System.out.print("Enter y/n only: ");
+                AppConstants.s.nextLine(); // clear any bad input
+            }
+        }
+    }
+
+    // Ask again after payment; if user declines, rollback to savepoint and mark payment refunded
+    private static boolean confirmAfterPayment(Savepoint sp) {
+        if(!Objects.equals(PaymentService.choice, "1")) {
+            System.out.print("\nPayment successful.\nConfirm order to finalize (y/n): ");
+        }
+        else {
+            System.out.print("\nConfirm order to finalize (y/n): ");
+        }
+        while (true) {
+            try {
+                String token = AppConstants.s.next().trim();
+                if (token.equalsIgnoreCase("y")) {
+                    return true; // proceed to commit
+                } else if (token.equalsIgnoreCase("n")) {
+                    try {
+                        // Undo all DB changes since savepoint (orders, items, any payment rows in same txn)
+                        AppConstants.connection.rollback(sp);
+                    } catch (Exception ignore) {
+                    }
+                    // Mark payment as refunded in-memory and notify
+                    if (Payment.payment != null) {
+                        Payment.payment.paymentStatus = "REFUNDED";
+                    }
+                    return false; // caller should stop flow
+                } else {
+                    System.out.print("Enter y/n only: ");
+                }
+            } catch (Exception e) {
+                System.out.print("Enter y/n only: ");
+                try { AppConstants.s.nextLine(); } catch (Exception ignore) {}
+            }
+        }
+    }
+
     public static void viewOrderAndOrderItems() throws Exception {
         String sqlOrders = "SELECT * FROM orders GROUP BY uid";
         String sqlOrderItems = "SELECT * FROM order_items GROUP BY o_id";
@@ -206,8 +250,7 @@ public class OrderDAO {
 
     public static void viewOrderAndOrderItems(String uid) throws Exception {
         // Single, FK-based joined view across orders, order_items, and payment
-        String sql = ""
-                + "SELECT "
+        String sql = "SELECT "
                 + "  o.o_id               AS o_id, "
                 + "  o.rid                AS rid, "
                 + "  o.order_time_stamp   AS order_time_stamp, "
@@ -227,7 +270,6 @@ public class OrderDAO {
                 + "GROUP BY o.o_id, o.rid, o.order_time_stamp, p.payment_id, p.paymentType, p.paymentStatus, p.amount "
                 + "ORDER BY o.o_id, p.payment_id";
 
-
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
             ps.setString(1, uid);
             try (ResultSet rs = ps.executeQuery()) {
@@ -236,10 +278,6 @@ public class OrderDAO {
         }
     }
 
-    /**
-     * Finds the latest order id (o_id) for a given user, restaurant, and dish.
-     * Returns null if no matching order exists.
-     */
     public static String findOrderIdByUserRestaurantAndDish(String userId, String restaurantId, String dishId) throws Exception {
         final String sql =
                 "SELECT o.o_id AS o_id " +
@@ -404,5 +442,9 @@ public class OrderDAO {
         sb.append(s);
         for (int i = s.length(); i < w; i++) sb.append(' ');
         return sb.toString();
+    }
+
+    private static double round2(double v) {
+        return Math.round(v * 100.0) / 100.0;
     }
 }

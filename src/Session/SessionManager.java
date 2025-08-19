@@ -16,7 +16,7 @@ public class SessionManager {
 //            Writer.write(AppConstants.HEADER);
 //            Writer.newLine();
 //            Writer.newLine();
-//            Writer.newLine();
+            Writer.newLine();
             Writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

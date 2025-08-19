@@ -9,7 +9,7 @@ import Ds.*;
 import java.sql.*;
 
 public class ReviewDAO {
-    public static void insertReview(Ds.LL cart,String uid) throws Exception {
+    public static void insertReview(Ds.LL cart,String uid, String orderId) throws Exception {
         Ds.LL.Node temp = cart.head;
         while (temp != null) {
             AppConstants.connection.setAutoCommit(false);
@@ -23,10 +23,37 @@ public class ReviewDAO {
                     rating = AppConstants.s.nextDouble();
                 }
             }
+            // consume leftover newline then read full feedback line
             AppConstants.s.nextLine();
             System.out.print("\nWrite your feedback :- ");
             String feedback = AppConstants.s.nextLine();
-            Review.rev = new Review(temp.data.getRestaurantId(temp.data.getRestaurant()),uid,OrderDAO.findOrderIdByUserRestaurantAndDish(uid,temp.data.getRestaurantId(temp.data.getRestaurant()),temp.data.getDish_id()),temp.data.getDish_id(),rating,feedback);
+
+            // Guard: ensure orderId is present. If not, try to derive once for this dish.
+            String resolvedOrderId = orderId;
+            if (resolvedOrderId == null) {
+                resolvedOrderId = OrderDAO.findOrderIdByUserRestaurantAndDish(
+                        uid,
+                        temp.data.getRestaurantId(temp.data.getRestaurant()),
+                        temp.data.getDish_id()
+                );
+            }
+            if (resolvedOrderId == null) {
+                System.out.println("\nCould not determine the order for this review. Skipping review for dish " +
+                        temp.data.getName() + " (" + temp.data.getDish_id() + ").");
+                AppConstants.connection.rollback();
+                temp = temp.next;
+                continue;
+            }
+
+            Review.rev = new Review(
+                    temp.data.getRestaurantId(temp.data.getRestaurant()),
+                    uid,
+                    resolvedOrderId,
+                    temp.data.getDish_id(),
+                    rating,
+                    feedback
+            );
+
             String rev = "INSERT INTO reviews(r_id,u_id,o_id,d_id,review,feedback) VALUES(?,?,?,?,?,?)";
             PreparedStatement ps = AppConstants.connection.prepareCall(rev);
             ps.setString(1,Review.rev.getRestaurant_id());
@@ -46,7 +73,7 @@ public class ReviewDAO {
         }
     }
 
-    public static void insertReviewByDishId(Ds.LL cart,String dishId,String uid) throws Exception{
+    public static void insertReviewByDishId(Ds.LL cart,String dishId,String uid, String orderId) throws Exception{
         Ds.LL.Node temp = cart.head;
         while (temp != null) {
             if(temp.data.getDish_id().equalsIgnoreCase(dishId)) {
@@ -61,10 +88,34 @@ public class ReviewDAO {
                         rating = AppConstants.s.nextDouble();
                     }
                 }
+                // consume leftover newline then read full feedback line
+                AppConstants.s.nextLine();
                 System.out.print("\nWrite your feedback :- ");
                 String feedback = AppConstants.s.nextLine();
-                AppConstants.s.nextLine();
-                Review.rev = new Review(temp.data.getRestaurantId(temp.data.getRestaurant()),uid,OrderDAO.findOrderIdByUserRestaurantAndDish(uid,temp.data.getRestaurantId(temp.data.getRestaurant()),temp.data.getDish_id()),temp.data.getDish_id(),rating,feedback);
+
+                // Prefer passed orderId; if null, derive specifically for this dish
+                String resolvedOrderId = orderId;
+                if (resolvedOrderId == null) {
+                    resolvedOrderId = OrderDAO.findOrderIdByUserRestaurantAndDish(
+                            uid,
+                            temp.data.getRestaurantId(temp.data.getRestaurant()),
+                            temp.data.getDish_id()
+                    );
+                }
+                if (resolvedOrderId == null) {
+                    System.out.println("\nCould not determine the order for this review. Review not added.");
+                    AppConstants.connection.rollback();
+                    break;
+                }
+
+                Review.rev = new Review(
+                        temp.data.getRestaurantId(temp.data.getRestaurant()),
+                        uid,
+                        resolvedOrderId,
+                        temp.data.getDish_id(),
+                        rating,
+                        feedback
+                );
                 String rev = "INSERT INTO reviews(r_id,u_id,o_id,d_id,review,feedback) VALUES(?,?,?,?,?,?)";
                 PreparedStatement ps = AppConstants.connection.prepareCall(rev);
                 ps.setString(1,Review.rev.getRestaurant_id());

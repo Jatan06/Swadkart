@@ -184,12 +184,15 @@ public class DishDAO {
         }
     }
 
-    public static Models.Dish getDishByIdAndRestaurant(String dishId) {
+    public static Models.Dish getDishByIdAndRestaurant(String dishId, String restaurantName) {
         try {
-            java.sql.PreparedStatement stmt = AppConstants.connection.prepareStatement(
-                    "SELECT * FROM dishes WHERE dish_id = ?");
+            PreparedStatement stmt = AppConstants.connection.prepareStatement(
+                    "SELECT * FROM dishes WHERE dish_id = ? AND restaurant = ?"
+            );
             stmt.setString(1, dishId);
-            java.sql.ResultSet rs = stmt.executeQuery();
+            stmt.setString(2, restaurantName);
+
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Models.Dish(
                         rs.getString("dish_id"),
@@ -201,10 +204,12 @@ public class DishDAO {
                 );
             }
         } catch (Exception e) {
-            // ignore
+            e.printStackTrace();
         }
         return null;
     }
+
+
 
     public static String getRestaurantNameByDishId(String d_Id) {
         PreparedStatement stmt = null;
@@ -218,7 +223,7 @@ public class DishDAO {
                 resName = rs.getString("restaurant");
             }
         } catch (SQLException e) {
-            System.out.printf("Exception %s arise in getRestaurantNameByDishId.");
+            System.out.print("\nException %s arise in DishDAO/getRestaurantNameByDishId.");
         }
         return resName;
     }
@@ -234,7 +239,7 @@ public class DishDAO {
                 resName = rs.getString("name");
             }
         } catch (Exception e) {
-            System.out.printf("Exception %s arise in getRestaurantNameById.");
+            System.out.printf("Exception %s arise in DishDAO/getRestaurantNameById.");
         }
         return resName;
     }

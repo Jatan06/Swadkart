@@ -40,7 +40,7 @@ public class LL {
         Node current = head;
         System.out.println("Dish List:");
         while (current != null) {
-            System.out.println("\nDish Id :- " +current.data.getDish_id()+"\nDish Name :- "+current.data.getName() + "\nQuantity " + current.quantity+"\nPer unit price :- "+current.data.getPrice()+"\nTotal Price :- "+current.quantity*current.data.getPrice()+"\n");
+            System.out.println("\nDish Id :- " +current.data.getDish_id()+"\nDish Name :- "+current.data.getName() + "\nQuantity :- " + current.quantity+"\nPer unit price :- "+current.data.getPrice()+"\nTotal Price :- "+current.quantity*current.data.getPrice()+"\n");
             current = current.next;
         }
     }
@@ -101,17 +101,24 @@ public class LL {
     }
     
     // Delete by dishId
-    public void delete(String dishId) {
+    public boolean delete(String dishId,int quantity) {
         if (head == null) {
             System.out.println("Cart is empty. Nothing to delete.");
-            return;
+            return false;
         }
 
         // Special case: head is the one to delete
         if (head.data.getDish_id().equalsIgnoreCase(dishId)) {
-            System.out.println("Deleting: " + head.data.getDish_id());
-            head = head.next;
-            return;
+            if(quantity> head.quantity) return false;
+            System.out.println("\nRemoved quantity " +quantity+" for dish : " + head.data.getName());
+            if (quantity< head.quantity) {
+                head.quantity = head.quantity - quantity;
+                return true;
+            }
+            else if(quantity== head.quantity){
+                head = head.next;
+                return true;
+            }
         }
 
         Node current = head;
@@ -124,12 +131,24 @@ public class LL {
 
         if (current == null) {
             System.out.println("Dish with ID " + dishId + " not found.");
-            return;
+            return false;
         }
 
         // Delete node
-        System.out.println("Deleting: " + current.data.getName());
-        prev.next = current.next;
+        if(quantity> current.quantity){
+            return false;
+        }
+        System.out.println("\nRemoved quantity " +quantity+" for dish : " + current.data.getName());
+        if(quantity< current.quantity) {
+            current.quantity = current.quantity - quantity;
+            return true;
+        }
+        else if (quantity==current.quantity) {
+            prev.next = current.next;
+            return true;
+        }
+
+        return false;
     }
 
     // Clear the entire list

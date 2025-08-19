@@ -26,11 +26,12 @@ public class Validators {
 
     // Validate email format
     public static boolean validateEmail(String email) {
-        if (email == null || email.length() < 5) {
+        if (email == null) {
             return false;
         }
-        return email.contains("@") && email.contains(".") &&
-                email.indexOf("@") < email.lastIndexOf(".");
+        // Accepts emails like user.name+tag@gmail.com, user@yahoo.co.in, user@company.org, etc.
+        // Ensures: local part allowed chars, domain has at least one dot, TLD 2-63 letters.
+        return email.matches("^[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,63}$");
     }
 
     // Validate address format
@@ -175,6 +176,7 @@ public class Validators {
     }
 
     public static boolean validateColumnNameUser(String c_name) {
+
         return true;
     }
 }

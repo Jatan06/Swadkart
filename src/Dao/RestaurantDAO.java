@@ -6,6 +6,17 @@ import java.util.*;
 
 public class RestaurantDAO {
 
+    public static void getRestaurantIdAndName() {
+        String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, name ASC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("RESTAURANT IDs AND NAMES", rs);
+        } catch (SQLException e) {
+            System.out.println("\nError fetching restaurant IDs and names: " + e.getMessage());
+        }
+    }
+
+
     public static void browseRestaurants() {
         RestaurantDAO dao = new RestaurantDAO();
         while (true) {
@@ -16,7 +27,6 @@ public class RestaurantDAO {
             System.out.println("4. By Cuisine (A → Z)");
             System.out.println("5. Back");
             System.out.print("Enter choice: ");
-
             String choice = AppConstants.s.next().trim();
             try {
                 switch (choice) {
@@ -30,10 +40,9 @@ public class RestaurantDAO {
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
             } catch (Exception e) {
-                System.out.println("\nError: " + e.getMessage());
+                System.out.println("Please enter numbers only.");
             }
         }
-
     }
 
     private void browseRestaurantsByRating() throws Exception {
@@ -274,9 +283,7 @@ public class RestaurantDAO {
     }
 
     public static void addRestaurant() throws Exception {
-        AppConstants.s.nextLine();
-        System.out.print("\nEnter Restaurant ID: ");
-        String id = AppConstants.s.nextLine().trim();
+        String id = getRestaurantId();
         System.out.print("\nEnter Restaurant Name: ");
         String name = AppConstants.s.nextLine().trim();
         System.out.print("\nEnter Cuisine Type: ");
@@ -302,6 +309,48 @@ public class RestaurantDAO {
         }
     }
 
+    private static String getRestaurantId() {
+        String sql = "SELECT id FROM restaurants ORDER BY CAST(id AS UNSIGNED) DESC LIMIT 1";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            String lastId = null;
+            if (rs.next()) {
+                lastId = rs.getString("id");
+            }
+
+            if (lastId == null || lastId.isBlank()) {
+                return "1";
+            }
+
+            // Try to increment the trailing numeric part while preserving prefix and zero padding
+            String pattern = "(.*?)(\\d+)$";
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern).matcher(lastId);
+            if (m.find()) {
+                String prefix = m.group(1);
+                String numPart = m.group(2);
+                int width = numPart.length();
+                long num = Long.parseLong(numPart);
+                String nextNum = String.format(java.util.Locale.ROOT, "%0" + width + "d", num + 1);
+                return prefix + nextNum;
+            }
+
+            // Fallback: if the whole ID is numeric, increment it
+            try {
+                long n = Long.parseLong(lastId);
+                return String.valueOf(n + 1);
+            } catch (NumberFormatException ignore) {
+                // If not numeric at all, append 1
+                return lastId + "1";
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error generating next restaurant id: " + e.getMessage());
+            return "1";
+        }
+
+    }
+
     public static void deleteRestaurant() throws Exception {
         AppConstants.connection.setAutoCommit(false);
         AppConstants.s.nextLine();
@@ -320,19 +369,23 @@ public class RestaurantDAO {
         br.setString(1, id);
         if (br.executeUpdate() > 0) {
             System.out.print("\nAre you sure you want to delete this restaurant? (y/n): ");
-            if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
-                System.out.print("\nEnter Password");
-                if(AppConstants.s.next().equals(Admin.getAdminPassword())) {
-                    AppConstants.connection.commit();
-                    System.out.println("\nRestaurant deleted successfully.");
+            while (true) {
+                if (AppConstants.s.next().trim().equalsIgnoreCase("y")) {
+                    System.out.print("\nEnter Password");
+                    if (AppConstants.s.next().equals(Admin.getAdminPassword())) {
+                        AppConstants.connection.commit();
+                        System.out.println("\nRestaurant deleted successfully.");
+                        break;
+                    } else {
+                        AppConstants.connection.rollback();
+                        System.out.println("\nIncorrect password. Restaurant not deleted!");
+                    }
+                } else if (AppConstants.s.next().trim().equalsIgnoreCase("n")) {
+                    System.out.println("\nRestaurant not deleted.");
+                    break;
+                } else {
+                    System.out.println("Enter y/n only.");
                 }
-                else {
-                    AppConstants.connection.rollback();
-                    System.out.println("\nIncorrect password. Restaurant not deleted!");
-                }
-            }
-            else {
-                System.out.println("\nRestaurant not deleted.");
             }
         }
         else {
@@ -372,7 +425,7 @@ public class RestaurantDAO {
             resfound = cs.getBoolean(2);
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error while checking restaurant ID", e);
+            System.out.println("Exception at RestaurantDAO/checkRestaurantID at line 381");
         }
         return resfound;
     }

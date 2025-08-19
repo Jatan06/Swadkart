@@ -1,12 +1,13 @@
 package Services;
 
 import Constants.AppConstants;
+import Dao.OrderDAO;
 import Dao.PaymentDAO;
 import Ds.LL;
 import Models.Payment;
 
 public class PaymentService {
-
+    public static String choice;
     public static boolean paymentInterface() {
         LL cart = UserService.Cart;
         if (cart == null || cart.head == null) {
@@ -59,7 +60,6 @@ public class PaymentService {
 
         // Build row formats (left for text, right for numbers)
         String rowFmt = "| %-" + widths[0] + "s | %" + widths[1] + "s | %" + widths[2] + "s | %" + widths[3] + "s |%n";
-
         System.out.println("\n" + "-".repeat(Math.max(18, sep.length())));
         System.out.println("Order Summary");
         System.out.println("-".repeat(Math.max(18, sep.length())));
@@ -75,6 +75,7 @@ public class PaymentService {
         double taxRate = 0.05;
         double tax = round2(subtotal * taxRate);
         double total = round2(subtotal + tax);
+        OrderDAO.total = total;
 
         System.out.printf("Subtotal: %.2f%n", subtotal);
         System.out.printf("Tax (%.0f%%): %.2f%n", taxRate * 100, tax);
@@ -83,14 +84,6 @@ public class PaymentService {
         // Set the amount in a Payment object
         if (Payment.payment != null) {
             Payment.payment.amount = total;
-        }
-
-        System.out.print("\nAre you sure want to confirm order (y/n) :- ");
-        if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
-
-        }
-        else {
-            return false;
         }
 
         // Select a payment method
@@ -103,7 +96,7 @@ public class PaymentService {
         boolean payment_selection = true;
         while (payment_selection) {
             System.out.print("\nEnter choice (1-3) or enter 'exit' to go back : ");
-            String choice = UserService.scanner.next().trim();
+            choice = UserService.scanner.next().trim();
             switch (choice) {
                 case "1":
                     success = handleCash(total);
@@ -155,62 +148,111 @@ public class PaymentService {
     // ---------------- Payment Handlers ----------------
 
     private static boolean handleCash(double total) {
-        System.out.print("Enter cash received: ");
-        String in = UserService.scanner.next().trim();
-        try {
-            double received = Double.parseDouble(in);
-            if (received < total) {
-                System.out.printf("Insufficient amount. Need %.2f more.%n", round2(total - received));
-                return false;
-            }
-            System.out.printf("Payment successful. Change: %.2f%n", round2(received - total));
-            return true;
-        } catch (Exception e) {
-            System.out.println("Invalid amount. Payment failed.");
-            return false;
-        }
+        // Just mark as cash, but don’t ask yet
+        System.out.println("💵 Cash selected. Please pay when order is finalized.");
+        return true;
     }
 
     private static boolean handleCard(double total) {
-        System.out.print("Enter card number (16 digits): ");
-        String card = UserService.scanner.next().replaceAll("\\s+", "");
-        if (card.length() != 16) {
-            System.out.println("Invalid card number.");
-            return false;
-        }
-        System.out.print("Enter expiry (MM/YY): ");
-        String expiry = UserService.scanner.next().trim();
-        System.out.print("Enter CVV: ");
-        String cvv = UserService.scanner.next().trim();
+        String card, expiry, cvv;
 
-        if (expiry.isEmpty() || cvv.length() != 3) {
-            System.out.println("Invalid card details.");
-            return false;
+        // --- CARD NUMBER ---
+        while (true) {
+            System.out.print("Enter card number (16 digits): ");
+            card = UserService.scanner.next().replaceAll("\\s+", ""); // remove spaces
+
+            if (card.matches("\\d{16}") && isValidCard(card)) {
+                break; // valid card number
+            } else {
+                System.out.println("❌ Invalid card number. Please try again.");
+            }
         }
 
-        System.out.printf("Card charged %.2f. Payment successful. **** **** **** %s%n",
+        // --- EXPIRY DATE ---
+        while (true) {
+            System.out.print("Enter expiry (MM/YY): ");
+            expiry = UserService.scanner.next().trim();
+
+            if (expiry.matches("^(0[1-9]|1[0-2])/\\d{2}$") && !isExpired(expiry)) {
+                break; // valid expiry
+            } else {
+                System.out.println("❌ Invalid expiry date. Format must be MM/YY and not expired.");
+            }
+        }
+
+        // --- CVV ---
+        while (true) {
+            System.out.print("Enter CVV: ");
+            cvv = UserService.scanner.next().trim();
+
+            if (cvv.matches("\\d{3,4}")) {
+                break; // valid CVV
+            } else {
+                System.out.println("❌ Invalid CVV. Must be 3 or 4 digits.");
+            }
+        }
+
+        // --- SUCCESS ---
+        System.out.printf("✅ Card charged ₹%.2f successfully. **** **** **** %s%n",
                 total, card.substring(card.length() - 4));
         return true;
     }
 
+    // Luhn algorithm
+    private static boolean isValidCard(String card) {
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = card.length() - 1; i >= 0; i--) {
+            int n = Integer.parseInt(card.substring(i, i + 1));
+            if (alternate) {
+                n *= 2;
+                if (n > 9) n -= 9;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (sum % 10 == 0);
+    }
+
+    // Expiry check
+    private static boolean isExpired(String expiry) {
+        try {
+            String[] parts = expiry.split("/");
+            int month = Integer.parseInt(parts[0]);
+            int year = 2000 + Integer.parseInt(parts[1]); // assumes 20YY
+
+            java.time.YearMonth expDate = java.time.YearMonth.of(year, month);
+            java.time.YearMonth now = java.time.YearMonth.now();
+
+            return expDate.isBefore(now);
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    public static void handcash(double total) { handcash(total);}
+
     private static boolean handleUpi(double total) {
         System.out.print("Enter UPI ID (e.g., user@bank): ");
         String upi = UserService.scanner.next().trim();
-        if (!upi.contains("@") || upi.startsWith("@") || upi.endsWith("@")) {
-            System.out.println("Invalid UPI ID.");
+        // Strong regex for UPI validation
+        String upiRegex = "^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$";
+        if (!upi.matches(upiRegex)) {
+            System.out.println("❌ Invalid UPI ID. Format must be like: username@bank");
             return false;
         }
-        System.out.printf("UPI collect request for %.2f sent to %s...%n", total, upi);
-        System.out.println("Payment successful.");
+        System.out.printf("✅ UPI collect request for ₹%.2f sent to %s...%n", total, upi);
+        System.out.println("💰 Payment successful.");
         return true;
     }
+
 
     // ---------------- Helper Methods ----------------
 
     private static boolean simulateRestaurantConfirmation() {
         System.out.print("\nConfirming order with restaurant ");
         for (int i = 0; i < 6; i++) {
-            try { Thread.sleep(700); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
             System.out.print(".");
         }
         System.out.println();
@@ -234,7 +276,6 @@ public class PaymentService {
         System.out.printf("TOTAL: %.2f%n", total);
         System.out.println("=====================\n");
     }
-
     private static double round2(double v) {
         return Math.round(v * 100.0) / 100.0;
     }

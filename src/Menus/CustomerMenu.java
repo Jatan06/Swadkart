@@ -8,7 +8,6 @@ import Session.*;
 import Ds.*;
 
 public class CustomerMenu {
-    //SessionManager.NewRegistration(String id,Boolean isCreated); // (Call it in catch block also)-try isCreated = true,catch isCreated = false.
     public static void newCustomer() {
         boolean flag = true;
         while (flag) {
@@ -57,10 +56,10 @@ public class CustomerMenu {
                                 if (userOTP.equals(generatedOTP)) {
                                     otpValidated = true;
                                     System.out.println("\n✅ Phone number verified successfully!");
-                                    System.out.print("\nEnter password : ");
+                                    System.out.print("Enter password : ");
                                     password = AppConstants.s.nextLine().trim();
                                     while (!Validators.validatePassword(password)) {
-                                        System.out.println("Enter valid password :-  ");
+                                        System.out.print("\nEnter valid password :-  ");
                                         password = AppConstants.s.nextLine().trim();
                                         if (!Validators.validatePassword(password)) {
                                             System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
@@ -70,10 +69,11 @@ public class CustomerMenu {
                                     String repass = AppConstants.s.next().trim();
                                     while (true) {
                                         if(!password.equals(repass)) {
-                                            System.out.println("Please enter valid password which you have set :- ");
+                                            System.out.print("Please enter valid password which you have set :- ");
                                             repass = AppConstants.s.next();
                                         }
                                         else {
+                                            otpAttempts = 0;
                                             break;
                                         }
                                     }
@@ -95,34 +95,22 @@ public class CustomerMenu {
                         System.out.println("\n========= Registration =========");
                         System.out.print("Enter Name : ");
                         String user_Name = AppConstants.s.nextLine();
-                        while (true) {
-                            if (Validators.validateName(user_Name))
-                                break;
-                            else {
-                                System.out.println("Enter valid name : ");
-                                user_Name = AppConstants.s.next();
-                            }
+                        while (!Validators.validateName(user_Name)) {
+                            System.out.print("Enter valid name : ");
+                            user_Name = AppConstants.s.nextLine();
                         }
                         System.out.print("Enter email : ");
                         String email = AppConstants.s.nextLine();
-                        while (true) {
-                            if (Validators.validateEmail(email))
-                                break;
-                            else {
-                                System.out.println("Enter valid email id :");
-                                email = AppConstants.s.next();
-                            }
+                        while (!Validators.validateEmail(email)) {
+                            System.out.print("Enter valid email id : ");
+                            email = AppConstants.s.nextLine().trim();
                         }
+                        AppConstants.s.nextLine();
                         System.out.print("Enter address : ");
                         String address = AppConstants.s.nextLine();
-                        while (true) {
-                            if (Validators.validateAddress(address)) {
-                                break;
-                            }
-                            else {
-                                System.out.print("\nEnter valid address : ");
-                                address = AppConstants.s.nextLine();
-                            }
+                        while (!Validators.validateAddress(address)) {
+                            System.out.print("Enter valid address : ");
+                            address = AppConstants.s.nextLine();
                         }
                         String id;
                         if (users > 0 && users < 100) {
@@ -229,16 +217,46 @@ public class CustomerMenu {
         }
     }
 
+    public static boolean validateId(String id) {
+        String sql = "SELECT id FROM users WHERE id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // user id not found
+                    return true;
+                }
+                else {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception arise in Menus/CustomerMenu/ValidateId(String id).");
+            return false;
+        }
+    }
+
+    public static String getId(String mobile_no) {
+        String sql = "SELECT id FROM users WHERE phone_number = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, mobile_no);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString("id");
+                else return null;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception arise in Menus/CustomerMenu/getId(String mono).");
+            return null;
+        }
+    }
+
     // Safer, precise validator that only logs session on success
     public static boolean customerValidator(String id, String password) throws Exception {
         String sql = "SELECT password FROM users WHERE id = ?";
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
             ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) {
-                    // user id not found
-                    return false;
-                }
+                if (!rs.next()) return false;
                 String storedPassword = rs.getString(1);
                 boolean ok = storedPassword != null && storedPassword.equals(password);
                 if (ok) {
@@ -250,6 +268,9 @@ public class CustomerMenu {
                     return false;
                 }
             }
+        } catch (Exception e) {
+            System.out.println("Exception arise in Menus/customerMenu/customerValidator(String id,String password).");
+            return false;
         }
     }
 
@@ -264,9 +285,7 @@ public class CustomerMenu {
                 System.out.println("Invalid input. Please enter a number.");
                 AppConstants.s.nextLine(); // clear buffer
             } catch (Exception e) {
-                // Surface the underlying cause clearly and stop the loop
-                e.printStackTrace();
-                throw new RuntimeException("An error occurred in the Customer Menu loop while processing an action", e);
+                System.out.println("Exception arise at CustomerMenu/customerMenu at line 303.");
             }
         }
     }
@@ -295,7 +314,7 @@ public class CustomerMenu {
                 return v;
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                AppConstants.s.next(); // Clear invalid token
+                AppConstants.s.next();
             }
         }
     }

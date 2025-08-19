@@ -1,13 +1,8 @@
 package Services;
-
-import Constants.AppConstants;
-import Dao.OrderDAO;
 import Dao.ReviewDAO;
 import Models.Review;
 import java.util.List;
 import java.util.Scanner;
-
-// ... existing code ...
 public class ReviewService {
 
     private final ReviewDAO reviewDAO;
@@ -17,18 +12,6 @@ public class ReviewService {
         this.reviewDAO = reviewDAO;
     }
 
-    /**
-     * Displays a menu to browse and display reviews by different categories.
-     * Options:
-     * 1) All reviews
-     * 2) By Restaurant ID
-     * 3) By User ID
-     * 4) By Order ID
-     * 5) By Dish ID
-     * 6) By Rating Range
-     * 7) By Feedback Keyword
-     * 0) Exit
-     */
     public static void showReviewMenu() {
         while (true) {
             System.out.println("\n=== Review Browser ===");
@@ -128,4 +111,3 @@ public class ReviewService {
         return (s == null || s.isEmpty()) ? "-" : s;
     }
 }
-// ... existing code ...
