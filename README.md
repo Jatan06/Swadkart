@@ -28,7 +28,7 @@ It simulates a real-world food delivery platform where customers can browse rest
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/swadkart.git
+git clone https://github.com/Jatan06/swadkart.git
 cd swadkart
 ```
 
