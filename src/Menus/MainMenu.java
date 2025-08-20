@@ -17,7 +17,6 @@ public class MainMenu {
             throw new RuntimeException(e);
         }
     }
-
     protected static void show() {
         AppConstants.show = true;
         while (AppConstants.show) {
