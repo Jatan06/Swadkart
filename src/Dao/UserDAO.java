@@ -33,14 +33,7 @@ public class UserDAO {
     public static void profile(String id) {
         boolean prof = true;
         while (prof) {
-            System.out.println("\n\n===================================");
-            System.out.println("|         Profile Menu            |");
-            System.out.println("===================================");
-            System.out.println("|  1. View Profile                |");
-            System.out.println("|  2. Update Profile              |");
-            System.out.println("|  3. Back To Menu                |");
-            System.out.println("===================================");
-            System.out.print("\nPlease select an option: ");
+            displayProfileMenu();
             try {
                 switch (AppConstants.s.nextInt()) {
                     case 1:
@@ -53,13 +46,26 @@ public class UserDAO {
                         prof = false;
                         break;
                     default:
-                        System.out.println(AppConstants.ERR_INVALID_INPUT);
+                        System.out.println(AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
                 }
             } catch (Exception e) {
-                System.out.println(AppConstants.ERR_INVALID_INPUT);
+                System.out.println(AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
                 AppConstants.s.nextLine();
             }
         }
+    }
+
+    private static void displayProfileMenu() {
+        System.out.println("\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t****************\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Profile Menu +\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t****************\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Profile Section\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Update Information\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Back\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 
     public static boolean phoneNumberExists(String number) throws Exception {
@@ -84,10 +90,10 @@ public class UserDAO {
             ps.setString(1, new_pass);
             ps.setString(2, id);
             if(ps.executeUpdate()>0) {
-                System.out.println("\nYour password has been updated");
+                System.out.println(AppConstants.TEXT_ANSI_GREEN+"\nYour password has been updated"+AppConstants.ANSI_RESET);
             }
             else {
-                System.out.println("\nPassword not updated, please try again !");
+                System.out.println(AppConstants.TEXT_ANSI_RED+"\nPassword not updated, please try again !"+AppConstants.ANSI_RESET);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -97,14 +103,14 @@ public class UserDAO {
     private static void updateProfile(String id) {
         CallableStatement up;
         try {
-            System.out.print("\nEnter that you want to edit (name,email,address) : ");
+            System.out.print("\nEnter (name,email,address) to edit : ");
             String update = AppConstants.s.next();
             while(true) {
                 if(Validators.validateColumnNameUser(update)) {
                     break;
                 }
                 else {
-                    System.out.println("\nInvalid column name. Please enter a valid column name.");
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"\nInvalid column name. Please enter a valid column name."+AppConstants.ANSI_RESET);
                     update = AppConstants.s.next();
                 }
             }
@@ -117,7 +123,7 @@ public class UserDAO {
                         break;
                     }
                     else {
-                        System.out.println("Enter valid name :- ");
+                        System.out.println(AppConstants.TEXT_ANSI_RED+"Enter valid name :- "+AppConstants.ANSI_RESET);
                         new_name = AppConstants.s.nextLine();
                     }
                 }
@@ -140,7 +146,7 @@ public class UserDAO {
                         break;
                     }
                     else {
-                        System.out.print("\nEnter valid email :- ");
+                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid email :- "+AppConstants.ANSI_RESET);
                         new_email = AppConstants.s.nextLine();
                     }
                 }
@@ -151,7 +157,7 @@ public class UserDAO {
                     SpeakTextService.speak("\nYour email has been updated");
                 }
                 else {
-                    System.out.println("\nEmail not updated, please try again !");
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"\nEmail not updated, please try again !"+AppConstants.ANSI_RESET);
                 }
                 up.close();
             }
@@ -163,7 +169,7 @@ public class UserDAO {
                         break;
                     }
                     else {
-                        System.out.print("\nEnter valid address :- ");
+                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid address :- "+AppConstants.ANSI_RESET);
                         new_address = AppConstants.s.nextLine();
                     }
                 }
@@ -174,12 +180,12 @@ public class UserDAO {
                     SpeakTextService.speak("\nYour address has been updated");
                 }
                 else {
-                    System.out.println("\nAddress not updated, please try again !");
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"\nAddress not updated, please try again !"+AppConstants.ANSI_RESET);
                 }
                 up.close();
             }
             else {
-                System.out.print("\nPlease enter a valid column name.\n");
+                System.out.print(AppConstants.TEXT_ANSI_RED+"\nPlease enter a valid column name.\n"+AppConstants.ANSI_RESET);
                 updateProfile(id);
             }
             Thread.sleep(2000);
@@ -193,12 +199,12 @@ public class UserDAO {
                     AppConstants.s.nextLine();
                     return;
                 } else {
-                    System.out.println("\nInvalid choice. Please try again.\n");
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"\nInvalid choice. Please try again.\n"+AppConstants.ANSI_RESET);
                 }
             }
         }
         catch (Exception e) {
-            System.out.print("\nException "+e+" arise in updateProfile. Please provide valid input.");
+            System.out.print(AppConstants.TEXT_ANSI_RED+"\nException "+e+" arise in updateProfile. Please provide valid input."+AppConstants.ANSI_RESET);
         }
     }
 
@@ -262,7 +268,7 @@ public class UserDAO {
         return sb.toString();
     }
 
-    // Format a single-line row like: | Label           : Value                         |
+    // Format a single-line row like: | Label: Value |
     private static String formatRow(String label, String value, int width) {
         final int labelWidth = 16; // fixed label width
         // "| " + label + " : " + value + " |" => reserve spaces accordingly

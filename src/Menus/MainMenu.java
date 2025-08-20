@@ -4,8 +4,12 @@ import Constants.AppConstants;
 import Db.DBConnection;
 import Services.SpeakTextService;
 import Utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainMenu {
+    private static final Logger log = LoggerFactory.getLogger(MainMenu.class);
+
     public static void run() {
         try {
             if (DBConnection.DbConnection()) {
@@ -17,6 +21,7 @@ public class MainMenu {
             throw new RuntimeException(e);
         }
     }
+
     protected static void show() {
         AppConstants.show = true;
         while (AppConstants.show) {
@@ -29,7 +34,7 @@ public class MainMenu {
                         n = AppConstants.s.nextInt();
                         break;
                     } catch (Exception e) {
-                        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease choose a number only: ");
+                        System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+"Please choose a number only: "+AppConstants.ANSI_RESET);
                         AppConstants.s.nextLine();
                     }
                 }
@@ -43,32 +48,28 @@ public class MainMenu {
                         } catch (InterruptedException e) {
                             System.out.println("Exception at MainMenu/show at line 51");
                         }
-                        System.out.print("\n\n============== Login ==============\n");
+                        System.out.print("\n\t\t\t"+AppConstants.BG_ANSI_BLACK+"============== Login =============="+AppConstants.ANSI_RESET+"\n");
                         login();
                         break;
                     case 3:
                         SpeakTextService.speak("SwadKart signing off... pet full, mood chill!");
                         Thread.sleep(2000);
-                        System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
+                        System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
                         AppConstants.show = false;
                         break;
                     default:
-                        System.out.println("Invalid Choice Please try again !");
+                        System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET+"\n\n");
                         break;
                 }
             }
             catch(Exception e){
-                System.out.println("Exception at MainMenu/show() at line 67.");
+                System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
                 AppConstants.s.nextLine(); // attempt to clear buffer for next loop
             }
         }
     }
 
-    public static void login() {
-        login_main();
-    }
-
-    private static void login_main() {
+    private static void login() {
         boolean id_verification = true;
         String id = "";
         while (id_verification) {
@@ -76,71 +77,28 @@ public class MainMenu {
             id = AppConstants.s.next().trim();
             if (id.charAt(0) == 'u' || id.charAt(0) == 'U') {
                 if (id.charAt(1) == '-') {
-                    int j = 0;
-                    for (int i = 2; i < id.length(); i++,j++) {
-                        char c = id.charAt(i);
-                        if (Character.isDigit(c)) {
-                            if(id.length()==6) {
-                                continue;
-                            }
-                            else {
-                                System.out.println("Enter valid id like u-xxxx.");
-                                break;
-                            }
-                        } else {
-                            System.out.println("Invalid Id! Please enter again.");
-                            break;
-                        }
+                    if(CustomerMenu.validateId(id)) {
+                        id_verification = false;
                     }
-                } else {
-                    System.out.println("Invalid id, please try again!");
-                }
-                if (CustomerMenu.validateId(id)) {
-                    id_verification = false;
+                    else {
+                        System.out.print(AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_USER_NOT_FOUND+AppConstants.ANSI_RESET+"\n");
+                        login();
+                    }
                 }
                 else {
-                    System.out.print("\nNo id " + id + " found. Have you Register ? (y/n) :- ");
-                    while (true) {
-                        try {
-                            if (AppConstants.s.next().charAt(0) == 'y') {
-                                System.out.println("Forgot id ? (y/n) :- ");
-                                if (AppConstants.s.next().charAt(0) == 'y' || AppConstants.s.next().charAt(0) == 'Y') {
-                                    System.out.println("Enter mobile number :- ");
-                                    String mo_no = AppConstants.s.next().trim();
-                                    while (!Validators.validateMobileNumber(mo_no)) {
-                                        System.out.println("Enter valid mobile number :- ");
-                                        mo_no = AppConstants.s.next().trim();
-                                    }
-                                    if (CustomerMenu.getId(mo_no) == null) {
-                                        System.out.println("Please try again.");
-                                        return;
-                                    } else {
-                                        System.out.println("\nYour id : " + id);
-                                    }
-                                } else if (AppConstants.s.next().charAt(0) == 'n' || AppConstants.s.next().charAt(0) == 'N') {
-                                    continue;
-                                }
-                                break;
-                            } else if (AppConstants.s.next().charAt(0) == 'n') {
-                                return;
-                            } else {
-                                System.out.println("\nEnter y/n only.");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("\nEnter only a single character.");
-                        }
-                    }
+                    System.out.print("\n"+AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_RED+"\nInvalid id, please try again!"+AppConstants.ANSI_RESET+"\n");
+                    login();
                 }
             }
             else if (id.charAt(0) == 'a' || id.charAt(0) == 'A') {
                 while (!AdminMenu.adminValidatorId(id)) {
-                    System.out.println("Invalid Admin password.");
+                    System.out.println(AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
                     id = AppConstants.s.next().trim();
                 }
-                System.out.print("Enter password :- ");
+                System.out.print(AppConstants.BG_ANSI_BLACK+"Enter password :- "+AppConstants.ANSI_RESET);
                 String password = AppConstants.s.next().trim();
                 while (!AdminMenu.adminValidatorPassword(password)) {
-                    System.out.println("Invalid Admin password.");
+                    System.out.println(AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
                     password = AppConstants.s.next().trim();
                 }
                 AdminMenu.adminMenu();
@@ -148,18 +106,9 @@ public class MainMenu {
             }
             else {
                 for (int i = 0;i<id.length();i++) {
-                    if(Character.isDigit(id.charAt(i))) {
-                        continue;
-                    }
-                    else {
-                        System.out.print("\nInvalid id, Have you registered ? (y/n) :- ");
-                        if(AppConstants.s.next().charAt(0)=='n') {
-                            return;
-                        }
-                        else {
-                            System.out.println("\nPlease try again.");
-                            login_main();
-                        }
+                    if(!Character.isDigit(id.charAt(i))) {
+                        System.out.print("\n"+AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_RED+"\nInvalid ID, Please try again." + AppConstants.ANSI_RESET+"\n");
+                        login();
                     }
                 }
                 if(id.length()==1) {
@@ -172,44 +121,15 @@ public class MainMenu {
                     id = "u-"+id;
                 }
                 else {
-                    System.out.println("Invalid id. Please try again!");
-                    return;
+                    System.out.print("\n"+AppConstants.TEXT_ANSI_RED+"\nInvalid id. Please try again!"+AppConstants.ANSI_RESET+"\n");
+                    login();
                 }
                 if(CustomerMenu.validateId(id)) {
                     id_verification = false;
                 }
                 else {
-                    System.out.print("\nNo id " + id + " found. Have you Register ? (y/n) :- ");
-                    while (true) {
-                        try {
-                            if (AppConstants.s.next().charAt(0) == 'y') {
-                                System.out.println("Forgot id ? (y/n) :- ");
-                                if (AppConstants.s.next().charAt(0) == 'y' || AppConstants.s.next().charAt(0) == 'Y') {
-                                    System.out.println("Enter mobile number :- ");
-                                    String mo_no = AppConstants.s.next().trim();
-                                    while (!Validators.validateMobileNumber(mo_no)) {
-                                        System.out.println("Enter valid mobile number :- ");
-                                        mo_no = AppConstants.s.next().trim();
-                                    }
-                                    if (CustomerMenu.getId(mo_no) == null) {
-                                        System.out.println("Please try again.");
-                                        return;
-                                    } else {
-                                        System.out.println("\nYour id : " + id);
-                                    }
-                                } else if (AppConstants.s.next().charAt(0) == 'n' || AppConstants.s.next().charAt(0) == 'N') {
-                                    continue;
-                                }
-                                break;
-                            } else if (AppConstants.s.next().charAt(0) == 'n') {
-                                return;
-                            } else {
-                                System.out.println("\nEnter y/n only.");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("\nEnter only a single character.");
-                        }
-                    }
+                    System.out.print("\n"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_USER_NOT_FOUND+AppConstants.ANSI_RESET+"\n");
+                    login();
                 }
             }
         }
@@ -221,41 +141,52 @@ public class MainMenu {
                 if(password.length()==1 && (password.charAt(0)=='f' || password.charAt(0)=='F')) {
                     if(CustomerMenu.forgotPassword(id)) {
                         CustomerMenu.customerMenu(id);
-                        System.out.println("Enter password again :- ");
+                        System.out.println(AppConstants.BG_ANSI_BLACK+"Enter password again :- "+AppConstants.ANSI_RESET);
                         password = AppConstants.s.next().trim();
                     }
                     else {
-                        System.out.println("Sorry, Please try again!");
+                        System.out.println(AppConstants.TEXT_ANSI_RED+"Sorry, Please try again!"+AppConstants.ANSI_RESET);
                         return;
                     }
                 }
                 while (!Validators.validatePassword(password)) {
-                    System.out.print("\nEnter valid password :- ");
+                    System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid password :- "+AppConstants.ANSI_RESET);
                     password = AppConstants.s.next().trim();
                 }
                 while(!CustomerMenu.customerValidator(id,password)) {
-                    System.out.print("\nIncorrect password, enter again :- ");
+                    System.out.print(AppConstants.TEXT_ANSI_RED+"\nIncorrect password, enter again or enter 'f' or enter 'b' :- "+AppConstants.ANSI_RESET);
                     password = AppConstants.s.next().trim();
+                    if(password.length()==1 && (password.charAt(0)=='f' || password.charAt(0)=='F')) {
+                        if(CustomerMenu.forgotPassword(id)) {
+                            CustomerMenu.customerMenu(id);
+                            System.out.println(AppConstants.BG_ANSI_BLACK+"Enter password again :- "+AppConstants.ANSI_RESET);
+                            password = AppConstants.s.next().trim();
+                            break;
+                        }
+                    } else if (password.length()==1 && (password.charAt(0)=='b' || password.charAt(0)=='B')) {
+                        return;
+                    }
                 }
+                System.out.println(AppConstants.TEXT_ANSI_GREEN+AppConstants.SUCCESS_LOGIN+AppConstants.ANSI_RESET);
                 CustomerMenu.customerMenu(id);
                 password_verification = false;
                 MainMenu.show();
             } catch (Exception e) {
-                System.out.println("Exception at MainMenu/show at line 195.");
+                System.out.println(AppConstants.TEXT_ANSI_RED+"Exception at MainMenu"+AppConstants.ANSI_RESET);
             }
         }
     }
 
     private static void showMenu() {
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-------------------------------------------------------------------------------------");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t*************\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t+ Main Menu +\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t*************\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t1. New To Swadkart\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t2. Login\t\t\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t3. Exit\t\t\t\t\t\t\t\t\t\t\t\t|");
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-------------------------------------------------------------------------------------");
-        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Main Menu +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. New To Swadkart\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Login\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Exit\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 }

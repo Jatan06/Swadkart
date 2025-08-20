@@ -10,12 +10,12 @@ public class OrderDAO {
     public static double total;
     public static void placeOrder(String uid) throws Exception {
         if (UserService.Cart == null || UserService.Cart.head == null) {
-            System.out.println("\nCart is empty. Nothing to place.");
+            System.out.println(AppConstants.TEXT_ANSI_RED+"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCart is empty. Nothing to place."+AppConstants.ANSI_RESET);
             return;
         }
 
         if (!confirmOrderPrompt()) {
-            System.out.println("\nOrder cancelled.");
+            System.out.println(AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_RED+"\nOrder cancelled."+AppConstants.ANSI_RESET);
             return; // exit without inserting orders/payment or committing
         }
 
@@ -164,6 +164,9 @@ public class OrderDAO {
                 UserService.isEmpty = true;
             }
             else {
+                if(PaymentService.choice.equalsIgnoreCase("exit")) {
+                    System.out.println("Order cancelled.");
+                }
                 AppConstants.connection.rollback(sp);
                 if(Objects.equals(PaymentService.choice, "1")) {
                     System.out.println("Order cancelled.");

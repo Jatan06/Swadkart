@@ -1,13 +1,13 @@
 package Services;
-
 import Constants.AppConstants;
 import Dao.OrderDAO;
 import Dao.PaymentDAO;
 import Ds.LL;
 import Models.Payment;
-
 public class PaymentService {
+
     public static String choice;
+
     public static boolean paymentInterface() {
         LL cart = UserService.Cart;
         if (cart == null || cart.head == null) {
@@ -110,6 +110,8 @@ public class PaymentService {
                     success = handleUpi(total);
                     if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_UPI;payment_selection = false;
                     break;
+                    case "exit":
+                        return false;
                 default:
                     System.out.println("Invalid choice. Payment Please try again.");
                     break;
@@ -198,7 +200,6 @@ public class PaymentService {
         return true;
     }
 
-    // Luhn algorithm
     private static boolean isValidCard(String card) {
         int sum = 0;
         boolean alternate = false;
@@ -214,7 +215,6 @@ public class PaymentService {
         return (sum % 10 == 0);
     }
 
-    // Expiry check
     private static boolean isExpired(String expiry) {
         try {
             String[] parts = expiry.split("/");
@@ -246,7 +246,6 @@ public class PaymentService {
         return true;
     }
 
-
     // ---------------- Helper Methods ----------------
 
     private static boolean simulateRestaurantConfirmation() {
@@ -276,6 +275,7 @@ public class PaymentService {
         System.out.printf("TOTAL: %.2f%n", total);
         System.out.println("=====================\n");
     }
+
     private static double round2(double v) {
         return Math.round(v * 100.0) / 100.0;
     }

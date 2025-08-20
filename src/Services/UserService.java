@@ -22,6 +22,7 @@ public class UserService {
             while(!Validators.validateRestaurantId(r_id)) {
                 System.out.print("\nEnter Restaurant Id or 'b' to go back: ");
                 r_id = scanner.next();
+                if(r_id.equalsIgnoreCase("b")) return;
                 for (int i =0;i<r_id.length();i++) {
                     if(!Character.isDigit(r_id.charAt(i))) {
                         System.out.println("Enter valid id (e.g 10,12) :- ");
@@ -44,7 +45,6 @@ public class UserService {
                     System.out.println("Enter valid r-id.");
                 }
             }
-            if(r_id.equalsIgnoreCase("b")) return;
             isEmpty= false;
         }
         if(!RestaurantDAO.checkRestaurantId(r_id)) {
@@ -58,12 +58,7 @@ public class UserService {
         }
         boolean running = true;
         while (running) {
-            System.out.println("\n--- Cart Menu ---");
-            System.out.println("1. Add dish to cart");
-            System.out.println("2. Remove dish from cart");
-            System.out.println("3. View cart");
-            System.out.println("4. Quit");
-            System.out.print("Select an option: ");
+            displayCartMenu();
             String option = scanner.next();
             switch (option) {
                 case "1":
@@ -123,8 +118,21 @@ public class UserService {
                     running = false;
                     break;
                 default:
-                    System.out.println("Invalid option. Try again.");
+                    System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
             }
         }
+    }
+    private static void displayCartMenu() {
+        System.out.println("\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Cart Menu +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t1. Add Dish\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t2. Remove Dish\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t3. Cart\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t4. Back\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 }

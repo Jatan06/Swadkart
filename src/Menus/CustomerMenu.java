@@ -12,35 +12,30 @@ public class CustomerMenu {
         boolean flag = true;
         while (flag) {
             try {
-                System.out.println("\n\n===================================");
-                System.out.println("|         Customer Menu           |");
-                System.out.println("===================================");
-                System.out.println("|  1. Register New Account        |");
-                System.out.println("|  2. Return to Main Menu         |");
-                System.out.println("===================================");
-                System.out.print("Please select an option: ");
+                displayNewCustomerMenu();
                 int choice = AppConstants.s.nextInt();
                 switch (choice) {
                     case 1:
-                        System.out.println("\n========= Verification =========");
+                        System.out.print("\n\t\t\t"+AppConstants.BG_ANSI_BLACK+"============== Verification =============="+AppConstants.ANSI_RESET+"\n");
                         int users = UserDAO.countUsers();
                         users++;
                         String password = "";
-                        System.out.print("Enter Phone No. : ");
-                        String ph_no = "+91" + AppConstants.s.next().trim();
+                        System.out.print("\nEnter Phone No. : ");
+                        String ph_no = AppConstants.s.next().trim();
+                        // Validate mobile number using Validators class
+                        while (!Validators.validateMobileNumber(ph_no)) {
+                            System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid mobile number (e.g., 9876543210): "+AppConstants.ANSI_RESET);
+                            ph_no = AppConstants.s.next().trim();
+                        }
+                        ph_no = "+91"+ph_no;
                         while(true) {
                             if(UserDAO.phoneNumberExists(ph_no)) {
-                                System.out.print("\nPhone number already exists. Please enter a different number : ");
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"\nPhone number already exists. Please enter a different number : "+AppConstants.ANSI_RESET);
                                 ph_no = "+91" + AppConstants.s.next().trim();
                             }
                             else {
                                 break;
                             }
-                        }
-                        // Validate mobile number using Validators class
-                        while (!Validators.validateMobileNumber(ph_no)) {
-                            System.out.print("\nEnter valid mobile number (e.g., 9876543210): ");
-                            ph_no = "+91" + AppConstants.s.next().trim();
                         }
                         // Generate OTP once
                         String generatedOTP = OTPService.generateOTP();
@@ -59,17 +54,17 @@ public class CustomerMenu {
                                     System.out.print("Enter password : ");
                                     password = AppConstants.s.nextLine().trim();
                                     while (!Validators.validatePassword(password)) {
-                                        System.out.print("\nEnter valid password :-  ");
+                                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid password :-  "+AppConstants.ANSI_RESET);
                                         password = AppConstants.s.nextLine().trim();
                                         if (!Validators.validatePassword(password)) {
-                                            System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
+                                            System.out.println(AppConstants.TEXT_ANSI_RED+"\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol."+AppConstants.ANSI_RESET);
                                         }
                                     }
                                     System.out.print("\nRe-Enter password :- ");
                                     String repass = AppConstants.s.next().trim();
                                     while (true) {
                                         if(!password.equals(repass)) {
-                                            System.out.print("Please enter valid password which you have set :- ");
+                                            System.out.print(AppConstants.TEXT_ANSI_RED+"Please enter valid password which you have set :- "+AppConstants.ANSI_RESET);
                                             repass = AppConstants.s.next();
                                         }
                                         else {
@@ -79,21 +74,21 @@ public class CustomerMenu {
                                     }
                                 } else {
                                     if (--otpAttempts > 0) {
-                                        System.out.print("\n❌ Incorrect OTP. Please try again (" + otpAttempts + " attempts left): ");
+                                        System.out.print("\n❌ "+AppConstants.TEXT_ANSI_RED+"Incorrect OTP. Please try again (" + otpAttempts + " attempts left): "+AppConstants.ANSI_RESET);
                                         userOTP = AppConstants.s.nextLine().trim();
                                     } else {
-                                        System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                                        System.out.println("\n🚫"+AppConstants.TEXT_ANSI_RED+" Phone number verification failed. Registration terminated."+AppConstants.ANSI_RESET+"\n");
                                         return;
                                     }
                                 }
                             }
                         }
                         else {
-                            System.out.println("\n🚫 Phone number verification failed. Registration terminated.\n");
+                            System.out.println("\n🚫"+AppConstants.TEXT_ANSI_RED+" Phone number verification failed. Registration terminated."+AppConstants.ANSI_RESET+"\n");
                             return;
                         }
-                        System.out.println("\n========= Registration =========");
-                        System.out.print("Enter Name : ");
+                        System.out.print("\n\t\t\t"+AppConstants.BG_ANSI_BLACK+"============== Registration =============="+AppConstants.ANSI_RESET+"\n");
+                        System.out.print("\nEnter Name : ");
                         String user_Name = AppConstants.s.nextLine();
                         while (!Validators.validateName(user_Name)) {
                             System.out.print("Enter valid name : ");
@@ -128,11 +123,12 @@ public class CustomerMenu {
                         flag = false;
                         break;
                     default:
-                        System.out.println("\nInvalid choice. Please try again.\n");
+                        System.out.println(AppConstants.TEXT_ANSI_RED+"\nInvalid choice. Please try again.\n"+AppConstants.ANSI_RESET);
                         break;
                 }
             } catch (Exception e) {
-                throw new RuntimeException("An error occurred in the Customer Menu in new customer ", e);
+                System.out.println(AppConstants.TEXT_ANSI_RED+"\nError Please try again!"+AppConstants.ANSI_RESET);
+                AppConstants.s.nextLine();
             }
         }
     }
@@ -227,7 +223,7 @@ public class CustomerMenu {
                     return true;
                 }
                 else {
-                    return true;
+                    return false;
                 }
             }
         } catch (SQLException e) {
@@ -291,19 +287,33 @@ public class CustomerMenu {
     }
 
     private static void displayMenu() {
-        System.out.println("\n=================================");
-        System.out.println("|              Menu              |");
-        System.out.println("=================================");
-        System.out.println("|  1. Browse Restaurants         |");
-        System.out.println("|  2. Browse Dishes              |");
-        System.out.println("|  3. Add to Cart                |");
-        System.out.println("|  4. View Cart                  |");
-        System.out.println("|  5. Place Order                |");
-        System.out.println("|  6. View Order History         |");
-        System.out.println("|  7. Profile                    |");
-        System.out.println("|  8. Log Out                    |");
-        System.out.println("=================================");
-        System.out.print("\nPlease select an option: ");
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ User Menu +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Browse Restaurants\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Browse Dishes\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Add To Cart\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. View Cart\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. Place Order\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t6. Order History\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t7. Profile\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t8. Logout\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+    }
+
+    private static void displayNewCustomerMenu() {
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*****************\t\t\t\t    |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Customer Menu +\t\t\t\t    |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*****************\t\t\t\t    |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t1. Register\t\t\t\t\t\t\t|"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t2. Back\t\t\t\t\t\t\t\t|"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 
     private static int getUserInput() {
@@ -313,7 +323,7 @@ public class CustomerMenu {
                 AppConstants.s.nextLine(); // consume trailing newline to make nextLine safe everywhere
                 return v;
             } else {
-                System.out.println("Invalid input. Please enter a number.");
+                System.out.println(AppConstants.ERR_INVALID_INPUT);
                 AppConstants.s.next();
             }
         }
@@ -333,7 +343,7 @@ public class CustomerMenu {
                 UserService.Cart = null;
                 AppConstants.run = false;
             }
-            default -> System.out.println("Invalid choice. Please try again.");
+            default -> System.out.println(AppConstants.ERR_INVALID_INPUT);
         }
     }
 }

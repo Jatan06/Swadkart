@@ -1,4 +1,5 @@
 package Ds;
+import Constants.AppConstants;
 import Models.Dish;
 
 public class LL {
@@ -33,7 +34,7 @@ public class LL {
     // Display all dishes
     public void display() {
         if (head == null) {
-            System.out.println("\nCart is empty, Nothing to display.");
+            System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+ AppConstants.TEXT_ANSI_RED+"Cart is empty, Nothing to display."+AppConstants.ANSI_RESET);
             return;
         }
 
