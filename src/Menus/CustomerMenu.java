@@ -219,7 +219,6 @@ public class CustomerMenu {
             ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // user id not found
                     return true;
                 }
                 else {

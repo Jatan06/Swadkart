@@ -1,12 +1,334 @@
 package Dao;
 import Admin.Admin;
 import Constants.*;
+import Menus.CustomerMenu;
 import Utils.Validators;
 
 import java.sql.*;
 import java.util.*;
 
 public class RestaurantDAO {
+    public static void updateRestaurant() {
+        boolean up = true;
+        while (up) {
+            try {
+                updateRestaurantMenu();
+                switch (AppConstants.s.next().trim()) {
+                    case "1" -> {
+                        AppConstants.s.nextLine();
+                        System.out.print("\nEnter Restaurant ID :- ");
+                        String id = AppConstants.s.nextLine().trim();
+                        while (true) {
+                            if (id.length() == 1) {
+                                id = "r-000".concat(id);
+                            } else if (id.length() == 2) {
+                                id = "r-00".concat(id);
+                            } else if (id.length() == 3) {
+                                id = "r-0".concat(id);
+                            } else if (id.length() == 4) {
+                                id = "r-".concat(id);
+                            } else {
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if(id.equalsIgnoreCase("b")) return;
+                                }
+                                changeRestName(id);
+                                return;
+                            }
+                            while (!validateId(id)) {
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                id = AppConstants.s.nextLine().trim();
+                                if(id.equalsIgnoreCase("b")) return;
+                            }
+                            if(validateId(id)) {
+                                changeRestRating(id);
+                                return;
+                            }
+                        }
+                    }
+                    case "2" -> {
+                        AppConstants.s.nextLine();
+                        System.out.print("\nEnter Restaurant ID :- ");
+                        String id = AppConstants.s.nextLine().trim();
+                        while (true) {
+                            if (id.length() == 1) {
+                                id = "r-000".concat(id);
+                            } else if (id.length() == 2) {
+                                id = "r-00".concat(id);
+                            } else if (id.length() == 3) {
+                                id = "r-0".concat(id);
+                            } else if (id.length() == 4) {
+                                id = "r-".concat(id);
+                            } else {
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if(id.equalsIgnoreCase("b")) return;
+                                }
+                                changeRestCuisine(id);
+                                return;
+                            }
+                            while (!validateId(id)) {
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                id = AppConstants.s.nextLine().trim();
+                                if(id.equalsIgnoreCase("b")) return;
+                            }
+                            if(validateId(id)) {
+                                changeRestRating(id);
+                                return;
+                            }
+                        }
+                    }
+                    case "3" -> {
+                        AppConstants.s.nextLine();
+                        System.out.print("\nEnter Restaurant ID :- ");
+                        String id = AppConstants.s.nextLine().trim();
+                        while (true) {
+                            if (id.length() == 1) {
+                                id = "r-000".concat(id);
+                            } else if (id.length() == 2) {
+                                id = "r-00".concat(id);
+                            } else if (id.length() == 3) {
+                                id = "r-0".concat(id);
+                            } else if (id.length() == 4) {
+                                id = "r-".concat(id);
+                            } else {
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if(id.equalsIgnoreCase("b")) return;
+                                }
+                                changeRestPhone(id);
+                                return;
+                            }
+                            while (!validateId(id)) {
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                id = AppConstants.s.nextLine().trim();
+                                if(id.equalsIgnoreCase("b")) return;
+                            }
+                            if(validateId(id)) {
+                                changeRestRating(id);
+                                return;
+                            }
+                        }
+                    }
+                    case "4" -> {
+                        AppConstants.s.nextLine();
+                        System.out.print("\nEnter Restaurant ID :- ");
+                        String id = AppConstants.s.nextLine().trim();
+                        while (true) {
+                            if (id.length() == 1) {
+                                id = "r-000".concat(id);
+                            } else if (id.length() == 2) {
+                                id = "r-00".concat(id);
+                            } else if (id.length() == 3) {
+                                id = "r-0".concat(id);
+                            } else if (id.length() == 4) {
+                                id = "r-".concat(id);
+                            } else {
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if(id.equalsIgnoreCase("b")) return;
+                                }
+                                changeRestAddress(id);
+                                return;
+                            }
+                            while (!validateId(id)) {
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                id = AppConstants.s.nextLine().trim();
+                                if(id.equalsIgnoreCase("b")) return;
+                            }
+                            if(validateId(id)) {
+                                changeRestRating(id);
+                                return;
+                            }
+                        }
+                    }
+                    case "5" -> {
+                        AppConstants.s.nextLine();
+                        System.out.print("\nEnter Restaurant ID :- ");
+                        String id = AppConstants.s.nextLine().trim();
+                        while (true) {
+                            if (id.length() == 1) {
+                                id = "r-000".concat(id);
+                            } else if (id.length() == 2) {
+                                id = "r-00".concat(id);
+                            } else if (id.length() == 3) {
+                                id = "r-0".concat(id);
+                            } else if (id.length() == 4) {
+                                id = "r-".concat(id);
+                            } else {
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if(id.equalsIgnoreCase("b")) return;
+                                }
+                                changeRestRating(id);
+                                return;
+                            }
+                            while (!validateId(id)) {
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"Invalid Restaurant ID. Please try again."+AppConstants.ANSI_RESET+" or enter 'b' :- ");
+                                id = AppConstants.s.nextLine().trim();
+                                if(id.equalsIgnoreCase("b")) return;
+                            }
+                            if(validateId(id)) {
+                                changeRestRating(id);
+                                return;
+                            }
+                        }
+                    }
+                    case "6" -> up = false;
+                    default -> System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
+                }
+            }
+            catch (Exception e) {
+                System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
+                AppConstants.s.nextLine();
+            }
+        }
+    }
+
+    private static boolean validateId(String id) {
+        String sql = "SELECT id FROM restaurants WHERE id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception arise.");
+            return false;
+        }
+    }
+
+    private static void changeRestName(String id) {
+        System.out.print("\nEnter new Restaurant Name :- ");
+        String new_name = AppConstants.s.nextLine().trim();
+        String upName = "UPDATE restaurants SET name = ? WHERE id = ?";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(upName)) {
+            ps.setString(1, new_name);
+            ps.setString(2, id);
+            if (ps.executeUpdate() > 0) {
+                System.out.println(AppConstants.TEXT_ANSI_GREEN + "Restaurant name updated successfully!" + AppConstants.ANSI_RESET);
+            }
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() + AppConstants.ANSI_RESET);
+        }
+    }
+
+    private static void changeRestCuisine(String id) {
+        System.out.print("\nEnter new Cuisine :- ");
+        String newCuisine = AppConstants.s.nextLine().trim();
+        String sql = "UPDATE restaurants SET cuisine = ? WHERE id = ?";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, newCuisine);
+            ps.setString(2, id);
+
+            if (ps.executeUpdate() > 0) {
+                System.out.println(AppConstants.TEXT_ANSI_GREEN +
+                        "Cuisine updated successfully!" +
+                        AppConstants.ANSI_RESET);
+            }
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED +
+                    "Exception occurred: " + e.getMessage() +
+                    AppConstants.ANSI_RESET);
+        }
+    }
+
+    private static void changeRestPhone(String id) {
+        System.out.print("\nEnter new Phone Number :- ");
+        String newPhone = AppConstants.s.nextLine().trim();
+        while (!Validators.validateMobileNumber(newPhone)) {
+            System.out.println("Enter a valid phone number! or enter 'b' to go back.");
+            newPhone = AppConstants.s.nextLine().trim();
+            if (newPhone.equalsIgnoreCase("b")) {
+                return;
+            }
+        }
+        String sql = "UPDATE restaurants SET phone_no = ? WHERE id = ?";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, newPhone);
+            ps.setString(2, id);
+
+            if (ps.executeUpdate() > 0) {
+                System.out.println(AppConstants.TEXT_ANSI_GREEN +
+                        "Phone number updated successfully!" +
+                        AppConstants.ANSI_RESET);
+            }
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED +
+                    "Exception occurred: " + e.getMessage() +
+                    AppConstants.ANSI_RESET);
+        }
+    }
+
+    private static void changeRestAddress(String id) {
+        System.out.print("\nEnter new Address :- ");
+        String newAddress = AppConstants.s.nextLine().trim();
+        String sql = "UPDATE restaurants SET address = ? WHERE id = ?";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setString(1, newAddress);
+            ps.setString(2, id);
+
+            if (ps.executeUpdate() > 0) {
+                System.out.println(AppConstants.TEXT_ANSI_GREEN +
+                        "Address updated successfully!" +
+                        AppConstants.ANSI_RESET);
+            }
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED +
+                    "Exception occurred: " + e.getMessage() +
+                    AppConstants.ANSI_RESET);
+        }
+    }
+
+    private static void changeRestRating(String id) {
+        System.out.print("\nEnter new Rating (1.0 - 5.0) :- ");
+        String newRating = AppConstants.s.nextLine().trim();
+        String sql = "UPDATE restaurants SET rating = ? WHERE id = ?";
+
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql)) {
+            ps.setBigDecimal(1, new java.math.BigDecimal(newRating));
+            ps.setString(2, id);
+
+            if (ps.executeUpdate() > 0) {
+                System.out.println(AppConstants.TEXT_ANSI_GREEN +
+                        "Rating updated successfully!" +
+                        AppConstants.ANSI_RESET);
+            }
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED +
+                    "Exception occurred: " + e.getMessage() +
+                    AppConstants.ANSI_RESET);
+        }
+    }
+
+    public static void restaurantStats() {
+
+    }
+
+    private static void updateRestaurantMenu() {
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t**********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Update Restaurants +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t**********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t1. Name\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t2. Cuisine\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t3. Phone No\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t4. Address\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t5. Rating\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t6. Back\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+    }
+
     public static void getRestaurantIdAndName() {
         String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, name ASC";
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);

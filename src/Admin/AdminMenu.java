@@ -16,83 +16,83 @@ public class AdminMenu {
         AppConstants.adminRun = true;
         try {
             while (AppConstants.adminRun) {
-                System.out.println("\n=================================");
-                System.out.println("|          Admin Menu           |");
-                System.out.println("=================================");
-                System.out.println("|  1. Edit Restaurants          |");
-                System.out.println("|  2. View Restaurants          |");
-                System.out.println("|  3. View Orders               |");
-                System.out.println("|  4. View Transaction          |");
-                System.out.println("|  5. View Revenues             |");
-                System.out.println("|  6. View Reviews              |");
-                System.out.println("|  7. View Logins               |");
-                System.out.println("|  8. Logout                    |");
-                System.out.println("=================================");
-                System.out.print("\nPlease enter your choice: ");
+                displayAdminMenu();
                 try {
                     int choice = AppConstants.s.nextInt();
                     switch (choice) {
-                        case 1:
-                            boolean b = true;
-                            while (b) {
-                                System.out.println("\n=================================");
-                                System.out.println("|       Edit Restaurants        |");
-                                System.out.println("=================================");
-                                System.out.println("|  1. Add Restaurant            |");
-                                System.out.println("|  2. Delete Restaurant         |");
-                                System.out.println("|  3. Back                      |");
-                                System.out.println("=================================");
-                                System.out.print("\nPlease enter your choice: ");
-                                try {
-                                    int n = AppConstants.s.nextInt();
-                                    if (n == 1) {
-                                        RestaurantDAO.addRestaurant();
-                                    } else if (n == 2) {
-                                        RestaurantDAO.deleteRestaurant();
-                                    } else if (n == 3) {
-                                        b = false;
-                                    } else {
-                                        System.out.println("\nInvalid Input !");
+                        case 1 -> {
+                                    boolean b = true;
+                                    while (b) {
+                                        displayEditRestMenu();
+                                        try {
+                                            int n = AppConstants.s.nextInt();
+                                            if (n == 1) {
+                                                RestaurantDAO.addRestaurant();
+                                            } else if (n == 2) {
+                                                RestaurantDAO.deleteRestaurant();
+                                            } else if (n == 3) {
+                                                RestaurantDAO.updateRestaurant();
+                                            } else if (n == 4) {
+                                                RestaurantDAO.restaurantStats();
+                                            } else if (n == 5) {
+                                                b = false;
+                                            } else {
+                                                System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + AppConstants.TEXT_ANSI_RED + AppConstants.ERR_INVALID_INPUT + AppConstants.ANSI_RESET);
+                                            }
+                                        } catch (Exception e) {
+                                            System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + AppConstants.TEXT_ANSI_RED + AppConstants.ERR_INVALID_INPUT + AppConstants.ANSI_RESET);
+                                            AppConstants.s.nextLine();
+                                        }
                                     }
-                                } catch (Exception e) {
-                                    System.out.println("Enter numbers only.");
-                                    AppConstants.s.nextLine();
                                 }
-                            }
-                            break;
-                        case 2:
-                            RestaurantDAO.browseRestaurants();
-                            break;
-                        case 3:
-                            OrderDAO.viewOrderAndOrderItems();
-                            break;
-                        case 4:
-                            PaymentDAO.viewTransactions();
-                            break;
-                        case 5:
-                            PaymentDAO.revenueCall();
-                        case 6:
-                            ReviewService.showReviewMenu();
-                            break;
-                        case 7:
-                            LoginService.displayLogins();
-                            break;
-                        case 8:
-                            System.out.println();
-                            AppConstants.adminRun = false;
-                            break;
-                        default:
-                            System.out.println("Please choose valid option !");
-                            break;
+                        case 2 -> RestaurantDAO.browseRestaurants();
+                        case 3 -> OrderDAO.viewOrderAndOrderItems();
+                        case 4 -> PaymentDAO.viewTransactions();
+                        case 5 -> ReviewService.showReviewMenu();
+                        case 6 -> LoginService.displayLogins();
+                        case 7 -> AppConstants.adminRun = false;
+                        default -> System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
                     }
                 } catch (Exception e) {
-                    System.out.println("Enter number only.");
+                    System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
                     AppConstants.s.nextLine();
                 }
             }
         }
         catch (Exception e) {
-            System.out.println("Exception :- "+e.getMessage());
+            System.out.println(AppConstants.TEXT_ANSI_RED+"Exception :- "+e.getMessage()+AppConstants.ANSI_RESET);
         }
+    }
+
+    private static void displayAdminMenu() {
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t**************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Admin Menu +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t**************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Update Restaurants\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. View Restaurants\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. View Orders\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. View Transaction\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. View Reviews\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t6. View Logins\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t7. Logout\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+    }
+
+    private static void displayEditRestMenu() {
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Edit Restaurants +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Add Restaurant\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Delete Restaurant\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Update Restaurant\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. View Restaurant Stats\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. Back\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 }

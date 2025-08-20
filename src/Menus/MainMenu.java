@@ -56,7 +56,7 @@ public class MainMenu {
                         Thread.sleep(2000);
                         System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
                         AppConstants.show = false;
-                        break;
+                        return;
                     default:
                         System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET+"\n\n");
                         break;
@@ -81,34 +81,34 @@ public class MainMenu {
                         id_verification = false;
                     }
                     else {
-                        System.out.print(AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_USER_NOT_FOUND+AppConstants.ANSI_RESET+"\n");
-                        login();
+                        System.out.print(AppConstants.TEXT_ANSI_RED+AppConstants.ERR_USER_NOT_FOUND+AppConstants.ANSI_RESET+"\n");
+                        return;
                     }
                 }
                 else {
-                    System.out.print("\n"+AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_RED+"\nInvalid id, please try again!"+AppConstants.ANSI_RESET+"\n");
-                    login();
+                    System.out.print("\n"+AppConstants.TEXT_ANSI_RED+"\nInvalid id, please try again!"+AppConstants.ANSI_RESET+"\n");
+                    return;
                 }
             }
             else if (id.charAt(0) == 'a' || id.charAt(0) == 'A') {
                 while (!AdminMenu.adminValidatorId(id)) {
-                    System.out.println(AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
                     id = AppConstants.s.next().trim();
                 }
-                System.out.print(AppConstants.BG_ANSI_BLACK+"Enter password :- "+AppConstants.ANSI_RESET);
+                System.out.print("Enter password :- ");
                 String password = AppConstants.s.next().trim();
                 while (!AdminMenu.adminValidatorPassword(password)) {
-                    System.out.println(AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
                     password = AppConstants.s.next().trim();
                 }
                 AdminMenu.adminMenu();
-                MainMenu.show();
+                return;
             }
             else {
                 for (int i = 0;i<id.length();i++) {
                     if(!Character.isDigit(id.charAt(i))) {
                         System.out.print("\n"+AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_RED+"\nInvalid ID, Please try again." + AppConstants.ANSI_RESET+"\n");
-                        login();
+                        return;
                     }
                 }
                 if(id.length()==1) {
@@ -122,14 +122,14 @@ public class MainMenu {
                 }
                 else {
                     System.out.print("\n"+AppConstants.TEXT_ANSI_RED+"\nInvalid id. Please try again!"+AppConstants.ANSI_RESET+"\n");
-                    login();
+                    return;
                 }
                 if(CustomerMenu.validateId(id)) {
                     id_verification = false;
                 }
                 else {
                     System.out.print("\n"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_USER_NOT_FOUND+AppConstants.ANSI_RESET+"\n");
-                    login();
+                    return;
                 }
             }
         }
@@ -170,7 +170,7 @@ public class MainMenu {
                 System.out.println(AppConstants.TEXT_ANSI_GREEN+AppConstants.SUCCESS_LOGIN+AppConstants.ANSI_RESET);
                 CustomerMenu.customerMenu(id);
                 password_verification = false;
-                MainMenu.show();
+                return;
             } catch (Exception e) {
                 System.out.println(AppConstants.TEXT_ANSI_RED+"Exception at MainMenu"+AppConstants.ANSI_RESET);
             }
@@ -178,7 +178,7 @@ public class MainMenu {
     }
 
     private static void showMenu() {
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Main Menu +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
