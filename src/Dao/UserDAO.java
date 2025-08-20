@@ -185,16 +185,16 @@ public class UserDAO {
             Thread.sleep(2000);
             System.out.print("\nDo You want to update another information (y/n) : ");
             String choice = AppConstants.s.next();
-            if(choice.equals("y") || choice.equals("Y")) {
-                updateProfile(id);
-            }
-            else if(choice.equals("n") || choice.equals("N")) {
-                System.out.println("\nReturning to Profile Menu...");
-                AppConstants.s.nextLine();
-                profile(id);
-            }
-            else {
-                System.out.println("\nInvalid choice. Please try again.\n");
+            while (true) {
+                if (choice.equals("y") || choice.equals("Y")) {
+                    updateProfile(id);
+                } else if (choice.equals("n") || choice.equals("N")) {
+                    System.out.println("\nReturning to Profile Menu...");
+                    AppConstants.s.nextLine();
+                    return;
+                } else {
+                    System.out.println("\nInvalid choice. Please try again.\n");
+                }
             }
         }
         catch (Exception e) {

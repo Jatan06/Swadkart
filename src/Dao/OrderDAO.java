@@ -165,7 +165,12 @@ public class OrderDAO {
             }
             else {
                 AppConstants.connection.rollback(sp);
-                System.out.println("Order cancelled.");
+                if(Objects.equals(PaymentService.choice, "1")) {
+                    System.out.println("Order cancelled.");
+                }
+                else {
+                    System.out.println("Order Cancelled. Payment will be refunded.");
+                }
             }
         } catch (Exception ex) {
             try {
@@ -203,7 +208,7 @@ public class OrderDAO {
     // Ask again after payment; if user declines, rollback to savepoint and mark payment refunded
     private static boolean confirmAfterPayment(Savepoint sp) {
         if(!Objects.equals(PaymentService.choice, "1")) {
-            System.out.print("\nPayment successful.\nConfirm order to finalize (y/n): ");
+            System.out.print("Payment successful.\n\nConfirm order to finalize (y/n): ");
         }
         else {
             System.out.print("\nConfirm order to finalize (y/n): ");
