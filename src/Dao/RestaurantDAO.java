@@ -310,7 +310,7 @@ public class RestaurantDAO {
     }
 
     public static void restaurantStats() {
-
+        // Pending
     }
 
     private static void updateRestaurantMenu() {
