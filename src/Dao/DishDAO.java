@@ -4,6 +4,8 @@ package Dao;
 import java.sql.*;
 import java.util.*;
 import Constants.*;
+import Models.Dish;
+import Utils.Validators;
 
 public class DishDAO {
 
@@ -157,6 +159,34 @@ public class DishDAO {
         }
     }
 
+    private static String getNextDishId() {
+        // The default ID if the table is empty
+        String nextId = "VD001";
+        String sql = "SELECT MAX(dish_id) AS max_id FROM dishes";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                // Read the max_id as a String, not a long
+                String maxId = rs.getString("max_id");
+                // Check if maxId is not null (which happens if the table is not empty)
+                if (maxId != null && maxId.startsWith("VD")) {
+                    int numericPart = Integer.parseInt(maxId.substring(2));
+                    // Increment the numeric part
+                    numericPart++;
+                    // Format the new ID back to the "VD" followed by a 3-digit zero-padded number
+                    // For example, 501 becomes "VD501"
+                    nextId = String.format("VD%03d", numericPart);
+                }
+            }
+        } catch (SQLException | NumberFormatException e) {
+            // Catch both database errors and number parsing errors
+            System.out.println("Error generating next dish_id: " + e.getMessage());
+            // Return the default ID in case of any error
+            return null;
+        }
+        return nextId;
+    }
+
     public static void browseDishesByRestaurant(String res_name) throws Exception {
         String sql =
                 "SELECT " +
@@ -209,8 +239,6 @@ public class DishDAO {
         return null;
     }
 
-
-
     public static String getRestaurantNameByDishId(String d_Id) {
         PreparedStatement stmt = null;
         String resName = null;
@@ -242,6 +270,74 @@ public class DishDAO {
             System.out.printf("Exception %s arise in DishDAO/getRestaurantNameById.");
         }
         return resName;
+    }
+
+    public static void addDishes(String resName) {
+        String dish_id = getNextDishId();
+        AppConstants.s.nextLine();
+        System.out.print("\nEnter dish name: ");
+        String name = AppConstants.s.nextLine().trim();
+        while (!Validators.validateDishName(name)) {
+            System.out.print("Invalid dish name. Please try again: ");
+            name = AppConstants.s.nextLine().trim();
+        }
+        System.out.print("Enter cuisine: ");
+        String cuisine = AppConstants.s.nextLine().trim();
+        while (!Validators.validateString(cuisine)) {
+            System.out.print("Invalid cuisine. Please try again: ");
+            cuisine = AppConstants.s.nextLine().trim();
+        }
+        System.out.print("Enter rating :- ");
+        double rating = 0;
+        while (true) {
+            try {
+                rating = AppConstants.s.nextDouble();
+                if (rating < 0) {
+                    System.out.print("Invalid price. Please try again: ");
+                } else {
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Enter numbers only.");
+            }
+        }
+        System.out.print("Enter price :- ");
+        double price = 0;
+        while (true) {
+            try {
+                price = AppConstants.s.nextDouble();
+                if (price < 0) {
+                    System.out.print("Invalid price. Please try again: ");
+                } else {
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Enter numbers only.");
+            }
+        }
+        Models.Dish dish = new Dish(dish_id, name, cuisine, resName, rating, price);
+        addDish(dish);
+    }
+
+    private static void addDish(Models.Dish dish) {
+        String addDishSql = "INSERT INTO dishes VALUES (?,?,?,?,?,?)";
+        try(PreparedStatement ps = AppConstants.connection.prepareCall(addDishSql)) {
+            ps.setString(1,dish.getDish_id());
+            ps.setString(2,dish.getName());
+            ps.setString(3,dish.getCuisine());
+            ps.setString(4,dish.getRestaurant());
+            ps.setDouble(5,dish.getRating());
+            ps.setDouble(6,dish.getPrice());
+            if(ps.executeUpdate()>0) {
+                System.out.println("Dish "+dish.getName()+" added successfully.");
+            }
+            else {
+                System.out.println("Error adding dish: " + ps.getUpdateCount() + " row(s) affected.");
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error adding dish: " + e.getMessage());
+        }
     }
 
     // ---------- Helpers for tabular display (mirrors OrderDAO style) ----------

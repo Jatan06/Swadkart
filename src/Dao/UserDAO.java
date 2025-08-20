@@ -32,7 +32,6 @@ public class UserDAO {
 
     public static void profile(String id) {
         boolean prof = true;
-        AppConstants.s.nextLine();
         while (prof) {
             System.out.println("\n\n===================================");
             System.out.println("|         Profile Menu            |");
@@ -42,18 +41,23 @@ public class UserDAO {
             System.out.println("|  3. Back To Menu                |");
             System.out.println("===================================");
             System.out.print("\nPlease select an option: ");
-            switch (AppConstants.s.nextInt()) {
-                case 1:
-                    viewProfile(id);
-                    break;
-                case 2:
-                    updateProfile(id);
-                    break;
-                case 3:
-                    prof = false;
-                    break;
-                default:
-                    System.out.println(AppConstants.ERR_INVALID_INPUT);
+            try {
+                switch (AppConstants.s.nextInt()) {
+                    case 1:
+                        viewProfile(id);
+                        break;
+                    case 2:
+                        updateProfile(id);
+                        break;
+                    case 3:
+                        prof = false;
+                        break;
+                    default:
+                        System.out.println(AppConstants.ERR_INVALID_INPUT);
+                }
+            } catch (Exception e) {
+                System.out.println(AppConstants.ERR_INVALID_INPUT);
+                AppConstants.s.nextLine();
             }
         }
     }

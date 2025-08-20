@@ -23,13 +23,15 @@ public class AdminMenu {
                 System.out.println("|  2. View Restaurants          |");
                 System.out.println("|  3. View Orders               |");
                 System.out.println("|  4. View Transaction          |");
-                System.out.println("|  5. View Reviews              |");
-                System.out.println("|  6. View Logins               |");
-                System.out.println("|  7. Logout                    |");
+                System.out.println("|  5. View Revenues             |");
+                System.out.println("|  6. View Reviews              |");
+                System.out.println("|  7. View Logins               |");
+                System.out.println("|  8. Logout                    |");
                 System.out.println("=================================");
                 System.out.print("\nPlease enter your choice: ");
                 try {
-                    switch (AppConstants.s.nextInt()) {
+                    int choice = AppConstants.s.nextInt();
+                    switch (choice) {
                         case 1:
                             boolean b = true;
                             while (b) {
@@ -54,6 +56,7 @@ public class AdminMenu {
                                     }
                                 } catch (Exception e) {
                                     System.out.println("Enter numbers only.");
+                                    AppConstants.s.nextLine();
                                 }
                             }
                             break;
@@ -67,12 +70,14 @@ public class AdminMenu {
                             PaymentDAO.viewTransactions();
                             break;
                         case 5:
+                            PaymentDAO.revenueCall();
+                        case 6:
                             ReviewService.showReviewMenu();
                             break;
-                        case 6:
+                        case 7:
                             LoginService.displayLogins();
                             break;
-                        case 7:
+                        case 8:
                             System.out.println();
                             AppConstants.adminRun = false;
                             break;
@@ -82,6 +87,7 @@ public class AdminMenu {
                     }
                 } catch (Exception e) {
                     System.out.println("Enter number only.");
+                    AppConstants.s.nextLine();
                 }
             }
         }

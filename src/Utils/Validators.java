@@ -20,8 +20,10 @@ public class Validators {
 
     // Validate mobile number (10 digits, Indian format)
     public static boolean validateMobileNumber(String mobile) {
-        if (mobile == null) return false;
-        return mobile.matches("^\\+91[6-9]\\d{9}$");
+        if (mobile == null) {
+            return false;
+        }
+        return mobile.matches("^[6-9]\\d{9}$");
     }
 
     // Validate email format
@@ -96,7 +98,7 @@ public class Validators {
 
     // Validate restaurant name (letters, numbers, spaces, hyphens)
     public static boolean validateRestaurantId(String id) {
-        if (id == null || id.trim().isEmpty() || !id.startsWith("r-")) {
+        if (id == null || id.trim().isEmpty() || !(id.startsWith("r-") || id.startsWith("R-"))) {
             return false;
         }
         String trimmed = id.trim();
@@ -132,11 +134,8 @@ public class Validators {
     }
 
     // Validate rating (1-5)
-    public static boolean validateRating(String rating) {
-        if (!validateInteger(rating)) {
-            return false;
-        }
-        int value = Integer.parseInt(rating);
+    public static boolean validateRating(double rating) {
+        int value = (int) rating;
         return value >= 1 && value <= 5;
     }
 
@@ -176,7 +175,10 @@ public class Validators {
     }
 
     public static boolean validateColumnNameUser(String c_name) {
-
-        return true;
+        if (c_name == null || c_name.isEmpty()) {
+            return false;
+        } else {
+            return c_name.matches("^[a-zA-Z_][a-zA-Z0-9_]*$");
+        }
     }
 }

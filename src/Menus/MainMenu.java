@@ -37,7 +37,8 @@ public class MainMenu {
                         n = AppConstants.s.nextInt();
                         break;
                     } catch (Exception e) {
-                        System.out.println("Please choose a number only.");
+                        System.out.print("\nPlease choose a number only. :- ");
+                        AppConstants.s.nextLine();
                     }
                 }
                 switch (n) {

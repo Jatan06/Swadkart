@@ -1,11 +1,12 @@
 package Dao;
 import Admin.Admin;
 import Constants.*;
+import Utils.Validators;
+
 import java.sql.*;
 import java.util.*;
 
 public class RestaurantDAO {
-
     public static void getRestaurantIdAndName() {
         String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, name ASC";
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
@@ -15,7 +16,6 @@ public class RestaurantDAO {
             System.out.println("\nError fetching restaurant IDs and names: " + e.getMessage());
         }
     }
-
 
     public static void browseRestaurants() {
         RestaurantDAO dao = new RestaurantDAO();
@@ -283,17 +283,31 @@ public class RestaurantDAO {
     }
 
     public static void addRestaurant() throws Exception {
+        AppConstants.s.nextLine();
         String id = getRestaurantId();
         System.out.print("\nEnter Restaurant Name: ");
         String name = AppConstants.s.nextLine().trim();
         System.out.print("\nEnter Cuisine Type: ");
         String cuisine = AppConstants.s.nextLine().trim();
+
         System.out.print("\nEnter Phone Number: ");
         String phone = AppConstants.s.nextLine().trim();
+        while (!Validators.validateMobileNumber(phone)) {
+            System.out.print("\nInvalid Phone Number. Please enter a valid phone number. :- ");
+            phone = AppConstants.s.nextLine().trim();
+        }
         System.out.print("\nEnter Address: ");
         String address = AppConstants.s.nextLine().trim();
+        while (!Validators.validateAddress(address)) {
+            System.out.print("\nInvalid Address. Please enter a valid address. :- ");
+            address = AppConstants.s.nextLine().trim();
+        }
         System.out.print("\nEnter Rating: ");
         double rating = AppConstants.s.nextDouble();
+        while (!Validators.validateRating(rating)) {
+            System.out.println("\nInvalid Rating. Please enter a valid rating. (1.0-5.0):- ");
+            rating = AppConstants.s.nextDouble();
+        }
         CallableStatement br = AppConstants.connection.prepareCall("{call addRestaurant (?,?,?,?,?,?)}");
         br.setString(1, id);
         br.setString(2, name);
@@ -301,11 +315,66 @@ public class RestaurantDAO {
         br.setString(4, phone);
         br.setString(5, address);
         br.setDouble(6, rating);
-        if (br.executeUpdate() > 0) {
-            System.out.println("\nRestaurant added successfully.");
+        System.out.print("\nEnter number of dishes that you want to add for restaurant if not then enter '0' :- ");
+        int dish_input = 0;
+        while (true) {
+            try {
+                dish_input = AppConstants.s.nextInt();
+                if(dish_input<=-1) {
+                    System.out.println("Invalid input. Please enter a valid positive number :- ");
+                } else if (dish_input>=0) {
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Enter numbers only.");
+                AppConstants.s.nextLine();
+            }
+        }
+        if(dish_input==0) {
+            if (br.executeUpdate() > 0) {
+                System.out.println("\nRestaurant added successfully.");
+            }
+            else {
+                System.out.println("\nError adding restaurant.");
+            }
+            return;
         }
         else {
-            System.out.println("\nError adding restaurant.");
+            if (br.executeUpdate() > 0) {
+                System.out.println("\nRestaurant added successfully.");
+            }
+            else {
+                System.out.println("\nError adding restaurant.");
+                return;
+            }
+            for (int i = 0; i < dish_input; i++) {
+                DishDAO.addDishes(name);
+            }
+            System.out.println("Would you like to add more dishes :- ");
+            while (true) {
+                if (AppConstants.s.next().equalsIgnoreCase("y")) {
+                    System.out.println("Enter number of dishes that you want to add for restaurant :- ");
+                    while (true) {
+                        try {
+                            dish_input = AppConstants.s.nextInt();
+                            if(dish_input<=-1) {
+                                System.out.println("Invalid input. Please enter a valid positive number :- ");
+                            } else if (dish_input>=0) {
+                                break;
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Enter numbers only.");
+                            AppConstants.s.nextLine();
+                        }
+                    }
+                    for (int i = 0; i < dish_input; i++) {
+                        DishDAO.addDishes(name);
+                    }
+                }
+                else {
+                    return;
+                }
+            }
         }
     }
 
@@ -352,10 +421,25 @@ public class RestaurantDAO {
     }
 
     public static void deleteRestaurant() throws Exception {
-        AppConstants.connection.setAutoCommit(false);
         AppConstants.s.nextLine();
+        AppConstants.connection.setAutoCommit(false);
         System.out.print("\nEnter Restaurant ID: ");
         String id = AppConstants.s.nextLine().trim();
+        if(id.length()==1) {
+            id = "r-000"+id;
+        }
+        else if(id.length()==2) {
+            id = "r-00"+id;
+        } else if (id.length()==3) {
+            id = "r-0"+id;
+        }
+        else if (id.length()==4) {
+            id = "r-"+id;
+        }
+        while (!Validators.validateRestaurantId(id)) {
+            System.out.print("\nEnter valid id :- ");
+            id = AppConstants.s.nextLine().trim();
+        }
         if(!RestaurantDAO.checkRestaurantId(id)) {
             System.out.print("\nInvalid Restaurant Id. Try again. or enter 'b' to go back :- ");
             if(AppConstants.s.next().equalsIgnoreCase("b")) {
@@ -365,31 +449,27 @@ public class RestaurantDAO {
                 deleteRestaurant();
             }
         }
-        CallableStatement br = AppConstants.connection.prepareCall("delete from restaurants where id = ?");
-        br.setString(1, id);
-        if (br.executeUpdate() > 0) {
-            System.out.print("\nAre you sure you want to delete this restaurant? (y/n): ");
-            while (true) {
-                if (AppConstants.s.next().trim().equalsIgnoreCase("y")) {
-                    System.out.print("\nEnter Password");
-                    if (AppConstants.s.next().equals(Admin.getAdminPassword())) {
-                        AppConstants.connection.commit();
-                        System.out.println("\nRestaurant deleted successfully.");
-                        break;
-                    } else {
-                        AppConstants.connection.rollback();
-                        System.out.println("\nIncorrect password. Restaurant not deleted!");
-                    }
-                } else if (AppConstants.s.next().trim().equalsIgnoreCase("n")) {
-                    System.out.println("\nRestaurant not deleted.");
-                    break;
+        System.out.print("\nAre you sure you want to delete the restaurant with ID '" + id + "'? (y/n): ");
+        String confirmation = AppConstants.s.next().trim();
+        if (confirmation.equalsIgnoreCase("y")) {
+            System.out.print("\nEnter Password: ");
+            if (AppConstants.s.next().equals(Admin.getAdminPassword())) {
+                CallableStatement br = AppConstants.connection.prepareCall("delete from restaurants where id = ?");
+                br.setString(1, id);
+                if (br.executeUpdate() > 0) {
+                    AppConstants.connection.commit();
+                    System.out.println("\nRestaurant deleted successfully.");
                 } else {
-                    System.out.println("Enter y/n only.");
+                    AppConstants.connection.rollback();
+                    System.out.println("\nError: Restaurant with that ID was not found during deletion.");
                 }
+            } else {
+                System.out.println("\nIncorrect password. Deletion cancelled.");
+                AppConstants.connection.rollback();
             }
-        }
-        else {
-            System.out.println("Error deleting restaurant.");
+        } else {
+            System.out.println("\nDeletion cancelled by user.");
+            AppConstants.connection.rollback();
         }
     }
 
@@ -406,6 +486,21 @@ public class RestaurantDAO {
             System.out.printf("Exception :- "+e);
         }
         return id;
+    }
+
+    static public String getRestaurantNameById(String id) {
+        String name = null;
+        try {
+            PreparedStatement ps = AppConstants.connection.prepareCall("select name from restaurants where id = ?;");
+            ps.setString(1,id);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                name = rs.getString("name");
+            }
+        } catch (SQLException e) {
+            System.out.printf("Exception :- "+e);
+        }
+        return name;
     }
 
     public static boolean checkRestaurantId(String id) {

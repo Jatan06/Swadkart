@@ -2,6 +2,8 @@ package Dao;
 
 import Constants.AppConstants;
 import Models.Payment;
+import Utils.Validators;
+
 import java.sql.*;
 
 public class PaymentDAO {
@@ -66,6 +68,51 @@ public class PaymentDAO {
 
             System.out.println(sep);
         }
+    }
+
+    public static void revenueCall() {
+        System.out.print("\nEnter restaurant id :- ");
+        String resId = AppConstants.s.next().trim();
+        if(resId.length()==1) {
+            resId = "r-000"+resId;
+        }
+        else if(resId.length()==2) {
+            resId = "r-00"+resId;
+        }
+        else if(resId.length()==3) {
+            resId = "r-0"+resId;
+        } else if (resId.length()==4) {
+            resId = "r-"+resId;
+        } else if (Validators.validateRestaurantId(resId)) {
+            double tot_revenue = revenueByRestaurantId(resId);
+            System.out.println("Total revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
+            return;
+        } else {
+            System.out.println("Invalid restaurant id try again 't'. or enter 'b' to go back. :- ");
+            if(AppConstants.s.next().trim().equalsIgnoreCase("b")) {
+                return;
+            } else if (AppConstants.s.next().trim().equalsIgnoreCase("t")) {
+                revenueCall();
+            }
+        }
+        double tot_revenue = revenueByRestaurantId(resId);
+        System.out.println("Total revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
+    }
+
+    private static double revenueByRestaurantId(String resId) {
+        double totalRevenue = 0.0;
+        String sql = "{ ? = CALL showRevenueByRestaurantId(?) }";
+        try (CallableStatement cs = AppConstants.connection.prepareCall(sql)) {
+            // First ? is return value
+            cs.registerOutParameter(1, java.sql.Types.DECIMAL);
+            // Second ? is input parameter
+            cs.setString(2, resId);
+            cs.execute();
+            totalRevenue = cs.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return totalRevenue;
     }
 
     private static String repeat(char c, int count) {
