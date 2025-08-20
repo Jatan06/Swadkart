@@ -22,21 +22,14 @@ public class MainMenu {
         while (AppConstants.show) {
             try {
                 Thread.sleep(1000);
-                System.out.println("===================================");
-                System.out.println("|           Main Menu             |");
-                System.out.println("===================================");
-                System.out.println("|  1. New To Swadkart             |");
-                System.out.println("|  2. Login                       |");
-                System.out.println("|  3. Exit                        |");
-                System.out.println("===================================");
-                System.out.print("\nPlease select an option: ");
+                showMenu();
                 int n;
                 while (true) {
                     try {
                         n = AppConstants.s.nextInt();
                         break;
                     } catch (Exception e) {
-                        System.out.print("\nPlease choose a number only. :- ");
+                        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease choose a number only: ");
                         AppConstants.s.nextLine();
                     }
                 }
@@ -56,7 +49,7 @@ public class MainMenu {
                     case 3:
                         SpeakTextService.speak("SwadKart signing off... pet full, mood chill!");
                         Thread.sleep(2000);
-                        System.out.println("\nSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
+                        System.out.print("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSwadKart signing off... pet full, mood chill! \uD83D\uDE0E\uD83C\uDF55");
                         AppConstants.show = false;
                         break;
                     default:
@@ -251,5 +244,18 @@ public class MainMenu {
                 System.out.println("Exception at MainMenu/show at line 195.");
             }
         }
+    }
+
+    private static void showMenu() {
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-------------------------------------------------------------------------------------");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t*************\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t+ Main Menu +\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t*************\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t1. New To Swadkart\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t2. Login\t\t\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|\t\t\t\t\t\t\t\t3. Exit\t\t\t\t\t\t\t\t\t\t\t\t|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-------------------------------------------------------------------------------------");
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 }
