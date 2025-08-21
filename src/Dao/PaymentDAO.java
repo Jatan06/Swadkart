@@ -88,15 +88,16 @@ public class PaymentDAO {
             System.out.println("Total revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
             return;
         } else {
-            System.out.println("Invalid restaurant id try again 't'. or enter 'b' to go back. :- ");
+            System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid restaurant id."+AppConstants.ANSI_RESET+" or enter 'b' to go back. :- ");
             if(AppConstants.s.next().trim().equalsIgnoreCase("b")) {
                 return;
-            } else if (AppConstants.s.next().trim().equalsIgnoreCase("t")) {
-                revenueCall();
             }
         }
-        double tot_revenue = revenueByRestaurantId(resId);
-        System.out.println("Total revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
+        if(Validators.validateRestaurantId(resId)) {
+            double tot_revenue = revenueByRestaurantId(resId);
+            System.out.println("Total revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
+        }
+        else return;
     }
 
     private static double revenueByRestaurantId(String resId) {

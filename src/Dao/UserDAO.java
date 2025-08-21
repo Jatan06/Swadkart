@@ -186,7 +186,7 @@ public class UserDAO {
             }
             else {
                 System.out.print(AppConstants.TEXT_ANSI_RED+"\nPlease enter a valid column name.\n"+AppConstants.ANSI_RESET);
-                updateProfile(id);
+                return;
             }
             Thread.sleep(2000);
             System.out.print("\nDo You want to update another information (y/n) : ");

@@ -212,9 +212,10 @@ public class RestaurantDAO {
             ps.setString(2, id);
             if (ps.executeUpdate() > 0) {
                 System.out.println(AppConstants.TEXT_ANSI_GREEN + "Restaurant name updated successfully!" + AppConstants.ANSI_RESET);
+                ps.close();
             }
         } catch (SQLException e) {
-            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() + AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() + " Please try again ! " + AppConstants.ANSI_RESET);
         }
     }
 
@@ -228,14 +229,11 @@ public class RestaurantDAO {
             ps.setString(2, id);
 
             if (ps.executeUpdate() > 0) {
-                System.out.println(AppConstants.TEXT_ANSI_GREEN +
-                        "Cuisine updated successfully!" +
-                        AppConstants.ANSI_RESET);
+                System.out.println(AppConstants.TEXT_ANSI_GREEN + "Cuisine updated successfully!" + AppConstants.ANSI_RESET);
+                ps.close();
             }
         } catch (SQLException e) {
-            System.out.println(AppConstants.TEXT_ANSI_RED +
-                    "Exception occurred: " + e.getMessage() +
-                    AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() + " Please try again ! " + AppConstants.ANSI_RESET);
         }
     }
 
@@ -256,14 +254,11 @@ public class RestaurantDAO {
             ps.setString(2, id);
 
             if (ps.executeUpdate() > 0) {
-                System.out.println(AppConstants.TEXT_ANSI_GREEN +
-                        "Phone number updated successfully!" +
-                        AppConstants.ANSI_RESET);
+                System.out.println(AppConstants.TEXT_ANSI_GREEN + "Phone number updated successfully!" + AppConstants.ANSI_RESET);
+                ps.close();
             }
         } catch (SQLException e) {
-            System.out.println(AppConstants.TEXT_ANSI_RED +
-                    "Exception occurred: " + e.getMessage() +
-                    AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() +" Please try again !"+ AppConstants.ANSI_RESET);
         }
     }
 
@@ -277,14 +272,11 @@ public class RestaurantDAO {
             ps.setString(2, id);
 
             if (ps.executeUpdate() > 0) {
-                System.out.println(AppConstants.TEXT_ANSI_GREEN +
-                        "Address updated successfully!" +
-                        AppConstants.ANSI_RESET);
+                System.out.println(AppConstants.TEXT_ANSI_GREEN + "Address updated successfully!" + AppConstants.ANSI_RESET);
+                ps.close();
             }
         } catch (SQLException e) {
-            System.out.println(AppConstants.TEXT_ANSI_RED +
-                    "Exception occurred: " + e.getMessage() +
-                    AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() +" Please try again !"+ AppConstants.ANSI_RESET);
         }
     }
 
@@ -298,14 +290,11 @@ public class RestaurantDAO {
             ps.setString(2, id);
 
             if (ps.executeUpdate() > 0) {
-                System.out.println(AppConstants.TEXT_ANSI_GREEN +
-                        "Rating updated successfully!" +
-                        AppConstants.ANSI_RESET);
+                System.out.println(AppConstants.TEXT_ANSI_GREEN + "Rating updated successfully!" + AppConstants.ANSI_RESET);
+                ps.close();
             }
         } catch (SQLException e) {
-            System.out.println(AppConstants.TEXT_ANSI_RED +
-                    "Exception occurred: " + e.getMessage() +
-                    AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED + "Exception occurred: " + e.getMessage() + " Please try again !" + AppConstants.ANSI_RESET);
         }
     }
 
@@ -353,26 +342,26 @@ public class RestaurantDAO {
                     case "5" -> {
                         return;
                     }
-                    default -> System.out.println("Invalid choice. Please try again.");
+                    default -> System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
                 }
             } catch (Exception e) {
-                System.out.println("Please enter numbers only.");
+                System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.TEXT_ANSI_RED+AppConstants.ERR_INVALID_INPUT+AppConstants.ANSI_RESET);
             }
         }
     }
 
     private static void displayRestMenu() {
-        System.out.println("\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Browse Restaurants +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. By Rating (High → Low)\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. By ID (Ascending)\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. By Name (A → Z)\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. By Cuisine (A → Z)\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. Back\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"--------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t**********************\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t+ Browse Restaurants +\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t**********************\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t1. By Rating (High → Low)\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t2. By ID (Ascending)\t\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t3. By Name (A → Z)\t\t\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t4. By Cuisine (A → Z)\t\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t5. Back\t\t\t\t\t\t\t\t\t\t |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"--------------------------------------------------------------"+AppConstants.ANSI_RESET);
         System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 
@@ -421,6 +410,7 @@ public class RestaurantDAO {
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             printResultSetAsTable("RESTAURANTS (BY ID)", rs);
+            ps.close();
         } catch (SQLException e) {
             System.out.println("\nError fetching restaurants: " + e.getMessage());
         }
@@ -447,6 +437,7 @@ public class RestaurantDAO {
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             printResultSetAsTable("RESTAURANTS (BY NAME)", rs);
+            ps.close();
         } catch (SQLException e) {
             System.out.println("\nError fetching restaurants: " + e.getMessage());
         }
@@ -473,6 +464,7 @@ public class RestaurantDAO {
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             printResultSetAsTable("RESTAURANTS (BY CUISINE)", rs);
+            ps.close();
         } catch (SQLException e) {
             System.out.println("\nError fetching restaurants: " + e.getMessage());
         }

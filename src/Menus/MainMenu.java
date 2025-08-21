@@ -167,6 +167,7 @@ public class MainMenu {
                         return;
                     }
                 }
+                Thread.sleep(1000);
                 System.out.println(AppConstants.TEXT_ANSI_GREEN+AppConstants.SUCCESS_LOGIN+AppConstants.ANSI_RESET);
                 CustomerMenu.customerMenu(id);
                 password_verification = false;
