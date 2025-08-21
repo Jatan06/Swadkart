@@ -39,9 +39,9 @@ public class LL {
         }
 
         Node current = head;
-        System.out.println("Dish List:");
+        System.out.print("\n\t\t\t"+AppConstants.BG_ANSI_BLACK+"============== Cart =============="+AppConstants.ANSI_RESET+"\n");
         while (current != null) {
-            System.out.println("\nDish Id :- " +current.data.getDish_id()+"\nDish Name :- "+current.data.getName() + "\nQuantity :- " + current.quantity+"\nPer unit price :- "+current.data.getPrice()+"\nTotal Price :- "+current.quantity*current.data.getPrice()+"\n");
+            System.out.println("\nRestaurant :- "+current.data.getRestaurant()+"\nDish Id :- " +current.data.getDish_id()+"\nDish Name :- "+current.data.getName() + "\nQuantity :- " + current.quantity+"\nPer unit price :- "+current.data.getPrice()+"\nTotal Price :- "+current.quantity*current.data.getPrice()+"\n");
             current = current.next;
         }
     }
@@ -49,7 +49,7 @@ public class LL {
     // Display all dishes in a tabular format with all attributes
     public void displayTabular() {
         if (head == null) {
-            System.out.println("\nCart is empty, Nothing to display.");
+            System.out.println(AppConstants.TEXT_ANSI_RED+"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCart is empty, Nothing to display."+AppConstants.ANSI_RESET);
             return;
         }
 

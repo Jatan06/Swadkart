@@ -361,7 +361,7 @@ public class CustomerMenu {
             case 1 -> RestaurantDAO.browseRestaurants();
             case 2 -> DishDAO.browseDishes();
             case 3 -> UserService.addToCart();
-            case 4 -> UserService.Cart.display();
+            case 4 -> UserService.Cart.displayTabular();
             case 5 -> OrderDAO.placeOrder(id);
             case 6 -> OrderDAO.viewOrderAndOrderItems(id);
             case 7 -> UserDAO.profile(id);

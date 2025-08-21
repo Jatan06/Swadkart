@@ -448,7 +448,7 @@ public class RestaurantDAO {
     }
 
     public static void getRestaurantIdAndName() {
-        String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, name ASC";
+        String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, id ASC";
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             printResultSetAsTable("RESTAURANT IDs AND NAMES", rs);
