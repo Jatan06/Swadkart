@@ -15,7 +15,7 @@ public class MainMenu {
             }
             return;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("Connection Failed. Please check it and try again!");
         }
     }
 
