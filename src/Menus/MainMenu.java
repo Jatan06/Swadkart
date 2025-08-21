@@ -4,11 +4,9 @@ import Constants.AppConstants;
 import Db.DBConnection;
 import Services.SpeakTextService;
 import Utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MainMenu {
-    private static final Logger log = LoggerFactory.getLogger(MainMenu.class);
+
 
     public static void run() {
         try {
