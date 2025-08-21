@@ -27,8 +27,8 @@ public class LL {
                 current = current.next;
             current.next = newNode;
         }
-        System.out.println("Dish inserted: " + dish.getName());
-        System.out.println("Quantity : " + quantity);
+        System.out.println("\nDish added to cart : " + dish.getName());
+        System.out.println("\nQuantity : " + quantity);
     }
 
     // Display all dishes
