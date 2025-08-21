@@ -10,7 +10,7 @@ public class OrderDAO {
     public static double total;
     public static void placeOrder(String uid) throws Exception {
         if (UserService.Cart == null || UserService.Cart.head == null) {
-            System.out.println(AppConstants.TEXT_ANSI_RED+"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCart is empty. Nothing to place."+AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED+"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCart is empty, nothing to place order."+AppConstants.ANSI_RESET);
             return;
         }
 

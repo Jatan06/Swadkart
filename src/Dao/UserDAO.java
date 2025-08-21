@@ -1,6 +1,7 @@
 package Dao;
 import java.sql.*;
 import Constants.*;
+import Services.OTPService;
 import Services.SpeakTextService;
 import Utils.Validators;
 
@@ -13,7 +14,20 @@ public class UserDAO {
         pst.setString(5,address);pst.setString(6,password);
         if(pst.executeUpdate()>0)
         {
-            System.out.println("\nYour user id is \""+id+"\"");
+            String pass = "";
+            for(int i=0;i<password.length();i++) {
+                if(i%2==0) {
+                    pass = pass.concat(String.valueOf(password.charAt(i)));
+                }
+                else {
+                    pass = pass.concat("*");
+                }
+            }
+            if(!OTPService.sendIdAndPass(ph_no,id,password,user_Name)) {
+                System.out.println("Sorry, please try again.");
+                return;
+            }
+            System.out.println("\nYour user id and password are  \""+id+"\" and \""+pass+"\"");
             SpeakTextService.speak(user_Name+" your registration is successful");
             Thread.sleep(3000);
         }

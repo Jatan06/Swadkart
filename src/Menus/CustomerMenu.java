@@ -24,14 +24,17 @@ public class CustomerMenu {
                         String ph_no = AppConstants.s.next().trim();
                         // Validate mobile number using Validators class
                         while (!Validators.validateMobileNumber(ph_no)) {
-                            System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid mobile number (e.g., 9876543210): "+AppConstants.ANSI_RESET);
+                            System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid mobile number (e.g., 9876543210) or enter 'b' to go back: "+AppConstants.ANSI_RESET);
                             ph_no = AppConstants.s.next().trim();
+                            if(ph_no.equalsIgnoreCase("b")) return;
                         }
                         ph_no = "+91"+ph_no;
                         while(true) {
                             if(UserDAO.phoneNumberExists(ph_no)) {
-                                System.out.print(AppConstants.TEXT_ANSI_RED+"\nPhone number already exists. Please enter a different number : "+AppConstants.ANSI_RESET);
-                                ph_no = "+91" + AppConstants.s.next().trim();
+                                System.out.print(AppConstants.TEXT_ANSI_RED+"\nPhone number already exists. Please enter a different number or enter 'b' to go back: "+AppConstants.ANSI_RESET);
+                                ph_no = AppConstants.s.next().trim();
+                                if(ph_no.equalsIgnoreCase("b")) return;
+                                else ph_no = "+91"+ph_no;
                             }
                             else {
                                 break;
@@ -42,8 +45,9 @@ public class CustomerMenu {
                         // Send the same OTP
                         if(OTPService.sendOTP(ph_no, generatedOTP)) {
                             // Prompt user to enter OTP
-                            System.out.print("\nEnter the OTP sent to your phone: ");
+                            System.out.print("\nEnter the OTP sent to your phone or enter 'b' to go back: ");
                             String userOTP = AppConstants.s.next().trim();
+                            if(userOTP.equalsIgnoreCase("b")) return;
                             AppConstants.s.nextLine();
                             int otpAttempts = 3;
                             boolean otpValidated = false;
@@ -51,21 +55,25 @@ public class CustomerMenu {
                                 if (userOTP.equals(generatedOTP)) {
                                     otpValidated = true;
                                     System.out.println("\n✅ Phone number verified successfully!");
-                                    System.out.print("Enter password : ");
+                                    System.out.print("\nEnter password or enter 'b' to go back: ");
                                     password = AppConstants.s.nextLine().trim();
+                                    if(password.equalsIgnoreCase("b")) return;
                                     while (!Validators.validatePassword(password)) {
-                                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid password :-  "+AppConstants.ANSI_RESET);
+                                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid password or enter 'b' to go back :-  "+AppConstants.ANSI_RESET);
                                         password = AppConstants.s.nextLine().trim();
-                                        if (!Validators.validatePassword(password)) {
+                                        if(password.equalsIgnoreCase("b")) return;
+                                        else if (!Validators.validatePassword(password)) {
                                             System.out.println(AppConstants.TEXT_ANSI_RED+"\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol."+AppConstants.ANSI_RESET);
                                         }
                                     }
-                                    System.out.print("\nRe-Enter password :- ");
+                                    System.out.print("\nRe-Enter password or enter 'b' to go back :- ");
                                     String repass = AppConstants.s.next().trim();
+                                    if(repass.equalsIgnoreCase("b")) return;
                                     while (true) {
                                         if(!password.equals(repass)) {
-                                            System.out.print(AppConstants.TEXT_ANSI_RED+"Please enter valid password which you have set :- "+AppConstants.ANSI_RESET);
-                                            repass = AppConstants.s.next();
+                                            System.out.print(AppConstants.TEXT_ANSI_RED+"Please enter valid password which you have set or enter 'b' to go back :- "+AppConstants.ANSI_RESET);
+                                            repass = AppConstants.s.next().trim();
+                                            if(repass.equalsIgnoreCase("b")) return;
                                         }
                                         else {
                                             otpAttempts = 0;
@@ -74,8 +82,9 @@ public class CustomerMenu {
                                     }
                                 } else {
                                     if (--otpAttempts > 0) {
-                                        System.out.print("\n❌ "+AppConstants.TEXT_ANSI_RED+"Incorrect OTP. Please try again (" + otpAttempts + " attempts left): "+AppConstants.ANSI_RESET);
+                                        System.out.print("\n❌ "+AppConstants.TEXT_ANSI_RED+"Incorrect OTP. Please try again (" + otpAttempts + " attempts left) or enter 'b' to go back : "+AppConstants.ANSI_RESET);
                                         userOTP = AppConstants.s.nextLine().trim();
+                                        if(userOTP.equalsIgnoreCase("b")) return;
                                     } else {
                                         System.out.println("\n🚫"+AppConstants.TEXT_ANSI_RED+" Phone number verification failed. Registration terminated."+AppConstants.ANSI_RESET+"\n");
                                         return;
@@ -88,24 +97,30 @@ public class CustomerMenu {
                             return;
                         }
                         System.out.print("\n\t\t\t"+AppConstants.BG_ANSI_BLACK+"============== Registration =============="+AppConstants.ANSI_RESET+"\n");
-                        System.out.print("\nEnter Name : ");
+                        System.out.print("\nEnter Name or Enter 'b' to go back : ");
                         String user_Name = AppConstants.s.nextLine();
+                        if(user_Name.equalsIgnoreCase("b")) return;
                         while (!Validators.validateName(user_Name)) {
-                            System.out.print("Enter valid name : ");
+                            System.out.print("Enter valid name or Enter 'b' to go back : ");
                             user_Name = AppConstants.s.nextLine();
+                            if(user_Name.equalsIgnoreCase("b")) return;
                         }
-                        System.out.print("Enter email : ");
+                        System.out.print("Enter email or Enter 'b' to go back : ");
                         String email = AppConstants.s.nextLine();
+                        if(email.equalsIgnoreCase("b")) return;
                         while (!Validators.validateEmail(email)) {
-                            System.out.print("Enter valid email id : ");
+                            System.out.print("Enter valid email id or Enter 'b' to go back : ");
                             email = AppConstants.s.nextLine().trim();
+                            if(email.equalsIgnoreCase("b")) return;
                         }
                         AppConstants.s.nextLine();
-                        System.out.print("Enter address : ");
+                        System.out.print("Enter address or Enter 'b' to go back : ");
                         String address = AppConstants.s.nextLine();
+                        if(address.equalsIgnoreCase("b")) return;
                         while (!Validators.validateAddress(address)) {
-                            System.out.print("Enter valid address : ");
-                            address = AppConstants.s.nextLine();
+                            System.out.print("Enter valid address or Enter 'b' to go back : ");
+                            address = AppConstants.s.nextLine().trim();
+                            if(address.equalsIgnoreCase("b")) return;
                         }
                         String id;
                         if (users > 0 && users < 100) {
@@ -134,18 +149,28 @@ public class CustomerMenu {
     }
 
     public static boolean forgotPassword(String id) {
-        System.out.print("\nEnter Phone No. : ");
-        String ph_no = "+91" + AppConstants.s.nextLine().trim();
+        System.out.print("\nEnter Phone No. or Enter 'b' to go back : ");
+        String ph_no = AppConstants.s.nextLine().trim();
+        if (ph_no.equalsIgnoreCase("b")) return false;
+        else {
+            while (!Validators.validateMobileNumber(ph_no)) {
+                System.out.println("Invalid Phone Number. Please enter a valid phone number or enter 'b' to go back.");
+                ph_no = AppConstants.s.nextLine().trim();
+                if (ph_no.equalsIgnoreCase("b")) return false;
+            }
+            ph_no = "+91" + ph_no;
+        }
         while (true) {
             try {
                 if (UserDAO.changePass(id, ph_no)) {
                     String generatedOTP = PasswordChangeOTPService.generateOTP();
-                    if (PasswordChangeOTPService.sendOTP(ph_no, generatedOTP)) {
+                    if (OTPService.sendOTPForPassChange(ph_no, generatedOTP)) {
                         int otpAttempts = 3;
                         boolean otpValidated = false;
                         while (otpAttempts > 0) {
-                            System.out.print("\nEnter the OTP sent to your phone: ");
+                            System.out.print("\nEnter the OTP sent to your phone or enter 'b' to go back: ");
                             String userOTP = AppConstants.s.nextLine().trim();
+                            if(userOTP.equalsIgnoreCase("b")) return false;
                             if (userOTP.equals(generatedOTP)) {
                                 otpValidated = true;
                                 break;
@@ -164,22 +189,25 @@ public class CustomerMenu {
                         // New password setup with validation
                         String new_password;
                         while (true) {
-                            System.out.print("\nEnter new password : ");
+                            System.out.print("\nEnter new password or enter 'b' to go back : ");
                             new_password = AppConstants.s.nextLine();
-                            if (Validators.validatePassword(new_password)) {
+                            if(new_password.equalsIgnoreCase("b")) return false;
+                            else if (Validators.validatePassword(new_password)) {
                                 break;
                             }
                             System.out.println("\nPassword must be at least 8 characters long and contain at least one digit, one lowercase letter and one '@' symbol.");
                         }
                         while (true) {
-                            System.out.print("\nRe-Enter password :- ");
+                            System.out.print("\nRe-Enter password  or enter 'b' to go back:- ");
                             String repass = AppConstants.s.nextLine();
-                            if (new_password.equals(repass)) {
+                            if(repass.equalsIgnoreCase("b")) return false;
+                            else if (new_password.equals(repass)) {
                                 UserDAO.setNewPass(id, new_password);
                                 System.out.println("\n✅ Password has been updated successfully.");
                                 return true;
                             } else {
-                                System.out.println("Passwords do not match. Please try again.");
+                                System.out.println("Passwords do not match. Please try again. enter any key or enter 'b' to go back.");
+                                if(AppConstants.s.next().equalsIgnoreCase("b")) return false;
                             }
                         }
                     } else {
@@ -293,7 +321,7 @@ public class CustomerMenu {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Browse Restaurants\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Browse Dishes\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Add To Cart\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Cart\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. View Cart\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. Place Order\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t6. Order History\t\t\t\t\t  |"+AppConstants.ANSI_RESET);

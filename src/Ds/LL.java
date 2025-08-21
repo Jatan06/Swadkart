@@ -111,7 +111,7 @@ public class LL {
         // Special case: head is the one to delete
         if (head.data.getDish_id().equalsIgnoreCase(dishId)) {
             if(quantity> head.quantity) return false;
-            System.out.println("\nRemoved quantity " +quantity+" for dish : " + head.data.getName());
+            System.out.println("\nQuantity " +quantity+" for dish : " + head.data.getName());
             if (quantity< head.quantity) {
                 head.quantity = head.quantity - quantity;
                 return true;
@@ -149,6 +149,17 @@ public class LL {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean checkDish(String dishId) {
+        Node temp = head;
+        while (temp != null) {
+            if (temp.data.getDish_id().equalsIgnoreCase(dishId)) {
+                return true;
+            }
+            temp = temp.next;
+        }
         return false;
     }
 

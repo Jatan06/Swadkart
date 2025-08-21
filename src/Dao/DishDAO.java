@@ -36,8 +36,8 @@ public class DishDAO {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t*****************\t\t\t\t\t|"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t|"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t1. By Rating (High → Low)\t\t\t\t|"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t2. By Price (High → Low)\t\t\t\t|"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t3. By Price (Low → High)\t\t\t\t|"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t2. By Price (Low → High)\t\t\t\t|"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t3. By Price (High -> Low)\t\t\t\t|"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t4. By Name (A → Z)\t\t\t\t\t\t|"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t5. By Cuisine\t\t\t\t\t\t\t|"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t6. By Restaurant (A → Z)\t\t\t\t|"+AppConstants.ANSI_RESET);
@@ -349,76 +349,159 @@ public class DishDAO {
     // ---------- Helpers for tabular display (mirrors OrderDAO style) ----------
 
     private static void printResultSetAsTable(String title, ResultSet rs) throws SQLException {
+        // stop if rs is null
+        if (rs == null) {
+            System.out.println("\nNo data found for " + title);
+            return;
+        }
+
         ResultSetMetaData md = rs.getMetaData();
         int colCount = md.getColumnCount();
 
         List<String[]> rows = new ArrayList<>();
-        int[] widths = new int[colCount];
         String[] headers = new String[colCount];
         int[] types = new int[colCount];
 
+        // headers & types
         for (int i = 1; i <= colCount; i++) {
             headers[i - 1] = md.getColumnLabel(i);
             types[i - 1] = md.getColumnType(i);
-            widths[i - 1] = Math.max(3, headers[i - 1].length());
         }
 
+        // collect rows
         while (rs.next()) {
             String[] row = new String[colCount];
             for (int i = 1; i <= colCount; i++) {
-                String colName = headers[i - 1];
-                int sqlType = types[i - 1];
-
                 Object val = rs.getObject(i);
-                String txt = formatValue(colName, sqlType, val);
-                row[i - 1] = txt;
-                widths[i - 1] = Math.max(widths[i - 1], txt.length());
+                row[i - 1] = formatValue(headers[i - 1], types[i - 1], val);
             }
             rows.add(row);
         }
 
-        String[] colFmts = new String[colCount];
-        for (int i = 0; i < colCount; i++) {
-            boolean rightAlign = isNumeric(types[i]) || looksLikeMoney(headers[i]);
-            colFmts[i] = rightAlign ? "%" + widths[i] + "s" : "%-" + widths[i] + "s";
-        }
-
-        String sep = buildSeparator(widths);
-
-        StringBuilder headerFmt = new StringBuilder("| ");
-        for (int i = 0; i < colCount; i++) {
-            headerFmt.append(String.format("%%-%ds", widths[i])).append(" | ");
-        }
-        headerFmt.append("%n");
-
-        StringBuilder rowFmt = new StringBuilder("| ");
-        for (int i = 0; i < colCount; i++) {
-            rowFmt.append(colFmts[i]).append(" | ");
-        }
-        rowFmt.append("%n");
-
-        System.out.println();
-        System.out.println(centerTitleInSeparator(title, sep));
-        System.out.println(sep);
-        System.out.printf(headerFmt.toString(), (Object[]) headers);
-        System.out.println(sep);
-
         if (rows.isEmpty()) {
-            System.out.printf("| %s |%n", padRight("No records found.", sep.length() - 4));
-            System.out.println(sep);
+            System.out.println("\nNo data found for " + title);
             return;
         }
 
-        for (String[] row : rows) {
-            System.out.printf(rowFmt.toString(), (Object[]) row);
+        final String GAP = "     ";
+        final int rowsPerCol = 100; // <= chunk size (100–100–100 across)
+        int numCols = (int) Math.ceil(rows.size() / (double) rowsPerCol);
+
+        // split into column-chunks
+        List<List<String[]>> columns = new ArrayList<>(numCols);
+        for (int c = 0; c < numCols; c++) {
+            int start = c * rowsPerCol;
+            int end = Math.min(start + rowsPerCol, rows.size());
+            columns.add(rows.subList(start, end));
         }
-        System.out.println(sep);
+
+        // widths & separators per chunk
+        List<int[]> colWidths = new ArrayList<>(numCols);
+        List<String> seps = new ArrayList<>(numCols);
+        for (List<String[]> colRows : columns) {
+            int[] w = computeWidths(headers, colRows);
+            colWidths.add(w);
+            seps.add(buildSeparator(w));
+        }
+
+        // title & top border
+        String fullSep = String.join(GAP, seps);
+        System.out.println();
+        System.out.println(centerTitleInSeparator(title, fullSep));
+        System.out.println(fullSep);
+
+        // headers row (for all chunks)
+        for (int c = 0; c < numCols; c++) {
+            System.out.print(buildRow(headers, colWidths.get(c)));
+            if (c < numCols - 1) System.out.print(GAP);
+        }
+        System.out.println();
+        System.out.println(fullSep);
+
+        // ---- KEY CHANGE: print rows without wasting lines on trailing empty columns ----
+        // max height among chunks
+        int maxRows = columns.stream().mapToInt(List::size).max().orElse(0);
+
+        for (int r = 0; r < maxRows; r++) {
+            // find the rightmost column that still has data at row r
+            int lastColToPrint = -1;
+            for (int c = numCols - 1; c >= 0; c--) {
+                if (r < columns.get(c).size()) { lastColToPrint = c; break; }
+            }
+            // if no columns have data at this row, stop completely
+            if (lastColToPrint == -1) break;
+
+            // print only up to that rightmost non-empty column
+            for (int c = 0; c <= lastColToPrint; c++) {
+                List<String[]> colRows = columns.get(c);
+                if (r < colRows.size()) {
+                    System.out.print(buildRow(colRows.get(r), colWidths.get(c)));
+                } else {
+                    // interior columns (left of lastColToPrint) still need alignment
+                    System.out.print(buildEmptyRow(colWidths.get(c)));
+                }
+                if (c < lastColToPrint) System.out.print(GAP);
+            }
+            System.out.println();
+        }
+
+        // bottom border
+        // (okay to show full width once; it’s just one line)
+        System.out.println(fullSep);
+    }
+
+    // Helper: pad string to given width
+    private static String pad(String text, int width) {
+        if (text == null) text = "";
+        return String.format("%-" + width + "s", text);
+    }
+
+    // Helper: center text in given width
+    private static String center(String text, int width) {
+        if (text.length() >= width) return text;
+        int left = (width - text.length()) / 2;
+        int right = width - text.length() - left;
+        return " ".repeat(left) + text + " ".repeat(right);
+    }
+
+    // compute widths per column
+    private static int[] computeWidths(String[] headers, List<String[]> rows) {
+        int[] widths = new int[headers.length];
+        for (int i = 0; i < headers.length; i++) {
+            widths[i] = Math.max(3, headers[i].length());
+        }
+        for (String[] row : rows) {
+            for (int i = 0; i < row.length; i++) {
+                if (row[i] != null) {
+                    widths[i] = Math.max(widths[i], row[i].length());
+                }
+            }
+        }
+        return widths;
+    }
+
+    // build a row (for headers or data)
+    private static String buildRow(String[] row, int[] widths) {
+        StringBuilder sb = new StringBuilder("| ");
+        for (int i = 0; i < row.length; i++) {
+            String fmt = "%-" + widths[i] + "s"; // left align always for simplicity
+            sb.append(String.format(fmt, row[i] == null ? "-" : row[i])).append(" | ");
+        }
+        return sb.toString();
+    }
+
+    // empty row (used when one column has fewer entries than another)
+    private static String buildEmptyRow(int[] widths) {
+        StringBuilder sb = new StringBuilder("| ");
+        for (int w : widths) {
+            sb.append(" ".repeat(w)).append(" | ");
+        }
+        return sb.toString();
     }
 
     private static String formatValue(String colName, int sqlType, Object val) {
         if (val == null) return "-";
 
-        // Money-like formatting (price)
         if (looksLikeMoney(colName) && val instanceof Number) {
             return String.format(java.util.Locale.US, "%,.2f", ((Number) val).doubleValue());
         }
@@ -435,7 +518,7 @@ public class DishDAO {
         }
 
         String s = val.toString();
-        return (s.isEmpty()) ? "-" : s;
+        return (s == null || s.isEmpty()) ? "-" : s;
     }
 
     private static boolean looksLikeMoney(String colName) {
@@ -454,8 +537,8 @@ public class DishDAO {
     }
 
     private static String buildSeparator(int[] widths) {
-        int total = 1; // starting '|'
-        for (int w : widths) total += 1 + w + 1 + 1; // " " + content + " " + "|"
+        int total = 1;
+        for (int w : widths) total += 1 + w + 1 + 1;
         return repeat('-', total);
     }
 

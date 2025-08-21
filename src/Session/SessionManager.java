@@ -10,6 +10,7 @@ import Models.*;
 import java.util.*;
 public class SessionManager {
     static File logs = new File("LogsInfo.txt");
+
     static {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
@@ -22,6 +23,7 @@ public class SessionManager {
             throw new RuntimeException(e);
         }
     }
+
     public static void NewRegistration(String id,Boolean isCreated) {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));
@@ -34,6 +36,7 @@ public class SessionManager {
             throw new RuntimeException(e);
         }
     }
+
     public static void Login(String id) {
         try {
             BufferedWriter Writer = new BufferedWriter(new FileWriter(logs,true));

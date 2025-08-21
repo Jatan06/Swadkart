@@ -375,6 +375,8 @@ public class RestaurantDAO {
                                 }
                             }
                     }
+                    case "4" -> rs = false;
+                    default -> System.out.println(AppConstants.TEXT_ANSI_RED + AppConstants.ERR_INVALID_INPUT + AppConstants.ANSI_RESET);
                 }
             } catch(Exception e){
                 System.out.println(AppConstants.TEXT_ANSI_RED + AppConstants.ERR_INVALID_INPUT + AppConstants.ANSI_RESET);
@@ -424,6 +426,7 @@ public class RestaurantDAO {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t1. Total Revenue\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t2. Total Orders\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t3. Total Customers\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t4. back\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
         System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
@@ -597,71 +600,118 @@ public class RestaurantDAO {
 
     }
 
+    // --- helpers just for table building ---
+
     private static void printResultSetAsTable(String title, ResultSet rs) throws SQLException {
         ResultSetMetaData md = rs.getMetaData();
         int colCount = md.getColumnCount();
 
         List<String[]> rows = new ArrayList<>();
-        int[] widths = new int[colCount];
         String[] headers = new String[colCount];
         int[] types = new int[colCount];
 
         for (int i = 1; i <= colCount; i++) {
             headers[i - 1] = md.getColumnLabel(i);
             types[i - 1] = md.getColumnType(i);
-            widths[i - 1] = Math.max(3, headers[i - 1].length());
         }
 
         while (rs.next()) {
             String[] row = new String[colCount];
             for (int i = 1; i <= colCount; i++) {
-                String colName = headers[i - 1];
-                int sqlType = types[i - 1];
-
                 Object val = rs.getObject(i);
-                String txt = formatValue(colName, sqlType, val);
-                row[i - 1] = txt;
-                widths[i - 1] = Math.max(widths[i - 1], txt.length());
+                row[i - 1] = formatValue(headers[i - 1], types[i - 1], val);
             }
             rows.add(row);
         }
 
-        String[] colFmts = new String[colCount];
-        for (int i = 0; i < colCount; i++) {
-            boolean rightAlign = isNumeric(types[i]) || looksLikeMoney(headers[i]);
-            colFmts[i] = rightAlign ? "%" + widths[i] + "s" : "%-" + widths[i] + "s";
+        int rowsPerCol = 25; // ✅ change here if you want different chunk size
+        int numCols = (int) Math.ceil(rows.size() / (double) rowsPerCol);
+
+        // split rows into chunks (each chunk = one column)
+        List<List<String[]>> columns = new ArrayList<>();
+        for (int c = 0; c < numCols; c++) {
+            int start = c * rowsPerCol;
+            int end = Math.min(start + rowsPerCol, rows.size());
+            columns.add(rows.subList(start, end));
         }
 
-        String sep = buildSeparator(widths);
-
-        StringBuilder headerFmt = new StringBuilder("| ");
-        for (int i = 0; i < colCount; i++) {
-            headerFmt.append(String.format("%%-%ds", widths[i])).append(" | ");
+        // compute widths for each column separately
+        List<int[]> colWidths = new ArrayList<>();
+        for (List<String[]> colRows : columns) {
+            colWidths.add(computeWidths(headers, colRows));
         }
-        headerFmt.append("%n");
 
-        StringBuilder rowFmt = new StringBuilder("| ");
-        for (int i = 0; i < colCount; i++) {
-            rowFmt.append(colFmts[i]).append(" | ");
+        // build separators
+        List<String> seps = new ArrayList<>();
+        for (int[] w : colWidths) {
+            seps.add(buildSeparator(w));
         }
-        rowFmt.append("%n");
 
+        // print title centered across all columns
+        String fullSep = String.join("     ", seps);
         System.out.println();
-        System.out.println(centerTitleInSeparator(title, sep));
-        System.out.println(sep);
-        System.out.printf(headerFmt.toString(), (Object[]) headers);
-        System.out.println(sep);
+        System.out.println(centerTitleInSeparator(title, fullSep));
+        System.out.println(fullSep);
 
-        if (rows.isEmpty()) {
-            System.out.printf("| %s |%n", padRight("No records found.", sep.length() - 4));
-            System.out.println(sep);
-            return;
+        // print headers for each column
+        for (int c = 0; c < numCols; c++) {
+            System.out.print(buildRow(headers, colWidths.get(c)));
+            if (c < numCols - 1) System.out.print("     ");
+        }
+        System.out.println();
+        System.out.println(fullSep);
+
+        // print rows side by side across columns
+        int maxRows = rowsPerCol; // always print 25 per column height
+        for (int r = 0; r < maxRows; r++) {
+            for (int c = 0; c < numCols; c++) {
+                List<String[]> colRows = columns.get(c);
+                if (r < colRows.size()) {
+                    System.out.print(buildRow(colRows.get(r), colWidths.get(c)));
+                } else {
+                    System.out.print(buildEmptyRow(colWidths.get(c)));
+                }
+                if (c < numCols - 1) System.out.print("     ");
+            }
+            System.out.println();
         }
 
+        System.out.println(fullSep);
+    }
+
+    // compute widths per column
+    private static int[] computeWidths(String[] headers, List<String[]> rows) {
+        int[] widths = new int[headers.length];
+        for (int i = 0; i < headers.length; i++) {
+            widths[i] = Math.max(3, headers[i].length());
+        }
         for (String[] row : rows) {
-            System.out.printf(rowFmt.toString(), (Object[]) row);
+            for (int i = 0; i < row.length; i++) {
+                if (row[i] != null) {
+                    widths[i] = Math.max(widths[i], row[i].length());
+                }
+            }
         }
-        System.out.println(sep);
+        return widths;
+    }
+
+    // build a row (for headers or data)
+    private static String buildRow(String[] row, int[] widths) {
+        StringBuilder sb = new StringBuilder("| ");
+        for (int i = 0; i < row.length; i++) {
+            String fmt = "%-" + widths[i] + "s"; // left align always for simplicity
+            sb.append(String.format(fmt, row[i] == null ? "-" : row[i])).append(" | ");
+        }
+        return sb.toString();
+    }
+
+    // empty row (used when one column has fewer entries than another)
+    private static String buildEmptyRow(int[] widths) {
+        StringBuilder sb = new StringBuilder("| ");
+        for (int w : widths) {
+            sb.append(" ".repeat(w)).append(" | ");
+        }
+        return sb.toString();
     }
 
     private static String formatValue(String colName, int sqlType, Object val) {
@@ -730,6 +780,7 @@ public class RestaurantDAO {
         for (int i = s.length(); i < w; i++) sb.append(' ');
         return sb.toString();
     }
+
 
     public static void addRestaurant() throws Exception {
         AppConstants.s.nextLine();
@@ -952,6 +1003,22 @@ public class RestaurantDAO {
         return name;
     }
 
+    static public String getRestaurantPhoneNoById(String id) {
+        String phoneNo = null;
+        try {
+            PreparedStatement ps = AppConstants.connection.prepareCall("select phone_no from restaurants where id = ?;");
+            ps.setString(1,id);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                phoneNo = rs.getString("phone_no");
+                return phoneNo;
+            }
+        } catch (SQLException e) {
+            return phoneNo;
+        }
+        return phoneNo;
+    }
+
     public static boolean checkRestaurantId(String id) {
         boolean resfound = false;
         String sql = "{ call checkRestId(?, ?) }"; // procedure with IN + OUT
@@ -973,6 +1040,7 @@ public class RestaurantDAO {
         }
         return resfound;
     }
+
 
     private static String nz(String s) {
         return (s == null || s.isBlank()) ? "-" : s;
