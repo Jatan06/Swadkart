@@ -299,7 +299,133 @@ public class RestaurantDAO {
     }
 
     public static void restaurantStats() {
-        // Pending
+        boolean rs = true;
+        while (rs) {
+            try {
+                restaurantStatsMenu();
+                switch (AppConstants.s.next().trim()) {
+                    case "1" -> PaymentDAO.revenueCall();
+                    case "2" -> {
+                        AppConstants.s.nextLine();
+                        System.out.print("\nEnter Restaurant ID :- ");
+                        String id = AppConstants.s.nextLine().trim();
+                        while (true) {
+                            if (id.length() == 1) {
+                                id = "r-000".concat(id);
+                            } else if (id.length() == 2) {
+                                id = "r-00".concat(id);
+                            } else if (id.length() == 3) {
+                                id = "r-0".concat(id);
+                            } else if (id.length() == 4) {
+                                id = "r-".concat(id);
+                            } else {
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid Restaurant ID. Please try again." + AppConstants.ANSI_RESET + " or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if (id.equalsIgnoreCase("b")) return;
+                                }
+                                int t_o = totalOrders(id);
+                                System.out.println("Total orders for Restaurant ID: " + id + " is: " + t_o);
+                                return;
+                            }
+                            while (!validateId(id)) {
+                                System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid Restaurant ID. Please try again." + AppConstants.ANSI_RESET + " or enter 'b' :- ");
+                                id = AppConstants.s.nextLine().trim();
+                                if (id.equalsIgnoreCase("b")) return;
+                            }
+                            if (validateId(id)) {
+                                int t_o = totalOrders(id);
+                                System.out.println("Total orders for Restaurant ID: " + id + " is: " + t_o);
+                                return;
+                            }
+                        }
+                    }
+                    case "3" -> {
+                            AppConstants.s.nextLine();
+                            System.out.print("\nEnter Restaurant ID :- ");
+                            String id = AppConstants.s.nextLine().trim();
+                            while (true) {
+                                if (id.length() == 1) {
+                                    id = "r-000".concat(id);
+                                } else if (id.length() == 2) {
+                                    id = "r-00".concat(id);
+                                } else if (id.length() == 3) {
+                                    id = "r-0".concat(id);
+                                } else if (id.length() == 4) {
+                                    id = "r-".concat(id);
+                                } else {
+                                    while (!validateId(id)) {
+                                        System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid Restaurant ID. Please try again." + AppConstants.ANSI_RESET + " or enter 'b' :- ");
+                                        id = AppConstants.s.nextLine().trim();
+                                        if (id.equalsIgnoreCase("b")) return;
+                                    }
+                                    int t_o = totalUsers(id);
+                                    System.out.println("Total orders for Restaurant ID: " + id + " is: " + t_o);
+                                    return;
+                                }
+                                while (!validateId(id)) {
+                                    System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid Restaurant ID. Please try again." + AppConstants.ANSI_RESET + " or enter 'b' :- ");
+                                    id = AppConstants.s.nextLine().trim();
+                                    if (id.equalsIgnoreCase("b")) return;
+                                }
+                                if (validateId(id)) {
+                                    int t_o = totalUsers(id);
+                                    System.out.println("Total orders for Restaurant ID: " + id + " is: " + t_o);
+                                    return;
+                                }
+                            }
+                    }
+                }
+            } catch(Exception e){
+                System.out.println(AppConstants.TEXT_ANSI_RED + AppConstants.ERR_INVALID_INPUT + AppConstants.ANSI_RESET);
+                AppConstants.s.nextLine();
+            }
+        }
+    }
+
+    private static int totalOrders(String resId) {
+        int totalOrders = 0;
+        String sql = "{ ? = CALL count_orders(?) }";
+        try (CallableStatement cs = AppConstants.connection.prepareCall(sql)) {
+            // First ? is return value
+            cs.registerOutParameter(1, Types.INTEGER);
+            // Second ? is input parameter
+            cs.setString(2, resId);
+            cs.execute();
+            totalOrders = cs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED+"Exception :- "+e.getMessage()+AppConstants.ANSI_RESET);
+        }
+        return totalOrders;
+    }
+
+    private static int totalUsers(String resId) {
+        int tot_users = 0;
+        String sql = "{ ? = CALL total_users(?) }";
+        try (CallableStatement cs = AppConstants.connection.prepareCall(sql)) {
+            // First ? is return value
+            cs.registerOutParameter(1, Types.INTEGER);
+            // Second ? is input parameter
+            cs.setString(2, resId);
+            cs.execute();
+            tot_users = cs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println(AppConstants.TEXT_ANSI_RED+"Exception :- "+e.getMessage()+AppConstants.ANSI_RESET);
+        }
+        return tot_users;
+    }
+
+    private static void restaurantStatsMenu() {
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t**********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Restaurants Stats +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t**********************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t1. Total Revenue\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t2. Total Orders\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t3. Total Customers\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-------------------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
     }
 
     private static void updateRestaurantMenu() {
