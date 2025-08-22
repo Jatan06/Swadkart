@@ -117,28 +117,32 @@ public class UserDAO {
     private static void updateProfile(String id) {
         CallableStatement up;
         try {
-            System.out.print("\nEnter (name,email,address) to edit : ");
-            String update = AppConstants.s.next();
+            System.out.print("\nEnter (name,email,address) to edit or 'b' to go back :- ");
+            String update = AppConstants.s.next().trim();
+            if(update.equalsIgnoreCase("b")) {return;}
             while(true) {
                 if(Validators.validateColumnNameUser(update)) {
                     break;
                 }
                 else {
-                    System.out.println(AppConstants.TEXT_ANSI_RED+"\nInvalid column name. Please enter a valid column name."+AppConstants.ANSI_RESET);
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"\nInvalid column name. Please enter a valid column name or 'b' to go back."+AppConstants.ANSI_RESET);
                     update = AppConstants.s.next();
+                    if(update.equalsIgnoreCase("b")) return;
                 }
             }
             AppConstants.s.nextLine();
-            if(update.equalsIgnoreCase("name")) {
-                System.out.print("\nEnter your new name : ");
+            if(update.equalsIgnoreCase("name") || update.charAt(0)=='N' || update.charAt(0)=='n' || update.equalsIgnoreCase("nam") || update.equalsIgnoreCase("Na")) {
+                System.out.print("\nEnter your new name or 'b' to go back : ");
                 String new_name = AppConstants.s.nextLine();
+                if(new_name.equalsIgnoreCase("b")) {return;}
                 while (true){
-                    if(Validators.validateName(new_name)) {
+                    if(Validators.validateName(new_name) && getColumnVerify("name",new_name,id)) {
                         break;
                     }
                     else {
-                        System.out.println(AppConstants.TEXT_ANSI_RED+"Enter valid name :- "+AppConstants.ANSI_RESET);
+                        System.out.println(AppConstants.TEXT_ANSI_RED+"Enter valid name or new name or 'b' to go back :- "+AppConstants.ANSI_RESET);
                         new_name = AppConstants.s.nextLine();
+                        if(new_name.equalsIgnoreCase("b")) return;
                     }
                 }
                 up = AppConstants.connection.prepareCall("UPDATE users SET name = ? WHERE id = ?;");
@@ -152,16 +156,18 @@ public class UserDAO {
                 }
                 up.close();
             }
-            else if (update.equalsIgnoreCase("email")) {
-                System.out.print("\nEnter your new email : ");
+            else if (update.equalsIgnoreCase("email") || update.charAt(0)=='e' || update.charAt(0)=='E' || update.equalsIgnoreCase("ema") || update.equalsIgnoreCase("Em") || update.equalsIgnoreCase("emai")) {
+                System.out.print("\nEnter your new email or 'b' to go back :- ");
                 String new_email = AppConstants.s.nextLine();
+                if(new_email.equalsIgnoreCase("b")) {return;}
                 while (true){
-                    if(Validators.validateEmail(new_email)) {
+                    if(Validators.validateEmail(new_email) && getColumnVerify("email",new_email,id)) {
                         break;
                     }
                     else {
-                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid email :- "+AppConstants.ANSI_RESET);
+                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid email or new email or 'b' to go back :- "+AppConstants.ANSI_RESET);
                         new_email = AppConstants.s.nextLine();
+                        if(new_email.equalsIgnoreCase("b")) return;
                     }
                 }
                 up = AppConstants.connection.prepareCall("UPDATE users SET email = ? WHERE id = ?;");
@@ -175,16 +181,17 @@ public class UserDAO {
                 }
                 up.close();
             }
-            else if (update.equalsIgnoreCase("address")) {
-                System.out.print("\nEnter your new address : ");
+            else if (update.equalsIgnoreCase("address") || update.charAt(0)=='a' || update.charAt(0)=='A' || update.equalsIgnoreCase("add") || update.equalsIgnoreCase("Ad") || update.equalsIgnoreCase("addr") || update.equalsIgnoreCase("addre") || update.equalsIgnoreCase("addres")) {
+                System.out.print("\nEnter your new address or 'b' to go back :- ");
                 String new_address = AppConstants.s.nextLine();
                 while (true){
-                    if(Validators.validateAddress(new_address)) {
+                    if(Validators.validateAddress(new_address) && getColumnVerify("address",new_address,id) ) {
                         break;
                     }
                     else {
-                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid address :- "+AppConstants.ANSI_RESET);
+                        System.out.print(AppConstants.TEXT_ANSI_RED+"\nEnter valid address or new address or 'b' to go back :- "+AppConstants.ANSI_RESET);
                         new_address = AppConstants.s.nextLine();
+                        if(new_address.equalsIgnoreCase("b")) return;
                     }
                 }
                 up = AppConstants.connection.prepareCall("UPDATE users SET address = ? WHERE id = ?;");
@@ -220,6 +227,23 @@ public class UserDAO {
         catch (Exception e) {
             System.out.print(AppConstants.TEXT_ANSI_RED+"\nException "+e+" arise in updateProfile. Please provide valid input."+AppConstants.ANSI_RESET);
         }
+    }
+
+    private static boolean getColumnVerify(String column,String value,String id) {
+        String sql = "SELECT ? FROM users WHERE id = ?";
+        try(PreparedStatement ps = AppConstants.connection.prepareCall(sql)) {
+            ps.setString(1, column);
+            ps.setString(2, id);
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    return !rs.getString(1).equals(value);
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("\nFailed to update data please try again.");
+        }
+        return false;
     }
 
     private static void viewProfile(String id) {
