@@ -149,12 +149,13 @@ public class CustomerMenu {
     }
 
     public static boolean forgotPassword(String id) {
+        AppConstants.s.nextLine();
         System.out.print("\nEnter Phone No. or Enter 'b' to go back : ");
         String ph_no = AppConstants.s.nextLine().trim();
         if (ph_no.equalsIgnoreCase("b")) return false;
         else {
             while (!Validators.validateMobileNumber(ph_no)) {
-                System.out.println("Invalid Phone Number. Please enter a valid phone number or enter 'b' to go back.");
+                System.out.println("\nInvalid Phone Number. Please enter a valid phone number or enter 'b' to go back.");
                 ph_no = AppConstants.s.nextLine().trim();
                 if (ph_no.equalsIgnoreCase("b")) return false;
             }
@@ -215,8 +216,8 @@ public class CustomerMenu {
                         return false;
                     }
                 } else {
-                    System.out.println("Phone number " + ph_no + " does not match with your id " + id + ".");
-                    System.out.print("Enter 'b' to go back, or any other key to try again: ");
+                    System.out.println("\nPhone number " + ph_no + " does not match with your id " + id + ".");
+                    System.out.print("\nEnter 'b' to go back, or any other key to try again: ");
                     String choice = AppConstants.s.nextLine().trim();
                     if (choice.equalsIgnoreCase("b")) {
                         return false;

@@ -151,7 +151,7 @@ public class MainMenu {
                         CustomerMenu.customerMenu(id);
                     }
                     else {
-                        System.out.println(AppConstants.TEXT_ANSI_RED+"Sorry, Please try again!"+AppConstants.ANSI_RESET);
+                        System.out.println("\n"+AppConstants.TEXT_ANSI_RED+"Please try again!"+AppConstants.ANSI_RESET);
                         return;
                     }
                 }
