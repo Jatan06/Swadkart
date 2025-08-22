@@ -246,13 +246,15 @@ public class OrderDAO {
         String sqlOrders = "SELECT * FROM orders GROUP BY uid";
         String sqlOrderItems = "SELECT * FROM order_items GROUP BY o_id";
 
+        String sqlJoin = "SELECT o_id AS order-id,uid as user-id,rid as restaurant-id,order_time_stamp AS order-time,GROUP_CONCAT(CONCAT(did, ' (Qty: ', quantity, ')') SEPARATOR ', ') AS items FROM orders o JOIN order_items oi ON oi.o_id = o.o_id GROUP BY o_id,uid,rid,order_time_stamp ORDER BY o_id,order-time_stamp DESC";
+
         try (Statement st = AppConstants.connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(sqlOrders)) {
+            try (ResultSet rs = st.executeQuery(sqlOrderItems)) {
                 printResultSetAsTable("ORDERS", rs);
             }
-            try (ResultSet rs = st.executeQuery(sqlOrderItems)) {
-                printResultSetAsTable("ORDER ITEMS", rs);
-            }
+//            try (ResultSet rs = st.executeQuery(sqlOrderItems)) {
+//                printResultSetAsTable("ORDER ITEMS", rs);
+//            }
         }
     }
 

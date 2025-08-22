@@ -308,7 +308,8 @@ public class CustomerMenu {
                 System.out.println("Invalid input. Please enter a number.");
                 AppConstants.s.nextLine(); // clear buffer
             } catch (Exception e) {
-                System.out.println("Exception arise at CustomerMenu/customerMenu at line 303.");
+                System.out.println("Please try again.");
+                AppConstants.s.nextLine();
             }
         }
     }
@@ -370,7 +371,7 @@ public class CustomerMenu {
                 UserService.Cart = null;
                 AppConstants.run = false;
             }
-            default -> System.out.println(AppConstants.ERR_INVALID_INPUT);
+            default -> System.out.println(AppConstants.TEXT_ANSI_RED + "Please enter a valid menu option (1–8)." + AppConstants.ANSI_RESET);
         }
     }
 }

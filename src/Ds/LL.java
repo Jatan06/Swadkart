@@ -23,8 +23,29 @@ public class LL {
             head = newNode;
         } else {
             Node current = head;
-            while (current.next != null)
+            while (current.next != null) {
+                if(current.data.getDish_id().equalsIgnoreCase(dish.getDish_id())) {
+                    current.quantity += quantity;
+                    if(current.quantity>50) {
+                        System.out.println("\nSorry we are not placing more than 50 quantity for a dish in cart.");
+                        current.quantity -=quantity;
+                        return;
+                    }
+                    System.out.println("\nQuantity : " + quantity+" added to dish "+current.data.getName());
+                    return;
+                }
                 current = current.next;
+            }
+            if(current.data.getDish_id().equalsIgnoreCase(dish.getDish_id())) {
+                current.next.quantity+=quantity;
+                if(current.quantity>50) {
+                    System.out.println("\nSorry we are not placing more than 50 quantity for a dish in cart.");
+                    current.quantity -=quantity;
+                    return;
+                }
+                System.out.println("\nQuantity : " + quantity+" added to dish "+current.data.getName());
+                return;
+            }
             current.next = newNode;
         }
         System.out.println("\nDish added to cart : " + dish.getName());
@@ -52,6 +73,7 @@ public class LL {
             System.out.println(AppConstants.TEXT_ANSI_RED+"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCart is empty, Nothing to display."+AppConstants.ANSI_RESET);
             return;
         }
+        System.out.println("\n");
 
         // Column widths and header
         String headerFmt = "%-10s %-22s %-14s %-20s %8s %8s %14s %14s%n";

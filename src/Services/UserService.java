@@ -56,7 +56,7 @@ public class UserService {
             displayCartMenu();
             String option = scanner.next().trim();
             try {
-                processAction(option, r_id);
+                processActionUS(option, r_id);
             } catch (Exception e) {
                 System.out.println(AppConstants.ERR_INVALID_INPUT);
                 scanner.nextLine();
@@ -65,7 +65,7 @@ public class UserService {
         running = true;
     }
 
-    private static void processAction(String option,String r_id) throws Exception{
+    private static void processActionUS(String option,String r_id) throws Exception{
         switch (option) {
             case "1": // Add Dish
                     String restaurantName = DishDAO.getRestaurantNameById(r_id);
