@@ -46,7 +46,7 @@ public class PaymentService {
             switch (choice) {
                 case "1" -> {
                     if (Payment.payment != null) Payment.payment.paymentType = AppConstants.PAYMENT_CASH;
-                    System.out.println("\n💵 Cash selected. Please pay on delivery.");
+                    System.out.println("\n💵 Cash selected. Pay on delivery.");
                     // We collect the cash AFTER order is placed (in placeOrder)
                     return true;
                 }
@@ -133,11 +133,11 @@ public class PaymentService {
     }
 
     private static boolean handleUpi(double total) {
-        System.out.print("Enter UPI ID (e.g., user@bank): ");
+        System.out.print("\nEnter UPI ID (e.g., user@bank): ");
         String upi = UserService.scanner.next().trim();
         String upiRegex = "^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$";
         if (!upi.matches(upiRegex)) {
-            System.out.println("❌ Invalid UPI ID. Format must be like: username@bank");
+            System.out.println("\n❌ Invalid UPI ID. Format must be like: username@bank");
             return false;
         }
         try {

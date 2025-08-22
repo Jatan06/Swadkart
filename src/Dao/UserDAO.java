@@ -431,20 +431,4 @@ public class UserDAO {
         return sb.toString();
     }
 
-    // --- helpers just for table building ---
-
-    private static boolean looksLikeMoney(String colName) {
-        String n = colName.toLowerCase(Locale.ROOT);
-        return n.contains("amount") || n.contains("price") || n.contains("total");
-    }
-
-    private static boolean isNumeric(int sqlType) {
-        return switch (sqlType) {
-            case Types.BIT, Types.BOOLEAN,
-                 Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT,
-                 Types.FLOAT, Types.REAL, Types.DOUBLE,
-                 Types.NUMERIC, Types.DECIMAL -> true;
-            default -> false;
-        };
-    }
 }
