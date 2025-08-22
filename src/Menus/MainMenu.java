@@ -70,7 +70,7 @@ public class MainMenu {
         boolean id_verification = true;
         String id = "";
         while (id_verification) {
-            System.out.print("\nEnter id (u-xxxx/xxxx) or enter 'b' for back: ");
+            System.out.print("\nEnter id (u-xxxx/xxxx) or enter 'b' for back :- ");
             id = AppConstants.s.next().trim();
             if(id.equalsIgnoreCase("b")) return;
             else if (id.charAt(0) == 'u' || id.charAt(0) == 'U') {
@@ -140,8 +140,9 @@ public class MainMenu {
         boolean password_verification = true;
         while (password_verification) {
             try {
-                System.out.print("Enter Password or Enter 'f' for forgot password :- ");
+                System.out.print("\nEnter Password or Enter 'f' for forgot password or enter 'b' to go back :- ");
                 String password = AppConstants.s.next().trim();
+                if(password.equalsIgnoreCase("b")) return;
                 if(password.equalsIgnoreCase("f")) {
                     if(CustomerMenu.forgotPassword(id)) {
                         System.out.println(AppConstants.BG_ANSI_BLACK+"Enter password again  or enter 'b' to go back :- "+AppConstants.ANSI_RESET);
@@ -179,7 +180,7 @@ public class MainMenu {
                     }
                 }
                 Thread.sleep(1000);
-                System.out.println(AppConstants.TEXT_ANSI_GREEN+AppConstants.SUCCESS_LOGIN+AppConstants.ANSI_RESET);
+                System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  "+AppConstants.TEXT_ANSI_GREEN+AppConstants.SUCCESS_LOGIN+AppConstants.ANSI_RESET);
                 password_verification = false;
             } catch (Exception e) {
                 System.out.println(AppConstants.TEXT_ANSI_RED+"Exception at MainMenu"+AppConstants.ANSI_RESET);
@@ -198,6 +199,6 @@ public class MainMenu {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Login\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Exit\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
-        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option :- ");
     }
 }

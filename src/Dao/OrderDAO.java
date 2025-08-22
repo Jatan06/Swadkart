@@ -8,50 +8,82 @@ import Services.*;
 import Ds.*;
 public class OrderDAO {
     public static double total;
+
     public static void placeOrder(String uid) throws Exception {
         if (UserService.Cart == null || UserService.Cart.head == null) {
-            System.out.println(AppConstants.TEXT_ANSI_RED+"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCart is empty, nothing to place order."+AppConstants.ANSI_RESET);
+            System.out.println(AppConstants.TEXT_ANSI_RED +
+                    "\n\t\t\tCart is empty, nothing to place order." +
+                    AppConstants.ANSI_RESET);
             return;
         }
 
+        // --- First confirmation ---
         if (!confirmOrderPrompt()) {
-            System.out.println(AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_RED+"\nOrder cancelled."+AppConstants.ANSI_RESET);
-            return; // exit without inserting orders/payment or committing
+            System.out.println("\n" + AppConstants.BG_ANSI_BLACK + AppConstants.TEXT_ANSI_RED +
+                    "Order cancelled. Do you want to clear your cart ? (y/n) :- " +
+                    AppConstants.ANSI_RESET);
+            while (true) {
+                String token = AppConstants.s.next().trim();
+                if (token.equalsIgnoreCase("y")) {
+                    UserService.Cart.clearList();
+                    return;
+                } else if (token.equalsIgnoreCase("n")) {
+                    return;
+                } else {
+                    System.out.print("\nEnter y/n only :- ");
+                }
+            }
         }
 
-
-        // Derive a restaurant for this order from the first cart item
+        // Restaurant from first cart item
         LL.Node head = UserService.Cart.head;
         String restaurantId = head.data.getRestaurantId(head.data.getRestaurant());
         if (restaurantId == null || restaurantId.isBlank()) {
             throw new IllegalStateException("Restaurant ID could not be determined from cart.");
         }
 
-        boolean previousAutoCommit = AppConstants.connection.getAutoCommit();
+        // --- Payment (no DB yet) ---
+        Payment.payment = new Payment();
+        Payment.payment.user_id = uid;
+        Payment.payment.restaurant_id = restaurantId;
+        Payment.payment.paymentStatus = "PENDING";
+
+        boolean paymentSuccess = PaymentService.paymentInterface();
+        if (!paymentSuccess) {
+            System.out.println("Payment failed. Order not placed.");
+            return;
+        }
+
+        // --- Second confirmation ---
+        if (!confirmAfterPayment()) {
+            System.out.println("Order cancelled. Payment refunded.");
+            UserService.Cart.clearList();
+            UserService.isEmpty = true;
+            return;
+        }
+
+        // --- DB writes AFTER second confirm ---
+        boolean prevAuto = AppConstants.connection.getAutoCommit();
         AppConstants.connection.setAutoCommit(false);
         Savepoint sp = null;
-
         Integer orderId = null;
 
         try {
             sp = AppConstants.connection.setSavepoint();
 
-            // 1) Insert record into the order table.
+            // orders
             String insertOrderSQL = "INSERT INTO orders(uid, rid, order_time_stamp) VALUES(?, ?, CURRENT_TIMESTAMP)";
             try (PreparedStatement psOrder = AppConstants.connection.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setString(1, uid);
                 psOrder.setString(2, restaurantId);
                 psOrder.executeUpdate();
                 try (ResultSet rs = psOrder.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        orderId = rs.getInt(1);
-                    } else {
-                        throw new SQLException("Failed to obtain generated order ID.");
-                    }
+                    if (rs.next()) orderId = rs.getInt(1);
+                    else throw new SQLException("Failed to obtain generated order ID.");
                 }
             }
 
-            // 2) Insert all cart items into order_items (batched)
+            // order_items
             String insertItemSQL = "INSERT INTO order_items(o_id, did, quantity) VALUES(?, ?, ?)";
             try (PreparedStatement psItem = AppConstants.connection.prepareStatement(insertItemSQL)) {
                 LL.Node n = head;
@@ -65,182 +97,109 @@ public class OrderDAO {
                 psItem.executeBatch();
             }
 
-            // 3) Prepare payment info before invoking payment routine
-            Payment.payment = new Payment();
-            Payment.payment.user_id = uid;
-            Payment.payment.order_id = String.valueOf(orderId);
-            Payment.payment.restaurant_id = restaurantId;
-            if (Payment.payment.paymentType == null) Payment.payment.paymentType = "UNKNOWN";
-            if (Payment.payment.paymentStatus == null) Payment.payment.paymentStatus = "PENDING";
+            AppConstants.connection.commit();
 
-            // 4) Process payment
-            boolean paymentSuccess = PaymentService.paymentInterface();
+            // --- Success UX ---
+            Thread.sleep(10000);
+            System.out.println("\n✅ Order placed successfully!");
+            try { Sound.playWav("/zomato_app.wav"); } catch (Exception ignore) {}
 
-            // Ask again for final confirmation; on "no" reset and refund
-            if (paymentSuccess && !confirmAfterPayment(sp)) {
-                // Reset cart state after rollback
-                UserService.Cart.clearList();
-                UserService.isEmpty = true;
-                if(!Objects.equals(PaymentService.choice, "1")) {
-                    System.out.println("\nOrder cancelled.");
-                }
-                else {
-                    System.out.println("\nOrder cancelled. Payment refunded.");
-                }
-                return;
-            }
-
-            // 6) Commit and finalize
-            if(paymentSuccess) {
-                AppConstants.connection.commit();
-                Thread.sleep(2000);
-                String op = "\nOrder placed successfully!";
-                new Thread(() -> {
+            // --- Cash collection at delivery (now that order exists) ---
+            if ("1".equals(PaymentService.choice)) {
+                double totalDue = OrderDAO.total; // set during paymentInterface
+                boolean paid = false;
+                while (!paid) {
+                    System.out.print("\nEnter cash received: ");
+                    String in = AppConstants.s.next().trim();
                     try {
-                        Sound.playWav("/zomato_app.wav");
-                    } catch (Exception e) {
-                        // ignore sound errors
-                    }
-                }).start();
-                System.out.println(op);
-                Thread.sleep(5000);
-
-                // Derive the just-created orderId once using the first item in the cart
-                String OrderId = null;
-                if (UserService.Cart != null && UserService.Cart.head != null) {
-                    Ds.LL.Node first = UserService.Cart.head;
-                    String rid = first.data.getRestaurantId(first.data.getRestaurant());
-                    String did = first.data.getDish_id();
-                    try {
-                        OrderId = OrderDAO.findOrderIdByUserRestaurantAndDish(uid, rid, did);
-                    } catch (Exception ignore) {
-                        // If lookup fails, we keep orderId as null and let ReviewDAO guard it
-                    }
-                }
-
-                // --- Handle cash payment if choice was 1 ---
-                if ("1".equals(PaymentService.choice)) {
-                    boolean paid = false;
-                    while (!paid) {
-                        System.out.print("\nEnter cash received: ");
-                        String in = AppConstants.s.next().trim();
-                        try {
-                            double received = Double.parseDouble(in);
-                            if (received < total) {
-                                System.out.printf("❌ Insufficient amount. Need ₹%.2f more.%n", round2(total - received));
-                            } else {
-                                System.out.printf("✅ Cash received. Change: ₹%.2f%n", round2(received - total));
-                                paid = true;
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("❌ Invalid amount. Please enter a valid number.");
-                        }
-                    }
-                }
-
-
-                System.out.print("\nWould you like to give review (y/n) :- ");
-                if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
-                    UserService.Cart.displayTabular();
-                    boolean review = true;
-                    while (review) {
-                        System.out.println("would you like to give all dishes (Enter 'all') review or enter dish id :- ");
-                        String dishId = AppConstants.s.next().trim();
-                        if (dishId.equalsIgnoreCase("all")) {
-                            ReviewDAO.insertReview(UserService.Cart, uid, OrderId);
-                            review = false;
+                        double received = Double.parseDouble(in);
+                        if (received < totalDue) {
+                            double shortAmt = round2(totalDue - received);
+                            System.out.printf(AppConstants.TEXT_ANSI_RED + "\n❌ Insufficient amount." +
+                                    AppConstants.ANSI_RESET + " Need ₹%.2f more.%n", shortAmt);
                         } else {
-                            ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid, OrderId);
-                            System.out.println("Would you like to give review for another dish (y/n) :-");
-                            if(AppConstants.s.next().trim().equalsIgnoreCase("y")) {
-                                continue;
-                            } else {
-                                review = false;
-                            }
+                            double change = round2(received - totalDue);
+                            System.out.printf(AppConstants.TEXT_ANSI_GREEN + "\n✅ Cash received. " +
+                                    AppConstants.ANSI_RESET + "Change: ₹%.2f%n", change);
+                            paid = true;
+                            Payment.payment.paymentStatus = "paid";
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println(AppConstants.TEXT_ANSI_RED + "\n❌ Invalid amount." +
+                                AppConstants.ANSI_RESET + " Please enter a valid number.");
+                    }
+                }
+            }
+
+            // payment row now (linked with orderId)
+            Payment.payment.order_id = String.valueOf(orderId);
+            PaymentDAO.savePaymentDetails(true, Payment.payment);
+
+            // --- Review flow (your original behavior) ---
+            System.out.print("\nWould you like to give review (y/n) :- ");
+            if (AppConstants.s.next().trim().equalsIgnoreCase("y")) {
+                UserService.Cart.displayTabular(); // show what was ordered
+                boolean review = true;
+                while (review) {
+                    System.out.print("\nwould you like to give all dishes (Enter 'all') review or enter dish id or enter 'b' to go back :- ");
+                    String dishId = AppConstants.s.next().trim();
+                    if (dishId.equalsIgnoreCase("b")) break;
+                    if (dishId.equalsIgnoreCase("all") || dishId.equalsIgnoreCase("a")) {
+                        ReviewDAO.insertReview(UserService.Cart, uid, String.valueOf(orderId));
+                        review = false;
+                    } else {
+                        if(dishId.length()==1) {dishId = "VD-000"+dishId;}
+                        else if(dishId.length()==2) {dishId = "VD-00"+dishId;}
+                        else if(dishId.length()==3) {dishId = "VD-0"+dishId;}
+                        else if(dishId.length()==4) {dishId = "VD-"+dishId;}
+                        ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid, String.valueOf(orderId));
+
+                        System.out.print("\nWould you like to give review for another dish (y/n) or enter 'b' to go back :- ");
+                        while (true) {
+                            String t = AppConstants.s.next().trim();
+                            if (t.equalsIgnoreCase("b")) { review = false; break; }
+                            else if (t.equalsIgnoreCase("y")) { break; }
+                            else if (t.equalsIgnoreCase("n")) { review = false; break; }
+                            else System.out.print("\nInvalid input. Please enter 'y' or 'n' or 'b' :- ");
                         }
                     }
                 }
-                UserService.Cart.clearList();
-                UserService.isEmpty = true;
             }
-            else {
-                if(PaymentService.choice.equalsIgnoreCase("exit")) {
-                    System.out.println("Order cancelled.");
-                }
-                AppConstants.connection.rollback(sp);
-                if(Objects.equals(PaymentService.choice, "1")) {
-                    System.out.println("Order cancelled.");
-                }
-                else {
-                    System.out.println("Order Cancelled. Payment will be refunded.");
-                }
-            }
+
+            // finally clear
+            UserService.Cart.clearList();
+            UserService.isEmpty = true;
+
         } catch (Exception ex) {
-            try {
-                if (sp != null) AppConstants.connection.rollback(sp);
-            } catch (Exception ignore) {
-            }
+            try { if (sp != null) AppConstants.connection.rollback(sp); } catch (Exception ignore) {}
             throw ex;
         } finally {
-            try {
-                AppConstants.connection.setAutoCommit(previousAutoCommit);
-            } catch (Exception ignore) {
-            }
+            try { AppConstants.connection.setAutoCommit(prevAuto); } catch (Exception ignore) {}
         }
     }
 
     private static boolean confirmOrderPrompt() {
         System.out.print("\nAre you sure you want to confirm the order (y/n): ");
         while (true) {
-            try {
-                String token = AppConstants.s.next().trim();
-                if (token.equalsIgnoreCase("y")) {
-                    return true;
-                } else if (token.equalsIgnoreCase("n")) {
-                    return false;
-                } else {
-                    System.out.print("Enter y/n only: ");
-                }
-            } catch (Exception e) {
-                System.out.print("Enter y/n only: ");
-                AppConstants.s.nextLine(); // clear any bad input
-            }
+            String token = AppConstants.s.next().trim();
+            if (token.equalsIgnoreCase("y")) return true;
+            if (token.equalsIgnoreCase("n")) return false;
+            System.out.print("\nEnter y/n only: ");
         }
     }
 
-    // Ask again after payment; if user declines, rollback to savepoint and mark payment refunded
-    private static boolean confirmAfterPayment(Savepoint sp) {
-        if(!Objects.equals(PaymentService.choice, "1")) {
-            System.out.print("Payment successful.\n\nConfirm order to finalize (y/n): ");
-        }
-        else {
-            System.out.print("\nConfirm order to finalize (y/n): ");
-        }
+    private static boolean confirmAfterPayment() {
+        System.out.print(AppConstants.TEXT_ANSI_GREEN +
+                "Payment successful." + AppConstants.ANSI_RESET +
+                "\n\nConfirm order to finalize (y/n) :- ");
         while (true) {
-            try {
-                String token = AppConstants.s.next().trim();
-                if (token.equalsIgnoreCase("y")) {
-                    return true; // proceed to commit
-                } else if (token.equalsIgnoreCase("n")) {
-                    try {
-                        // Undo all DB changes since savepoint (orders, items, any payment rows in same txn)
-                        AppConstants.connection.rollback(sp);
-                    } catch (Exception ignore) {
-                    }
-                    // Mark payment as refunded in-memory and notify
-                    if (Payment.payment != null) {
-                        Payment.payment.paymentStatus = "REFUNDED";
-                    }
-                    return false; // caller should stop flow
-                } else {
-                    System.out.print("Enter y/n only: ");
-                }
-            } catch (Exception e) {
-                System.out.print("Enter y/n only: ");
-                try { AppConstants.s.nextLine(); } catch (Exception ignore) {}
-            }
+            String token = AppConstants.s.next().trim();
+            if (token.equalsIgnoreCase("y")) return true;
+            if (token.equalsIgnoreCase("n")) return false;
+            System.out.print("Enter y/n only: ");
         }
     }
+
 
     public static void viewOrderAndOrderItems() throws Exception {
         String sqlOrders = "SELECT * FROM orders GROUP BY uid";

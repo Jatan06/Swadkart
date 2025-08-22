@@ -100,7 +100,7 @@ public class UserService {
                     }
                     int quantity = Integer.parseInt(qtyInput);
                     while (quantity > 50) {
-                        System.out.println(AppConstants.TEXT_ANSI_YELLOW + "Maximum quantity allowed is 50. Contact restaurant for more." + AppConstants.ANSI_RESET);
+                        System.out.println("\n"+AppConstants.TEXT_ANSI_YELLOW + "Maximum quantity allowed is 50. Contact restaurant for more. ("+RestaurantDAO.getRestaurantNameById(r_id)+"-"+RestaurantDAO.getRestaurantPhoneNoById(r_id)+")" + AppConstants.ANSI_RESET);
                         System.out.print("\nEnter quantity <=50 or 'b' to go back :- ");
                         qtyInput = scanner.next().trim();
                         if (qtyInput.equalsIgnoreCase("b")) {
@@ -108,7 +108,7 @@ public class UserService {
                             return;
                         }
                         while (!Validators.validateQuantity(qtyInput)) {
-                            System.out.println("\nEnter valid quantity or 'b' to go back to Main Menu :- ");
+                            System.out.println("\nEnter valid quantity or 'b' to go back to :- ");
                             qtyInput = scanner.next().trim();
                             if (qtyInput.equalsIgnoreCase("b")) {
                                 isEmpty = true;
@@ -126,7 +126,7 @@ public class UserService {
                     }
                     Cart.displayTabular();
 
-                    System.out.print("\nEnter Dish id to remove or 'b' to go back to Main Menu :- ");
+                    System.out.print("\nEnter Dish id to remove or 'b' to go back :- ");
                     String removeId = scanner.next().trim();
                     if (removeId.equalsIgnoreCase("b")) return;
 
@@ -135,23 +135,24 @@ public class UserService {
                     else if (removeId.length() == 3) removeId = "VD" + removeId;
 
                     while (!Cart.checkDish(removeId)) {
-                        System.out.print(AppConstants.TEXT_ANSI_RED + "Dish not in cart. Try again or 'b' to go back to Main Menu :- " + AppConstants.ANSI_RESET);
+                        System.out.print("\n"+AppConstants.TEXT_ANSI_RED + "Dish not in cart. Try again or 'b' to go back :- " + AppConstants.ANSI_RESET);
                         removeId = scanner.next().trim();
-                        if (removeId.equalsIgnoreCase("b")) addToCart();
+                        if (removeId.equalsIgnoreCase("b"))  {
+                            return;
+                        }
                         if (removeId.length() == 1) removeId = "VD00" + removeId;
                         else if (removeId.length() == 2) removeId = "VD0" + removeId;
                         else if (removeId.length() == 3) removeId = "VD" + removeId;
                     }
 
-                    System.out.print("Enter quantity to remove or 'b' to go back to Main Menu :- ");
+                    System.out.print("Enter quantity to remove or 'b' to go back :- ");
                     String quant = scanner.next().trim();
                     if (quant.equalsIgnoreCase("b")) {
                         isEmpty = true;
                         return;
                     }
-
                     while (!Validators.validateQuantity(quant) || !Cart.delete(removeId, Integer.parseInt(quant))) {
-                        System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid quantity, try again or 'b' to go back to Main Menu :- " + AppConstants.ANSI_RESET);
+                        System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid quantity, try again or 'b' to go back :- " + AppConstants.ANSI_RESET);
                         quant = scanner.next().trim();
                         if (quant.equalsIgnoreCase("b")) {
                             isEmpty = true;
@@ -179,7 +180,7 @@ public class UserService {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t1. Add Dish\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t2. Remove Dish\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t3. Cart\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t3. View Cart\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t4. Back\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
         System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");

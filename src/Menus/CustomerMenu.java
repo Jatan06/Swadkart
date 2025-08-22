@@ -315,21 +315,21 @@ public class CustomerMenu {
     }
 
     private static void displayMenu() {
-        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+ AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ User Menu +\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t*************\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Browse Restaurants\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. Browse Dishes\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
-        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Cart\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. Edit Cart\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. View Cart\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. Place Order\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t6. Order History\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t7. Profile\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t8. Logout\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
-        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option :- ");
     }
 
     private static void displayNewCustomerMenu() {
@@ -341,7 +341,7 @@ public class CustomerMenu {
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t  1. Register\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t  2. Back\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
-        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option: ");
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option :- ");
     }
 
     private static int getUserInput() {
@@ -363,7 +363,10 @@ public class CustomerMenu {
             case 2 -> DishDAO.browseDishes();
             case 3 -> UserService.addToCart();
             case 4 -> UserService.Cart.displayTabular();
-            case 5 -> OrderDAO.placeOrder(id);
+            case 5 -> {
+                System.out.print("\n\t\t\t"+AppConstants.BG_ANSI_BLACK+"============== Payment Interface =============="+AppConstants.ANSI_RESET+"\n");
+                OrderDAO.placeOrder(id);
+            }
             case 6 -> OrderDAO.viewOrderAndOrderItems(id);
             case 7 -> UserDAO.profile(id);
             case 8 -> {
