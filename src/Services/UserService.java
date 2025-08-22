@@ -145,14 +145,14 @@ public class UserService {
                         else if (removeId.length() == 3) removeId = "VD" + removeId;
                     }
 
-                    System.out.print("Enter quantity to remove or 'b' to go back :- ");
+                    System.out.print("\nEnter quantity to remove or 'b' to go back :- ");
                     String quant = scanner.next().trim();
                     if (quant.equalsIgnoreCase("b")) {
                         isEmpty = true;
                         return;
                     }
                     while (!Validators.validateQuantity(quant) || !Cart.delete(removeId, Integer.parseInt(quant))) {
-                        System.out.print(AppConstants.TEXT_ANSI_RED + "Invalid quantity, try again or 'b' to go back :- " + AppConstants.ANSI_RESET);
+                        System.out.print("\n"+AppConstants.TEXT_ANSI_RED + "Invalid quantity, try again or 'b' to go back :- " + AppConstants.ANSI_RESET);
                         quant = scanner.next().trim();
                         if (quant.equalsIgnoreCase("b")) {
                             isEmpty = true;

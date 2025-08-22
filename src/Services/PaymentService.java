@@ -161,7 +161,7 @@ public class PaymentService {
     // ---------------- Helpers ----------------
 
     private static void printReceipt(LL cart, double subtotal, double tax, double total) {
-        System.out.println("\n====== ORDER SUMMARY ======");
+        System.out.println("\n=================== ORDER SUMMARY ===================");
         String fmt = "%-24s %5s %10s %12s%n";
         System.out.printf(fmt, "Item", "Qty", "Price", "Line Total");
         System.out.println("-----------------------------------------------");

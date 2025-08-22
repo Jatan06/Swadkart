@@ -1,7 +1,4 @@
-import Constants.AppConstants;
 import Menus.MainMenu;
 class Main {
-    public static void main(String[]args){
-        MainMenu.run();
-    }
+    public static void main(String[]args){ MainMenu.run();}
 }

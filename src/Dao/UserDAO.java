@@ -4,6 +4,7 @@ import Constants.*;
 import Services.OTPService;
 import Services.SpeakTextService;
 import Utils.Validators;
+import java.util.*;
 
 public class UserDAO {
     public static void insertNewUser(String id,String user_Name,String email,String ph_no,String address,String password) throws Exception {
@@ -282,6 +283,71 @@ public class UserDAO {
         }
     }
 
+    public static void getUsers() {
+        String sql = "SELECT \n" +
+                "    u.id AS user_id,\n" +
+                "    u.name AS user_name,\n" +
+                "    TRUNCATE(COUNT(o.o_id), 0) AS total_orders\n" +
+                "FROM orders o\n" +
+                "JOIN users u \n" +
+                "    ON o.uid = u.id\n" +
+                "GROUP BY u.id, u.name\n" +
+                "ORDER BY total_orders DESC;\n";
+        try (Statement stmt = AppConstants.connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            displayTable(rs,"Users");
+        } catch (SQLException e) {
+            System.out.println("Exception :- "+e.getMessage());
+        }
+    }
+
+    public static void displayTable(ResultSet rs, String title) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnCount = rsmd.getColumnCount();
+
+        // Get column widths (start with header length)
+        int[] colWidths = new int[columnCount];
+        for (int i = 1; i <= columnCount; i++) {
+            colWidths[i - 1] = rsmd.getColumnName(i).length();
+        }
+
+        // Scan rows once to compute max width
+        List<String[]> rows = new ArrayList<>();
+        while (rs.next()) {
+            String[] row = new String[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                String value = rs.getString(i);
+                if (value == null) value = "NULL";
+                row[i - 1] = value;
+                colWidths[i - 1] = Math.max(colWidths[i - 1], value.length());
+            }
+            rows.add(row);
+        }
+
+        // Print title
+        System.out.println("\n============== " + title + " ==============");
+
+        // Print headers
+        for (int i = 1; i <= columnCount; i++) {
+            System.out.printf("%-" + (colWidths[i - 1] + 2) + "s", rsmd.getColumnName(i));
+        }
+        System.out.println();
+
+        // Print separator line
+        for (int w : colWidths) {
+            System.out.print("-".repeat(w + 2));
+        }
+        System.out.println();
+
+        // Print rows
+        for (String[] row : rows) {
+            for (int i = 0; i < columnCount; i++) {
+                System.out.printf("%-" + (colWidths[i] + 2) + "s", row[i]);
+            }
+            System.out.println();
+        }
+    }
+
     // Helper to avoid null/blank printing
     private static String nvl(String s) {
         return (s == null || s.trim().isEmpty()) ? "-" : s.trim();
@@ -363,5 +429,22 @@ public class UserDAO {
         sb.append(s);
         while (sb.length() < width) sb.append(' ');
         return sb.toString();
+    }
+
+    // --- helpers just for table building ---
+
+    private static boolean looksLikeMoney(String colName) {
+        String n = colName.toLowerCase(Locale.ROOT);
+        return n.contains("amount") || n.contains("price") || n.contains("total");
+    }
+
+    private static boolean isNumeric(int sqlType) {
+        return switch (sqlType) {
+            case Types.BIT, Types.BOOLEAN,
+                 Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT,
+                 Types.FLOAT, Types.REAL, Types.DOUBLE,
+                 Types.NUMERIC, Types.DECIMAL -> true;
+            default -> false;
+        };
     }
 }

@@ -119,3 +119,19 @@ Login Successful (2025-08-22T20:08:50.667898600): u-0011
 Login Successful (2025-08-22T21:56:27.383119500): u-0011
 
 Login Successful (2025-08-22T21:58:38.676528800): u-0011
+
+Login Successful (2025-08-22T22:33:21.033046600): u-0003
+
+Login Successful (2025-08-22T22:45:42.200796200): u-0003
+
+New User Added (2025-08-22T23:23:58.949925500): u-0012
+
+Login Successful (2025-08-22T23:53:48.104566): u-0011
+
+Login Successful (2025-08-23T00:04:15.498434): u-0011
+
+Login Successful (2025-08-23T00:09:12.316631400): u-0011
+
+Login Successful (2025-08-23T00:16:48.330105500): u-0011
+
+Login Successful (2025-08-23T00:33:21.181264900): u-0011

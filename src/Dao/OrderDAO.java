@@ -50,13 +50,13 @@ public class OrderDAO {
 
         boolean paymentSuccess = PaymentService.paymentInterface();
         if (!paymentSuccess) {
-            System.out.println("Payment failed. Order not placed.");
+            System.out.println(AppConstants.TEXT_ANSI_RED+"\nPayment failed. Order not placed."+AppConstants.ANSI_RESET);
             return;
         }
 
         // --- Second confirmation ---
         if (!confirmAfterPayment()) {
-            System.out.println("Order cancelled. Payment refunded.");
+            System.out.println(AppConstants.TEXT_ANSI_RED+"\nOrder cancelled."+AppConstants.ANSI_RESET+AppConstants.TEXT_ANSI_GREEN+" Payment refunded."+AppConstants.ANSI_RESET);
             UserService.Cart.clearList();
             UserService.isEmpty = true;
             return;
@@ -134,6 +134,7 @@ public class OrderDAO {
             // payment row now (linked with orderId)
             Payment.payment.order_id = String.valueOf(orderId);
             PaymentDAO.savePaymentDetails(true, Payment.payment);
+
             Thread.sleep(5000);
             // --- Review flow (your original behavior) ---
             System.out.print("\nWould you like to give review (y/n) :- ");
@@ -141,20 +142,19 @@ public class OrderDAO {
                 UserService.Cart.displayTabular(); // show what was ordered
                 boolean review = true;
                 while (review) {
-                    System.out.print("\nwould you like to give all dishes (Enter 'all') review or enter dish id or enter 'b' to go back :- ");
+                    System.out.print("\nWould you like to give all dishes (Enter 'all') review or enter dish id or enter 'b' to go back :- ");
                     String dishId = AppConstants.s.next().trim();
                     if (dishId.equalsIgnoreCase("b")) break;
                     if (dishId.equalsIgnoreCase("all") || dishId.equalsIgnoreCase("a")) {
                         ReviewDAO.insertReview(UserService.Cart, uid, String.valueOf(orderId));
+                        Thread.sleep(1000);
                         System.out.println("\n"+AppConstants.TEXT_ANSI_CYAN+"\"\uD83C\uDF74 Every bite has a story — thanks for telling yours.\""+AppConstants.ANSI_RESET);
                         review = false;
                     } else {
-                        if(dishId.length()==1) {dishId = "VD-000"+dishId;}
-                        else if(dishId.length()==2) {dishId = "VD-00"+dishId;}
-                        else if(dishId.length()==3) {dishId = "VD-0"+dishId;}
-                        else if(dishId.length()==4) {dishId = "VD-"+dishId;}
+                        if(dishId.length()==1) {dishId = "VD-00"+dishId;}
+                        else if(dishId.length()==2) {dishId = "VD-0"+dishId;}
+                        else if(dishId.length()==3) {dishId = "VD-"+dishId;}
                         ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid, String.valueOf(orderId));
-
                         System.out.print("\nWould you like to give review for another dish (y/n) or enter 'b' to go back :- ");
                         while (true) {
                             String t = AppConstants.s.next().trim();
@@ -169,7 +169,8 @@ public class OrderDAO {
                     }
                 }
             }
-            System.out.println("\n"+AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_CYAN+"\"\uD83C\uDF74 Thanks for dining with Swadkart — your next meal is waiting!\""+AppConstants.ANSI_RESET);
+            Thread.sleep(2000);
+            System.out.println("\n"+AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_YELLOW+"\"\uD83C\uDF74 Thanks for dining with Swadkart — your next meal is waiting!\""+AppConstants.ANSI_RESET);
             UserService.Cart.clearList();
             UserService.isEmpty = true;
 
@@ -192,9 +193,7 @@ public class OrderDAO {
     }
 
     private static boolean confirmAfterPayment() {
-        System.out.print(AppConstants.TEXT_ANSI_GREEN +
-                "Payment successful." + AppConstants.ANSI_RESET +
-                "\n\nConfirm order to finalize (y/n) :- ");
+        System.out.print("\nConfirm order to finalize (y/n) :- ");
         while (true) {
             String token = AppConstants.s.next().trim();
             if (token.equalsIgnoreCase("y")) return true;
@@ -226,7 +225,7 @@ public class OrderDAO {
                 + "  o.o_id               AS o_id, "
                 + "  o.rid                AS rid, "
                 + "  o.order_time_stamp   AS order_time_stamp, "
-                + "  GROUP_CONCAT(CONCAT(oi.did, ' (Qty: ', oi.quantity, ')') SEPARATOR ', ') AS items, "
+                + "  GROUP_CONCAT(CONCAT(d.name, ' (Qty: ', oi.quantity, ')') SEPARATOR ', ') AS items, "
                 + "  p.payment_id         AS payment_id, "
                 + "  p.paymentType        AS paymentType, "
                 + "  p.paymentStatus      AS paymentStatus, "
@@ -234,6 +233,8 @@ public class OrderDAO {
                 + "FROM orders o "
                 + "LEFT JOIN order_items oi "
                 + "  ON oi.o_id = o.o_id "
+                + "LEFT JOIN dishes d "
+                + "  ON oi.did = d.dish_id "
                 + "LEFT JOIN payment p "
                 + "  ON p.o_id = o.o_id "
                 + " AND p.u_id = o.uid "
