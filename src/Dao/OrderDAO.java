@@ -103,7 +103,7 @@ public class OrderDAO {
             Thread.sleep(10000);
             System.out.println("\n✅ Order placed successfully!");
             try { Sound.playWav("/zomato_app.wav"); } catch (Exception ignore) {}
-
+            Thread.sleep(5000);
             // --- Cash collection at delivery (now that order exists) ---
             if ("1".equals(PaymentService.choice)) {
                 double totalDue = OrderDAO.total; // set during paymentInterface
@@ -134,7 +134,7 @@ public class OrderDAO {
             // payment row now (linked with orderId)
             Payment.payment.order_id = String.valueOf(orderId);
             PaymentDAO.savePaymentDetails(true, Payment.payment);
-
+            Thread.sleep(5000);
             // --- Review flow (your original behavior) ---
             System.out.print("\nWould you like to give review (y/n) :- ");
             if (AppConstants.s.next().trim().equalsIgnoreCase("y")) {
@@ -146,6 +146,7 @@ public class OrderDAO {
                     if (dishId.equalsIgnoreCase("b")) break;
                     if (dishId.equalsIgnoreCase("all") || dishId.equalsIgnoreCase("a")) {
                         ReviewDAO.insertReview(UserService.Cart, uid, String.valueOf(orderId));
+                        System.out.println("\n"+AppConstants.TEXT_ANSI_CYAN+"\"\uD83C\uDF74 Every bite has a story — thanks for telling yours.\""+AppConstants.ANSI_RESET);
                         review = false;
                     } else {
                         if(dishId.length()==1) {dishId = "VD-000"+dishId;}
@@ -159,14 +160,16 @@ public class OrderDAO {
                             String t = AppConstants.s.next().trim();
                             if (t.equalsIgnoreCase("b")) { review = false; break; }
                             else if (t.equalsIgnoreCase("y")) { break; }
-                            else if (t.equalsIgnoreCase("n")) { review = false; break; }
+                            else if (t.equalsIgnoreCase("n")) {
+                                System.out.println("\n"+AppConstants.TEXT_ANSI_CYAN+"\"\uD83C\uDF74 Every bite has a story — thanks for telling yours.\""+AppConstants.ANSI_RESET);
+                                review = false; break;
+                            }
                             else System.out.print("\nInvalid input. Please enter 'y' or 'n' or 'b' :- ");
                         }
                     }
                 }
             }
-
-            // finally clear
+            System.out.println("\n"+AppConstants.BG_ANSI_BLACK+AppConstants.TEXT_ANSI_CYAN+"\"\uD83C\uDF74 Thanks for dining with Swadkart — your next meal is waiting!\""+AppConstants.ANSI_RESET);
             UserService.Cart.clearList();
             UserService.isEmpty = true;
 
