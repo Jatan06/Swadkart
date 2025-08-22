@@ -71,8 +71,10 @@ public class PaymentDAO {
     }
 
     public static void revenueCall() {
-        System.out.print("\nEnter restaurant id :- ");
+        RestaurantDAO.getRestaurantIdAndName();
+        System.out.print("\nEnter restaurant id or enter 'b' to go back :- ");
         String resId = AppConstants.s.next().trim();
+        if(resId.equalsIgnoreCase("b")) return;
         if(resId.length()==1) {
             resId = "r-000"+resId;
         }
@@ -85,7 +87,7 @@ public class PaymentDAO {
             resId = "r-"+resId;
         } else if (Validators.validateRestaurantId(resId)) {
             double tot_revenue = revenueByRestaurantId(resId);
-            System.out.println("Total revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
+            System.out.println("\nTotal revenue for restaurant "+RestaurantDAO.getRestaurantNameById(resId)+" is "+tot_revenue);
             return;
         } else {
             System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid restaurant id."+AppConstants.ANSI_RESET+" or enter 'b' to go back. :- ");

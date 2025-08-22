@@ -74,8 +74,11 @@ public class Validators {
 
     // Validate string (not null, not empty, minimum length)
     public static boolean validateString(String input, int minLength) {
-        return input != null && input.trim().length() >= minLength;
+        return input != null
+                && input.trim().length() >= minLength
+                && input.matches(".*[a-zA-Z].*");
     }
+
 
     // Validate string (not null, not empty)
     public static boolean validateString(String input) {

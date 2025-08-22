@@ -23,7 +23,6 @@
     <orderEntry type="library" name="commons-logging-1.2" level="project" />
     <orderEntry type="library" name="slf4j-simple-1.7.36" level="project" />
     <orderEntry type="library" name="mysql-connector-j-8.1.1" level="project" />
-    <orderEntry type="library" name="commons-logging-1.3" level="project" />
     <orderEntry type="library" name="java" level="project" />
     <orderEntry type="module-library">
       <library>
@@ -34,5 +33,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="commons-logging-1.3" level="project" />
   </component>
 </module>

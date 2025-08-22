@@ -16,8 +16,10 @@ public class RestaurantDAO {
                 switch (AppConstants.s.next().trim()) {
                     case "1" -> {
                         AppConstants.s.nextLine();
-                        System.out.print("\nEnter Restaurant ID :- ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("\nEnter Restaurant ID or enter 'b' to go back :- ");
                         String id = AppConstants.s.nextLine().trim();
+                        if(id.equalsIgnoreCase("b")) return;
                         while (true) {
                             if (id.length() == 1) {
                                 id = "r-000".concat(id);
@@ -49,8 +51,10 @@ public class RestaurantDAO {
                     }
                     case "2" -> {
                         AppConstants.s.nextLine();
-                        System.out.print("\nEnter Restaurant ID :- ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("\nEnter Restaurant ID or enter 'b' to go back :- ");
                         String id = AppConstants.s.nextLine().trim();
+                        if(id.equalsIgnoreCase("b")) return;
                         while (true) {
                             if (id.length() == 1) {
                                 id = "r-000".concat(id);
@@ -82,8 +86,10 @@ public class RestaurantDAO {
                     }
                     case "3" -> {
                         AppConstants.s.nextLine();
-                        System.out.print("\nEnter Restaurant ID :- ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("\nEnter Restaurant ID or enter 'b' to go back :- ");
                         String id = AppConstants.s.nextLine().trim();
+                        if(id.equalsIgnoreCase("b")) return;
                         while (true) {
                             if (id.length() == 1) {
                                 id = "r-000".concat(id);
@@ -115,8 +121,10 @@ public class RestaurantDAO {
                     }
                     case "4" -> {
                         AppConstants.s.nextLine();
-                        System.out.print("\nEnter Restaurant ID :- ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("\nEnter Restaurant ID or enter 'b' to go back :- ");
                         String id = AppConstants.s.nextLine().trim();
+                        if(id.equalsIgnoreCase("b")) return;
                         while (true) {
                             if (id.length() == 1) {
                                 id = "r-000".concat(id);
@@ -148,8 +156,10 @@ public class RestaurantDAO {
                     }
                     case "5" -> {
                         AppConstants.s.nextLine();
-                        System.out.print("\nEnter Restaurant ID :- ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("\nEnter Restaurant ID or enter 'b' to go back :- ");
                         String id = AppConstants.s.nextLine().trim();
+                        if(id.equalsIgnoreCase("b")) return;
                         while (true) {
                             if (id.length() == 1) {
                                 id = "r-000".concat(id);
@@ -307,8 +317,10 @@ public class RestaurantDAO {
                     case "1" -> PaymentDAO.revenueCall();
                     case "2" -> {
                         AppConstants.s.nextLine();
-                        System.out.print("\nEnter Restaurant ID :- ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("\nEnter Restaurant ID or enter 'b' to go back :- ");
                         String id = AppConstants.s.nextLine().trim();
+                        if(id.equalsIgnoreCase("b")) return;
                         while (true) {
                             if (id.length() == 1) {
                                 id = "r-000".concat(id);
@@ -341,6 +353,7 @@ public class RestaurantDAO {
                         }
                     }
                     case "3" -> {
+                            RestaurantDAO.getRestaurantIdAndName();
                             AppConstants.s.nextLine();
                             System.out.print("\nEnter Restaurant ID :- ");
                             String id = AppConstants.s.nextLine().trim();
@@ -448,7 +461,7 @@ public class RestaurantDAO {
     }
 
     public static void getRestaurantIdAndName() {
-        String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, id ASC";
+        String sql = "SELECT id AS restaurant_id, name FROM restaurants ORDER BY CAST(id AS UNSIGNED) ASC, rating DESC";
         try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             printResultSetAsTable("RESTAURANT IDs AND NAMES", rs);
@@ -785,11 +798,15 @@ public class RestaurantDAO {
     public static void addRestaurant() throws Exception {
         AppConstants.s.nextLine();
         String id = getRestaurantId();
-        System.out.print("\nEnter Restaurant Name: ");
+        System.out.print("\nEnter Restaurant Name or enter 'b' to go back: :- ");
         String name = AppConstants.s.nextLine().trim();
+        if (name.equalsIgnoreCase("b")) return;
         System.out.print("\nEnter Cuisine Type: ");
         String cuisine = AppConstants.s.nextLine().trim();
-
+        while (!Validators.validateString(cuisine,5)) {
+            System.out.println("Enter a valid cuisine type :- ");
+            cuisine = AppConstants.s.nextLine().trim();
+        }
         System.out.print("\nEnter Phone Number: ");
         String phone = AppConstants.s.nextLine().trim();
         while (!Validators.validateMobileNumber(phone)) {
@@ -923,8 +940,10 @@ public class RestaurantDAO {
     public static void deleteRestaurant() throws Exception {
         AppConstants.s.nextLine();
         AppConstants.connection.setAutoCommit(false);
-        System.out.print("\nEnter Restaurant ID: ");
+        RestaurantDAO.getRestaurantIdAndName();
+        System.out.print("\nEnter Restaurant ID or enter 'b' to go back: :- ");
         String id = AppConstants.s.nextLine().trim();
+        if (id.equalsIgnoreCase("b")) return;
         if(id.length()==1) {
             id = "r-000"+id;
         }
@@ -968,7 +987,7 @@ public class RestaurantDAO {
                 AppConstants.connection.rollback();
             }
         } else {
-            System.out.println("\nDeletion cancelled by user.");
+            System.out.println("\nDeletion cancelled by admin.");
             AppConstants.connection.rollback();
         }
     }

@@ -92,15 +92,17 @@ public class MainMenu {
             }
             else if (id.charAt(0) == 'a' || id.charAt(0) == 'A') {
                 while (!AdminMenu.adminValidatorId(id)) {
-                    System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid Admin id. or enter 'b' to go back :- "+AppConstants.ANSI_RESET);
                     id = AppConstants.s.next().trim();
+                    if(id.equalsIgnoreCase("b")) return;
                 }
-                System.out.print("Enter password or enter 'b' for back:- ");
+                System.out.print("\nEnter password or enter 'b' for back:- ");
                 String password = AppConstants.s.next().trim();
                 if(password.equalsIgnoreCase("b")) return;
                 while (!AdminMenu.adminValidatorPassword(password)) {
-                    System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid Admin password."+AppConstants.ANSI_RESET);
+                    System.out.println(AppConstants.TEXT_ANSI_RED+"Invalid Admin password. or enter 'b' to go back :- "+AppConstants.ANSI_RESET);
                     password = AppConstants.s.next().trim();
+                    if(password.equalsIgnoreCase("b")) return;
                 }
                 AdminMenu.adminMenu();
                 return;

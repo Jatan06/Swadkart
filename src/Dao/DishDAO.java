@@ -165,6 +165,15 @@ public class DishDAO {
         }
     }
 
+    public static void browseDishIdAndRestaurant() throws Exception{
+        String sql =
+                "SELECT dish_id AS dish-id,name,restaurant FROM dishes ORDER BY restaurant ASC, name ASC";
+        try (PreparedStatement ps = AppConstants.connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            printResultSetAsTable("DISHES (BY RESTAURANT)", rs);
+        }
+    }
+
     private static String getNextDishId() {
         // The default ID if the table is empty
         String nextId = "VD001";

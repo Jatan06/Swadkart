@@ -1,4 +1,8 @@
 package Services;
+import Constants.AppConstants;
+import Dao.DishDAO;
+import Dao.OrderDAO;
+import Dao.RestaurantDAO;
 import Dao.ReviewDAO;
 import Models.Review;
 import java.util.List;
@@ -14,17 +18,7 @@ public class ReviewService {
 
     public static void showReviewMenu() {
         while (true) {
-            System.out.println("\n=== Review Browser ===");
-            System.out.println("1) Show all reviews");
-            System.out.println("2) Show by Restaurant ID");
-            System.out.println("3) Show by User ID");
-            System.out.println("4) Show by Order ID");
-            System.out.println("5) Show by Dish ID");
-            System.out.println("6) Show by Rating Range");
-            System.out.println("7) Search by Feedback Keyword");
-            System.out.println("8) Exit");
-            System.out.print("Choose an option: ");
-
+            menu();
             String choice = scanner.nextLine().trim();
             try {
                 switch (choice) {
@@ -32,32 +26,42 @@ public class ReviewService {
                         displayReviews(safeList(ReviewDAO.getAll()));
                         break;
                     case "2":
-                        System.out.print("Enter Restaurant ID: ");
+                        RestaurantDAO.getRestaurantIdAndName();
+                        System.out.print("Enter Restaurant ID or 'b' to go back: ");
+                        if (scanner.nextLine().trim().equalsIgnoreCase("b")) return;
                         displayReviews(safeList(ReviewDAO.findByRestaurantId(scanner.nextLine().trim())));
                         break;
                     case "3":
+
                         System.out.print("Enter User ID: ");
                         displayReviews(safeList(ReviewDAO.findByUserId(scanner.nextLine().trim())));
                         break;
                     case "4":
-                        System.out.print("Enter Order ID: ");
+                        OrderDAO.viewOrderAndOrderItems();
+                        System.out.print("Enter Order ID or 'b' to go back :- ");
+                        if (scanner.nextLine().trim().equalsIgnoreCase("b")) return;
                         displayReviews(safeList(ReviewDAO.findByOrderId(scanner.nextLine().trim())));
                         break;
                     case "5":
-                        System.out.print("Enter Dish ID: ");
+                        DishDAO.browseDishIdAndRestaurant();
+                        System.out.print("Enter Dish ID or 'b' to go back :- ");
+                        if (scanner.nextLine().trim().equalsIgnoreCase("b")) return;
                         displayReviews(safeList(ReviewDAO.findByDishId(scanner.nextLine().trim())));
                         break;
                     case "6":
                         double min = readDouble("Enter minimum rating (inclusive): ");
                         double max = readDouble("Enter maximum rating (inclusive): ");
-                        if (min > max) {
-                            System.out.println("Min rating cannot be greater than max rating.");
-                        } else {
-                            displayReviews(safeList(ReviewDAO.findByRatingRange(min, max)));
+                        while(min > max) {
+                            System.out.println("\nMin rating cannot be greater than max rating.\n or enter 't' or enter 'b' to go back :- ");
+                            if(scanner.nextLine().trim().equalsIgnoreCase("b")) return;
+                            min = readDouble("Enter minimum rating (inclusive): ");
+                            max = readDouble("Enter maximum rating (inclusive): ");
                         }
+                        displayReviews(safeList(ReviewDAO.findByRatingRange(min, max)));
                         break;
                     case "7":
-                        System.out.print("Enter keyword to search in feedback: ");
+                        System.out.print("Enter keyword to search in feedback or 'b' to go back :- ");
+                        if (scanner.nextLine().trim().equalsIgnoreCase("b")) return;
                         displayReviews(safeList(ReviewDAO.findByKeyword(scanner.nextLine().trim())));
                         break;
                     case "8":
@@ -67,9 +71,28 @@ public class ReviewService {
                         System.out.println("Invalid option. Please try again.");
                 }
             } catch (Exception ex) {
-                System.out.println("Error while fetching reviews: " + ex.getMessage());
+                System.out.println("Please try again.");
+                scanner.nextLine();
             }
         }
+    }
+
+    private static void menu() {
+        System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+ AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t****************\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t+ Reviews Menu +\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t****************\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t\t\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t1. Show all reviews\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t2. By Restaurant Id\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t3. By User Id\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t4. By Order Id\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t5. By Dish Id\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t6. By Rating Range\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t7. Search By Feedback Word\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"|\t\t\t\t\t8. Back\t\t\t\t\t\t\t\t  |"+AppConstants.ANSI_RESET);
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+AppConstants.BG_ANSI_BLACK+"-----------------------------------------------------------"+AppConstants.ANSI_RESET);
+        System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease select an option :- ");
     }
 
     private static double readDouble(String prompt) {
