@@ -151,9 +151,9 @@ public class OrderDAO {
                         System.out.println("\n"+AppConstants.TEXT_ANSI_CYAN+"\"\uD83C\uDF74 Every bite has a story — thanks for telling yours.\""+AppConstants.ANSI_RESET);
                         review = false;
                     } else {
-                        if(dishId.length()==1) {dishId = "VD-00"+dishId;}
-                        else if(dishId.length()==2) {dishId = "VD-0"+dishId;}
-                        else if(dishId.length()==3) {dishId = "VD-"+dishId;}
+                        if(dishId.length()==1) {dishId = "VD00"+dishId;}
+                        else if(dishId.length()==2) {dishId = "VD0"+dishId;}
+                        else if(dishId.length()==3) {dishId = "VD"+dishId;}
                         ReviewDAO.insertReviewByDishId(UserService.Cart, dishId, uid, String.valueOf(orderId));
                         System.out.print("\nWould you like to give review for another dish (y/n) or enter 'b' to go back :- ");
                         while (true) {

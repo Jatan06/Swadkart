@@ -26,18 +26,10 @@ public class AppConstants {
     public static final String PAYMENT_CARD = "card";
     public static final String PAYMENT_UPI = "upi";
 
-    // Payment Status
-    public static final String PAYMENT_STATUS_PENDING = "pending";
-    public static final String PAYMENT_STATUS_COMPLETED = "completed";
-    public static final String PAYMENT_STATUS_FAILED = "failed";
 
     // Error Messages
     public static final String ERR_INVALID_INPUT = "Invalid input. Please try again.";
     public static final String ERR_USER_NOT_FOUND = "\nUser not found.";
-    public static final String ERR_INVALID_CREDENTIALS = "\nInvalid credentials.";
-    public static final String ERR_RESTAURANT_NOT_FOUND = "\nRestaurant not found.";
-    public static final String ERR_DISH_NOT_FOUND = "\nDish not found.";
-    public static final String ERR_ORDER_NOT_FOUND = "\nOrder not found.";
 
     // Success Messages
     public static final String SUCCESS_REGISTRATION = "\nRegistration successful!";
@@ -63,13 +55,5 @@ public class AppConstants {
     public final static String TEXT_ANSI_BLUE = "\u001B[34m";
     public final static String TEXT_ANSI_PURPLE = "\u001B[35m";
     public final static String TEXT_ANSI_CYAN = "\u001B[36m";
-    public final static String TEXT_ANSI_WHITE = "\u001B[37m";
     public final static String BG_ANSI_BLACK = "\u001B[40m";
-    public final static String BG_ANSI_RED = "\u001B[41m";
-    public final static String BG_ANSI_GREEN = "\u001B[42m";
-    public final static String BG_ANSI_YELLOW = "\u001B[43m";
-    public final static String BG_ANSI_BLUE = "\u001B[44m";
-    public final static String BG_ANSI_PURPLE = "\u001B[45m";
-    public final static String BG_ANSI_CYAN = "\u001B[46m";
-    public final static String BG_ANSI_WHITE = "\u001B[47m";
 }
