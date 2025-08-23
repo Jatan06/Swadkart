@@ -3,6 +3,7 @@ import Admin.AdminMenu;
 import Constants.AppConstants;
 import Db.DBConnection;
 import Services.SpeakTextService;
+import Services.UserService;
 import Utils.*;
 
 public class MainMenu {
@@ -188,6 +189,7 @@ public class MainMenu {
                 System.out.println(AppConstants.TEXT_ANSI_RED+"Exception at MainMenu"+AppConstants.ANSI_RESET);
             }
         }
+        UserService.Cart = new Ds.LL();
         CustomerMenu.customerMenu(id);
     }
 

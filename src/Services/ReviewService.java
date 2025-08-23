@@ -55,10 +55,10 @@ public class ReviewService {
                         System.out.print("\nEnter Dish ID or 'b' to go back :- ");
                         String d_id = scanner.nextLine().trim();
                         if (d_id.trim().equalsIgnoreCase("b")) return;
-                        if(d_id.length() == 1) d_id = "VD-000".concat(d_id);
-                        else if(d_id.length() == 2) d_id = "VD-00".concat(d_id);
-                        else if(d_id.length() == 3) d_id = "VD-0".concat(d_id);
-                        else if(d_id.length() == 4) d_id = "VD-".concat(d_id);
+                        if(d_id.length() == 1) d_id = "VD000".concat(d_id);
+                        else if(d_id.length() == 2) d_id = "VD00".concat(d_id);
+                        else if(d_id.length() == 3) d_id = "VD0".concat(d_id);
+                        else if(d_id.length() == 4) d_id = "VD".concat(d_id);
                         displayReviews(safeList(ReviewDAO.findByDishId(d_id)));
                         break;
                     case "6":

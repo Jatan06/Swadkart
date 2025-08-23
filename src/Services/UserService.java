@@ -33,6 +33,14 @@ public class UserService {
                         break;
                     }
                 }
+                while (RestaurantDAO.checkRestaurantId(r_id)) {
+                    System.out.print("\n"+AppConstants.TEXT_ANSI_RED+"Enter valid restaurant id :- "+AppConstants.ANSI_RESET);
+                    r_id = scanner.next().trim();
+                    if (r_id.length() == 1) r_id = "r-000" + r_id;
+                    else if (r_id.length() == 2) r_id = "r-00" + r_id;
+                    else if (r_id.length() == 3) r_id = "r-0" + r_id;
+                    else r_id = "r-" + r_id;
+                }
                 if (!validDigits) {
                     System.out.println(AppConstants.TEXT_ANSI_RED + "Enter valid id (e.g 10,12) or 'b' to go back :- " + AppConstants.ANSI_RESET);
                     r_id = null;
@@ -54,6 +62,7 @@ public class UserService {
         }
         while (running) {
             displayCartMenu();
+            scanner.nextLine();
             String option = scanner.next().trim();
             try {
                 processActionUS(option, r_id);

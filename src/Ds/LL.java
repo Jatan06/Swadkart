@@ -29,7 +29,7 @@ public class LL {
             return;
         }
         Node current = head;
-        while (current != null) {
+        while (true) {
             if (current.data.getDish_id().equalsIgnoreCase(dish.getDish_id())) {
                 // Update quantity if dish already exists
                 current.quantity += quantity;
