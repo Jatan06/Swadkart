@@ -1,182 +1,136 @@
 # 🍴 Swadkart - Food Ordering System
 
-Swadkart is a **CLI-based food ordering system** built in **Java**.  
-It simulates a real-world food delivery platform where customers can browse restaurants, view dishes, place orders, and make payments.  
-
----
+Swadkart is a **CLI-based food ordering system** built in **Java**. It simulates a real-world food delivery platform where customers can browse restaurants, view dishes, place orders, and make payments.
 
 ## ✨ Features
-- 👤 Customer registration, login, and password reset  
-- 🍕 Browse and search dishes by restaurant or cuisine  
-- 🛒 Add dishes to cart (custom linked list implementation)  
-- 📦 Place and track orders  
-- 💳 Payment integration (Cash, Card, UPI)  
-- ⭐ Rate restaurants and dishes  
-- 📊 Admin access for data management  
 
----
+- 👤 **User Management**
+  - Customer registration with OTP verification
+  - Secure login with password validation
+  - Password reset via OTP
+  - Profile management
+
+- 🍽️ **Restaurant & Food**
+  - Browse restaurants
+  - View dishes by restaurant
+  - Search by cuisine type
+  - View dish details and ratings
+
+- 🛒 **Order Management**
+  - Add dishes to cart (custom linked list implementation)
+  - Modify order quantities
+  - Place orders
+  - Track order status
+
+- 💳 **Payment Processing**
+  - Multiple payment methods (Cash, Card, UPI)
+  - Payment verification
+  - Receipt generation
+
+- ⭐ **Reviews & Ratings**
+  - Rate restaurants and dishes
+  - View ratings and reviews
+
+- 👨‍💼 **Admin Panel**
+  - Manage restaurants and dishes
+  - View user data
+  - Generate reports
 
 ## 🛠️ Tech Stack
-- **Language**: Java  
-- **Database**: MySQL (via JDBC)  
-- **Tools**: IntelliJ IDEA / Eclipse  
-- **Version Control**: Git  
 
----
+- **Language**: Java
+- **Database**: MySQL (via JDBC)
+- **Architecture**: MVC pattern with DAO layer
+- **Data Structures**: Custom linked list implementation
+- **Security**: OTP verification via Twilio API
+- **UI**: Console-based with ANSI color formatting
 
-## ⚡ Getting Started
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/Jatan06/swadkart.git
-cd swadkart
-```
-
-### 2. Setup Database
-- Import `swadkart.sql` into MySQL  
-- Update DB credentials in `AppConstants.java`
-
-### 3. Run Application
-```bash
-javac App/Main.java
-java App.Main
-```
-
----
-
-## 📂 Project Structure (High-level)
+## 🏗️ Project Structure
 
 ```
 Swadkart
-├── Ds/                  # Core data structures
-│   ├── Dish.java
-│   ├── Node.java
-│   ├── CustomerMenu.java
-│   ├── Payment.java
-│   └── ...
-├── Database/            # JDBC + DB operations
-│   ├── ConnectionFactory.java
-│   ├── QueryExecutor.java
-│   └── ...
-├── App/                 # Main entry + constants
-│   ├── AppConstants.java
-│   └── Main.java
-├── README.md
+├── Admin/                # Admin functionality
+├── Constants/            # Application constants
+├── Dao/                  # Data Access Objects
+├── Db/                   # Database connection
+├── Ds/                   # Data structures
+├── Main.java             # Entry point
+├── Menus/                # UI menus
+├── Models/               # Data models
+├── Services/             # Business logic
+├── Session/              # Session management
+└── Utils/                # Utility functions
 ```
 
----
+## 🚀 Getting Started
 
-## 📦 Detailed Project Structure  
+### Prerequisites
 
-### Package: `Ds`
+- Java JDK 8 or higher
+- MySQL Server
+- Maven (optional, for dependency management)
 
-#### Class: `Dish`
-- **Attributes:**
-  - `String dish_id` → unique identifier for the dish
-  - `String name` → dish name
-  - `String cuisine` → cuisine type
-  - `String restaurant` → restaurant name
-  - `double rating` → dish rating
-  - `double price` → price of dish
-- **Methods:**
-  - `Dish(...)` → constructor to initialize dish
-  - `getDish_id()` → returns dish id
-  - `getName()` → returns dish name
-  - `getCuisine()` → returns cuisine type
-  - `getRestaurant()` → returns restaurant name
-  - `getRestaurantId(String name)` → retrieves restaurant id from name
-  - `getRating()` → returns dish rating
-  - `getPrice()` → returns price  
+### Database Setup
 
----
+1. Create a MySQL database named `swadkart`
+2. Import the database schema (SQL file not included in this repository)
+3. Update the database connection details in `Db/DBConnection.java` if needed
 
-#### Class: `Node`
-- **Attributes:**
-  - `Dish data` → stores a Dish object
-  - `int quantity` → quantity ordered
-  - `Node next` → link to next node
-- **Methods:**
-  - `Node(Dish data,int quantity)` → constructor
-  - `insert(Dish dish, int quantity)` → adds new dish to linked list
-  - `display()` → prints node data
-  - `displayTabular()` → prints in tabular form
-  - `delete(String dishId)` → deletes a dish by id
-  - `clearList()` → clears the list
-  - `repeat(char ch, int count)` → helper for table formatting
-  - `safe(String s)` → avoids null pointer  
+### Running the Application
 
----
+1. Compile the Java files
+2. Run the Main class
+3. Follow the on-screen instructions to navigate the application
 
-#### Class: `CustomerMenu`
-- **Methods:**
-  - `newCustomer()` → registers a new customer
-  - `forgotPassword(String id)` → handles password reset
-  - `customerValidator(String id, String password)` → validates login
-  - `customerMenu(String id)` → loads customer menu
-  - `displayMenu()` → prints menu options
-  - `getUserInput()` → takes input from user
-  - `processAction(int option, String id)` → processes menu actions  
+```bash
+java -cp ".;lib/*" Main
+```
 
----
+## 🔐 Authentication Flow
 
-#### Class: `MainMenu`
-- **Methods:**
-  - `run()` → starts main menu loop  
-  - `show()` → displays available options  
+1. **New User Registration**:
+   - Enter phone number for OTP verification
+   - Verify OTP
+   - Set password
+   - Enter personal details
+   - Receive user ID
 
----
+2. **Login**:
+   - Enter user ID (format: u-xxxx)
+   - Enter password
+   - Option for password reset via OTP
 
-#### Class: `Payment`
-- **Attributes:**
-  - `double amount` → transaction amount
-  - `String mode` → payment mode (cash/card/UPI)
-- **Methods:**
-  - `pay(double amount, String mode)` → processes payment  
+## 🛍️ Order Flow
 
----
+1. Browse restaurants
+2. Select dishes and quantities
+3. Review cart
+4. Place order
+5. Select payment method
+6. Complete payment
+7. Receive confirmation
 
-### Package: `Database`
+## 👨‍💻 Development
 
-#### Class: `ConnectionFactory`
-- **Methods:**
-  - `getConnection()` → establishes and returns DB connection  
+### Code Organization
+
+- **DAO Pattern**: Separates database operations from business logic
+- **Service Layer**: Handles business logic and operations
+- **Model Classes**: Represents data entities
+- **Menu Classes**: Manages user interface and interaction
+
+### Future Enhancements
+
+- Graphical user interface
+- Order tracking with real-time updates
+- Expanded payment options
+- Loyalty program integration
+- Mobile app version
+
+## 📝 License
+
+This project is for educational purposes only.
 
 ---
 
-#### Class: `QueryExecutor`
-- **Methods:**
-  - `executeQuery(String sql)` → runs SQL query  
-  - `executeUpdate(String sql)` → runs insert/update/delete  
-
----
-
-### Package: `App`
-
-#### Class: `AppConstants`
-- **Attributes:**
-  - `public static Connection connection` → DB connection reference  
-  - `public static Scanner s` → global scanner for input  
-  - `public static String dburl, dbuser, dbpass, driverName` → DB configs  
-
----
-
-#### Class: `Main`
-- **Methods:**
-  - `main(String[] args)` → entry point of application  
-  - initializes DB connection  
-  - invokes `MainMenu.run()`  
-
----
-
-## 🤝 Contributing
-1. Fork the repo  
-2. Create a feature branch  
-3. Commit changes  
-4. Submit a PR 🚀  
-
----
-
-## 👨‍💻 Author
-- Developed by [Jatan Parikh](https://github.com/Jatan06),
-  [Raj Desai](https://github.com/RajDesai87),
-  [Nishtha Dave](https://github.com/DaveNishtha)
+*Where every bite meets delight!* 🍕🍔🍰
