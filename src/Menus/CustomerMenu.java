@@ -12,6 +12,8 @@ public class CustomerMenu {
         boolean flag = true;
         while (flag) {
             try {
+                System.out.println(AppConstants.welcome);
+                AppConstants.clearScreen();
                 displayNewCustomerMenu();
                 int choice = AppConstants.s.nextInt();
                 switch (choice) {

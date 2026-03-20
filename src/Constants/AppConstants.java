@@ -1,6 +1,7 @@
 package Constants;
 import java.sql.*;
 import java.util.*;
+import java.io.*;
 public class AppConstants {
 
     public static Scanner s = new Scanner(System.in);
@@ -56,4 +57,13 @@ public class AppConstants {
     public final static String TEXT_ANSI_PURPLE = "\u001B[35m";
     public final static String TEXT_ANSI_CYAN = "\u001B[36m";
     public final static String BG_ANSI_BLACK = "\u001B[40m";
+
+    // *** NEW METHOD using ANSI Escape Codes for IDE compatibility ***
+    public static void clearScreen() {
+        // \033[H moves cursor to top left corner
+        // \033[2J clears the entire screen
+        System.out.print("\033[H\033[2J");
+        // System.flush() ensures the output is sent immediately
+        System.out.flush();
+    }
 }
